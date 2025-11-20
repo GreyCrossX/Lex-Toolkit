@@ -1,0 +1,4372 @@
+[
+  {
+    "id": "wo17186",
+    "title": "Código Civil Federal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17186.html",
+    "publication_date": "1928-05-26",
+    "status": "2024-01-17"
+  },
+  {
+    "id": "wo38904",
+    "title": "Código de Comercio",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo38904.html",
+    "publication_date": "1889-10-07",
+    "status": "2024-12-30"
+  },
+  {
+    "id": "wo17188",
+    "title": "Código de Justicia Militar",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17188.html",
+    "publication_date": "1933-08-31",
+    "status": "2023-09-05"
+  },
+  {
+    "id": "wo17190",
+    "title": "Código Federal de Procedimientos Civiles",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17190.html",
+    "publication_date": "1943-02-24",
+    "status": "2023-06-07"
+  },
+  {
+    "id": "wo56",
+    "title": "Código Fiscal de la Federación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo56.html",
+    "publication_date": "1981-12-31",
+    "status": "2023-05-31"
+  },
+  {
+    "id": "wo120904",
+    "title": "Código Militar de Procedimientos Penales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120904.html",
+    "publication_date": "2016-05-16",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo125098",
+    "title": "Código Nacional de Procedimientos Civiles y Familiares",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125098.html",
+    "publication_date": "2023-06-07",
+    "status": "2024-12-16"
+  },
+  {
+    "id": "wo92363",
+    "title": "Código Nacional de Procedimientos Penales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo92363.html",
+    "publication_date": "2014-03-05",
+    "status": "2024-12-16"
+  },
+  {
+    "id": "wo83048",
+    "title": "Código Penal Federal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83048.html",
+    "publication_date": "1931-08-14",
+    "status": "2024-06-07"
+  },
+  {
+    "id": "wo110799",
+    "title": "Impuesto Sobre Servicios Expresamente Declarados de Interés Público por Ley, en los que Intervengan Empresas Concesionarias de Bienes del Dominio Directo de la Nación (LEY que establece, reforma y adiciona las disposiciones relativas a diversos impuestos)",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo110799.html",
+    "publication_date": "1968-12-31",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo3",
+    "title": "Ley Aduanera",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo3.html",
+    "publication_date": "1995-12-15",
+    "status": "2023-12-28"
+  },
+  {
+    "id": "wo6027",
+    "title": "Ley Agraria",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo6027.html",
+    "publication_date": "1992-02-26",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo9485",
+    "title": "Ley de Aeropuertos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo9485.html",
+    "publication_date": "1995-12-22",
+    "status": "2023-05-03"
+  },
+  {
+    "id": "wo83103",
+    "title": "Ley de Aguas Nacionales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83103.html",
+    "publication_date": "1992-12-01",
+    "status": "2023-05-08"
+  },
+  {
+    "id": "wo4",
+    "title": "Ley de Ahorro y Crédito Popular",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo4.html",
+    "publication_date": "2001-06-04",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo16940",
+    "title": "Ley de Amnistía",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16940.html",
+    "publication_date": "1994-01-22",
+    "status": "2024-06-14"
+  },
+  {
+    "id": "wo6028",
+    "title": "Ley de Amparo, Reglamentaria de los Artículos 103 y 107 de la Constitución Política de los Estados Unidos Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo6028.html",
+    "publication_date": "2013-04-02",
+    "status": "2025-03-13"
+  },
+  {
+    "id": "wo16942",
+    "title": "Ley de Ascensos de la Armada de México",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16942.html",
+    "publication_date": "2004-06-25",
+    "status": "2011-06-01"
+  },
+  {
+    "id": "wo16943",
+    "title": "Ley de Ascensos y Recompensas del Ejército y Fuerza Aérea Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16943.html",
+    "publication_date": "2003-10-30",
+    "status": "2023-09-20"
+  },
+  {
+    "id": "wo11034",
+    "title": "Ley de Asistencia Social",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo11034.html",
+    "publication_date": "2004-09-02",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo124895",
+    "title": "Ley de Asociaciones Público Privadas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124895.html",
+    "publication_date": "2012-01-16",
+    "status": "2018-06-15"
+  },
+  {
+    "id": "wo16946",
+    "title": "Ley de Asociaciones Religiosas y Culto Público",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16946.html",
+    "publication_date": "1992-07-15",
+    "status": "2015-12-17"
+  },
+  {
+    "id": "wo83106",
+    "title": "Ley de Aviación Civil",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83106.html",
+    "publication_date": "1995-05-12",
+    "status": "2023-05-03"
+  },
+  {
+    "id": "wo57296",
+    "title": "Ley de Ayuda Alimentaria para los Trabajadores",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo57296.html",
+    "publication_date": "2011-01-17",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo125148",
+    "title": "Ley de Biocombustibles",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125148.html",
+    "publication_date": "2025-03-18",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo11035",
+    "title": "Ley de Bioseguridad de Organismos Genéticamente Modificados",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo11035.html",
+    "publication_date": "2005-03-18",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo83108",
+    "title": "Ley de Caminos, Puentes y Autotransporte Federal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83108.html",
+    "publication_date": "1993-12-22",
+    "status": "2023-11-15"
+  },
+  {
+    "id": "wo13181",
+    "title": "Ley de Capitalización del PROCAMPO",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13181.html",
+    "publication_date": "2001-12-31",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo125145",
+    "title": "Ley de Carrera Judicial del Poder Judicial de la Federación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125145.html",
+    "publication_date": "2025-01-02",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo3868",
+    "title": "Ley de Comercio Exterior",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo3868.html",
+    "publication_date": "1993-07-27",
+    "status": "2006-12-21"
+  },
+  {
+    "id": "wo5",
+    "title": "Ley de Concursos Mercantiles",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo5.html",
+    "publication_date": "2000-05-12",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo16955",
+    "title": "Ley de Contribución de Mejoras por Obras Públicas Federales de Infraestructura Hidráulica",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16955.html",
+    "publication_date": "1990-12-26",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo60483",
+    "title": "Ley de Cooperación Internacional para el Desarrollo",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo60483.html",
+    "publication_date": "2011-04-06",
+    "status": "2020-11-06"
+  },
+  {
+    "id": "wo6",
+    "title": "Ley de Coordinación Fiscal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo6.html",
+    "publication_date": "1978-12-27",
+    "status": "2024-01-03"
+  },
+  {
+    "id": "wo3867",
+    "title": "Ley de Cámaras Empresariales y sus Confederaciones",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo3867.html",
+    "publication_date": "2005-01-20",
+    "status": "2019-04-12"
+  },
+  {
+    "id": "wo13100",
+    "title": "Ley de Desarrollo Rural Sustentable",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13100.html",
+    "publication_date": "2001-12-07",
+    "status": "2024-06-07"
+  },
+  {
+    "id": "wo12073",
+    "title": "Ley de Desarrollo Sustentable de la Caña de Azúcar",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo12073.html",
+    "publication_date": "2005-08-22",
+    "status": "2008-10-20"
+  },
+  {
+    "id": "wo16959",
+    "title": "Ley de Disciplina del Ejército y Fuerza Aérea Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16959.html",
+    "publication_date": "1926-03-15",
+    "status": "2024-05-03"
+  },
+  {
+    "id": "wo112265",
+    "title": "Ley de Disciplina Financiera de las Entidades Federativas y los Municipios",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo112265.html",
+    "publication_date": "2016-04-27",
+    "status": "2022-05-10"
+  },
+  {
+    "id": "wo16960",
+    "title": "Ley de Disciplina para el Personal de la Armada de México",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16960.html",
+    "publication_date": "2002-12-13",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo16961",
+    "title": "Ley de Educación Militar del Ejército y Fuerza Aérea Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16961.html",
+    "publication_date": "2005-12-23",
+    "status": "2022-01-17"
+  },
+  {
+    "id": "wo120927",
+    "title": "Ley de Educación Naval",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120927.html",
+    "publication_date": "2019-03-12",
+    "status": "2023-03-24"
+  },
+  {
+    "id": "wo13185",
+    "title": "Ley de Energía para el Campo",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13185.html",
+    "publication_date": "2002-12-30",
+    "status": "2012-12-28"
+  },
+  {
+    "id": "wo6029",
+    "title": "Ley de Expropiación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo6029.html",
+    "publication_date": "1936-11-25",
+    "status": "2012-01-27"
+  },
+  {
+    "id": "wo16964",
+    "title": "Ley de Extradición Internacional",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16964.html",
+    "publication_date": "1975-12-29",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo67194",
+    "title": "Ley de Firma Electrónica Avanzada",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo67194.html",
+    "publication_date": "2012-01-11",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo114650",
+    "title": "Ley de Fiscalización y Rendición de Cuentas de la Federación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo114650.html",
+    "publication_date": "2016-07-18",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo120958",
+    "title": "Ley de Fomento a la Confianza Ciudadana",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120958.html",
+    "publication_date": "2020-01-20",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo120897",
+    "title": "Ley de Fomento a la Industria Vitivinícola",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120897.html",
+    "publication_date": "2018-05-23",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo3497",
+    "title": "Ley de Fomento para la Lectura y el Libro",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo3497.html",
+    "publication_date": "2008-07-24",
+    "status": "2023-11-29"
+  },
+  {
+    "id": "wo8",
+    "title": "Ley de Fondos de Aseguramiento Agropecuario y Rural",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo8.html",
+    "publication_date": "2005-05-13",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo19",
+    "title": "Ley de Fondos de Inversión",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo19.html",
+    "publication_date": "2001-06-04",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo125073",
+    "title": "Ley de Geotermia",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125073.html",
+    "publication_date": "2025-03-18",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo122872",
+    "title": "Ley de Infraestructura de la Calidad",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo122872.html",
+    "publication_date": "2020-07-01",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo125018",
+    "title": "Ley de Ingresos de la Federación para el Ejercicio Fiscal de 2025",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125018.html",
+    "publication_date": "2024-12-19",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo98006",
+    "title": "Ley de Ingresos sobre Hidrocarburos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo98006.html",
+    "publication_date": "2014-08-11",
+    "status": "2023-12-29"
+  },
+  {
+    "id": "wo12",
+    "title": "Ley de Instituciones de Crédito",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo12.html",
+    "publication_date": "1990-07-18",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo79889",
+    "title": "Ley de Instituciones de Seguros y de Fianzas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo79889.html",
+    "publication_date": "2013-04-04",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo14",
+    "title": "Ley de Inversión Extranjera",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo14.html",
+    "publication_date": "1993-12-27",
+    "status": "2024-05-27"
+  },
+  {
+    "id": "wo124596",
+    "title": "Ley de la Agencia Nacional de Seguridad Industrial y de Protección al Medio Ambiente del Sector Hidrocarburos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124596.html",
+    "publication_date": "2014-08-11",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo14413",
+    "title": "Ley de la Casa de Moneda de México",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo14413.html",
+    "publication_date": "1986-01-20",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo98026",
+    "title": "Ley de la Comisión Federal de Electricidad",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo98026.html",
+    "publication_date": "2014-08-11",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo15",
+    "title": "Ley de la Comisión Nacional Bancaria y de Valores",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo15.html",
+    "publication_date": "1995-04-28",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo125146",
+    "title": "Ley de la Comisión Nacional de Energía",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125146.html",
+    "publication_date": "2025-03-18",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo15531",
+    "title": "Ley de la Comisión Nacional de los Derechos Humanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo15531.html",
+    "publication_date": "1992-06-29",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo71100",
+    "title": "Ley de la Economía Social y Solidaria",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo71100.html",
+    "publication_date": "2012-05-23",
+    "status": "2023-12-29"
+  },
+  {
+    "id": "wo125149",
+    "title": "Ley de la Empresa Pública del Estado, Comisión Federal de Electricidad",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125149.html",
+    "publication_date": "2025-03-18",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo125094",
+    "title": "Ley de la Empresa Pública del Estado, Petróleos Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125094.html",
+    "publication_date": "2025-03-18",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo124442",
+    "title": "Ley de la Fiscalía General de la República",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124442.html",
+    "publication_date": "2021-05-20",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo120948",
+    "title": "Ley de la Guardia Nacional",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120948.html",
+    "publication_date": "2019-05-27",
+    "status": "2023-11-17"
+  },
+  {
+    "id": "wo83120",
+    "title": "Ley de la Policía Federal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83120.html",
+    "publication_date": "2009-06-01",
+    "status": "2011-06-24"
+  },
+  {
+    "id": "wo83123",
+    "title": "Ley de los Derechos de las Personas Adultas Mayores",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83123.html",
+    "publication_date": "2002-06-25",
+    "status": "2024-06-14"
+  },
+  {
+    "id": "wo124682",
+    "title": "Ley de los Husos Horarios en los Estados Unidos Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124682.html",
+    "publication_date": "2022-10-28",
+    "status": "2022-11-29"
+  },
+  {
+    "id": "wo124599",
+    "title": "Ley de los Impuestos Generales de Importación y de Exportación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124599.html",
+    "publication_date": "2022-06-07",
+    "status": "2024-05-08"
+  },
+  {
+    "id": "wo11036",
+    "title": "Ley de los Institutos Nacionales de Salud",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo11036.html",
+    "publication_date": "2000-05-26",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo16",
+    "title": "Ley de los Sistemas de Ahorro para el Retiro",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16.html",
+    "publication_date": "1996-05-23",
+    "status": "2024-04-30"
+  },
+  {
+    "id": "wo83139",
+    "title": "Ley de Migración",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83139.html",
+    "publication_date": "2011-05-25",
+    "status": "2024-05-27"
+  },
+  {
+    "id": "wo17108",
+    "title": "Ley de Minería",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17108.html",
+    "publication_date": "1992-06-26",
+    "status": "2023-05-08"
+  },
+  {
+    "id": "wo8266",
+    "title": "Ley de Nacionalidad",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo8266.html",
+    "publication_date": "1998-01-23",
+    "status": "2012-04-23"
+  },
+  {
+    "id": "wo83143",
+    "title": "Ley de Navegación y Comercio Marítimos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83143.html",
+    "publication_date": "2006-06-01",
+    "status": "2020-12-07"
+  },
+  {
+    "id": "wo12917",
+    "title": "Ley de Obras Públicas y Servicios Relacionados con las Mismas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo12917.html",
+    "publication_date": "2000-01-04",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo16991",
+    "title": "Ley de Organizaciones Ganaderas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16991.html",
+    "publication_date": "1999-01-06",
+    "status": "2012-04-09"
+  },
+  {
+    "id": "wo103489",
+    "title": "Ley de Planeación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo103489.html",
+    "publication_date": "1983-01-05",
+    "status": "2023-05-08"
+  },
+  {
+    "id": "wo125147",
+    "title": "Ley de Planeación y Transición Energética",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125147.html",
+    "publication_date": "2025-03-18",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo16993",
+    "title": "Ley de Premios, Estímulos y Recompensas Civiles",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16993.html",
+    "publication_date": "1975-12-31",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo12074",
+    "title": "Ley de Productos Orgánicos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo12074.html",
+    "publication_date": "2006-02-07",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo17",
+    "title": "Ley de Protección al Ahorro Bancario",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17.html",
+    "publication_date": "1999-01-19",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo16997",
+    "title": "Ley de Protección al Comercio y la Inversión de Normas Extranjeras que Contravengan el Derecho Internacional",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16997.html",
+    "publication_date": "1996-10-23",
+    "status": "2012-04-09"
+  },
+  {
+    "id": "wo124798",
+    "title": "Ley de Protección del Espacio Aéreo Mexicano",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124798.html",
+    "publication_date": "2023-03-01",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo18",
+    "title": "Ley de Protección y Defensa al Usuario de Servicios Financieros",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo18.html",
+    "publication_date": "1999-01-18",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo83173",
+    "title": "Ley de Puertos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83173.html",
+    "publication_date": "1993-07-19",
+    "status": "2020-12-07"
+  },
+  {
+    "id": "wo17000",
+    "title": "Ley de Recompensas de la Armada de México",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17000.html",
+    "publication_date": "1985-01-14",
+    "status": "2021-11-22"
+  },
+  {
+    "id": "wo17001",
+    "title": "Ley de Responsabilidad Civil por Daños Nucleares",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17001.html",
+    "publication_date": "1974-12-31",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo120865",
+    "title": "Ley de Seguridad Interior",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120865.html",
+    "publication_date": "2017-12-21",
+    "status": "2019-05-30"
+  },
+  {
+    "id": "wo17002",
+    "title": "Ley de Seguridad Nacional",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17002.html",
+    "publication_date": "2005-01-31",
+    "status": "2022-11-25"
+  },
+  {
+    "id": "wo17003",
+    "title": "Ley de Sistemas de Pagos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17003.html",
+    "publication_date": "2002-12-12",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo17005",
+    "title": "Ley de Sociedades de Responsabilidad Limitada de Interés Público",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17005.html",
+    "publication_date": "1934-08-31",
+    "status": "2012-04-09"
+  },
+  {
+    "id": "wo5433",
+    "title": "Ley de Sociedades de Solidaridad Social",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo5433.html",
+    "publication_date": "1976-05-27",
+    "status": "2018-04-24"
+  },
+  {
+    "id": "wo109251",
+    "title": "Ley de Tesorería de la Federación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo109251.html",
+    "publication_date": "2015-12-30",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo17007",
+    "title": "Ley de Transparencia y de Fomento a la Competencia en el Crédito Garantizado",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17007.html",
+    "publication_date": "2002-12-30",
+    "status": "2014-01-10"
+  },
+  {
+    "id": "wo13",
+    "title": "Ley de Uniones de Crédito",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13.html",
+    "publication_date": "2008-08-20",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo90163",
+    "title": "Ley de Vertimientos en las Zonas Marinas Mexicanas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo90163.html",
+    "publication_date": "2014-01-17",
+    "status": "2020-04-13"
+  },
+  {
+    "id": "wo5434",
+    "title": "Ley de Vivienda",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo5434.html",
+    "publication_date": "2006-06-27",
+    "status": "2024-06-14"
+  },
+  {
+    "id": "wo12916",
+    "title": "Ley de Vías Generales de Comunicación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo12916.html",
+    "publication_date": "1940-02-19",
+    "status": "2023-05-03"
+  },
+  {
+    "id": "wo20",
+    "title": "Ley del Banco de México",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo20.html",
+    "publication_date": "1993-12-23",
+    "status": "2014-01-10"
+  },
+  {
+    "id": "wo17011",
+    "title": "Ley del Diario Oficial de la Federación y Gacetas Gubernamentales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17011.html",
+    "publication_date": "1986-12-24",
+    "status": "2019-06-10"
+  },
+  {
+    "id": "wo98007",
+    "title": "Ley del Fondo Mexicano del Petróleo para la Estabilización y el Desarrollo",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo98007.html",
+    "publication_date": "2014-08-11",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo22",
+    "title": "Ley del Impuesto al Valor Agregado",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo22.html",
+    "publication_date": "1978-12-29",
+    "status": "2021-11-12"
+  },
+  {
+    "id": "wo83174",
+    "title": "Ley del Impuesto Especial sobre Producción y Servicios",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83174.html",
+    "publication_date": "1980-12-30",
+    "status": "2024-12-27"
+  },
+  {
+    "id": "wo25",
+    "title": "Ley del Impuesto sobre la Renta",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo25.html",
+    "publication_date": "2013-12-11",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo17018",
+    "title": "Ley del Instituto de Seguridad Social para las Fuerzas Armadas Mexicanas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17018.html",
+    "publication_date": "2003-07-09",
+    "status": "2019-05-07"
+  },
+  {
+    "id": "wo13204",
+    "title": "Ley del Instituto de Seguridad y Servicios Sociales de los Trabajadores del Estado",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13204.html",
+    "publication_date": "2007-03-31",
+    "status": "2024-06-07"
+  },
+  {
+    "id": "wo96160",
+    "title": "Ley del Instituto del Fondo Nacional de la Vivienda para los Trabajadores",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo96160.html",
+    "publication_date": "1972-04-24",
+    "status": "2024-04-30"
+  },
+  {
+    "id": "wo9061",
+    "title": "Ley del Instituto del Fondo Nacional para el Consumo de los Trabajadores",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo9061.html",
+    "publication_date": "2006-04-24",
+    "status": "2024-01-03"
+  },
+  {
+    "id": "wo13102",
+    "title": "Ley del Instituto Mexicano de la Juventud",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13102.html",
+    "publication_date": "1999-01-06",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo13206",
+    "title": "Ley del Instituto Nacional de las Mujeres",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13206.html",
+    "publication_date": "2001-01-12",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo120922",
+    "title": "Ley del Instituto Nacional de los Pueblos Indígenas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120922.html",
+    "publication_date": "2018-12-04",
+    "status": "2023-12-29"
+  },
+  {
+    "id": "wo27",
+    "title": "Ley del Mercado de Valores",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo27.html",
+    "publication_date": "2005-12-30",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo10805",
+    "title": "Ley del Registro Público Vehicular",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo10805.html",
+    "publication_date": "2004-09-01",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo125150",
+    "title": "Ley del Sector Eléctrico",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125150.html",
+    "publication_date": "2025-03-18",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo9056",
+    "title": "Ley del Seguro Social",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo9056.html",
+    "publication_date": "1995-12-21",
+    "status": "2024-06-07"
+  },
+  {
+    "id": "wo28",
+    "title": "Ley del Servicio de Administración Tributaria",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo28.html",
+    "publication_date": "1995-12-15",
+    "status": "2018-12-04"
+  },
+  {
+    "id": "wo8267",
+    "title": "Ley del Servicio Exterior Mexicano",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo8267.html",
+    "publication_date": "1994-01-04",
+    "status": "2018-04-19"
+  },
+  {
+    "id": "wo17031",
+    "title": "Ley del Servicio Militar",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17031.html",
+    "publication_date": "1940-09-11",
+    "status": "2022-05-18"
+  },
+  {
+    "id": "wo12897",
+    "title": "Ley del Servicio Postal Mexicano",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo12897.html",
+    "publication_date": "1986-12-24",
+    "status": "2023-01-19"
+  },
+  {
+    "id": "wo13208",
+    "title": "Ley del Servicio Profesional de Carrera en la Administración Pública Federal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13208.html",
+    "publication_date": "2003-04-10",
+    "status": "2006-01-09"
+  },
+  {
+    "id": "wo29",
+    "title": "Ley del Sistema Nacional de Información Estadística y Geográfica",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo29.html",
+    "publication_date": "2008-04-16",
+    "status": "2023-12-01"
+  },
+  {
+    "id": "wo97328",
+    "title": "Ley del Sistema Público de Radiodifusión del Estado Mexicano",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo97328.html",
+    "publication_date": "2014-07-14",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo17038",
+    "title": "Ley Federal contra la Delincuencia Organizada",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17038.html",
+    "publication_date": "1996-11-07",
+    "status": "2022-11-25"
+  },
+  {
+    "id": "wo17039",
+    "title": "Ley Federal de Armas de Fuego y Explosivos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17039.html",
+    "publication_date": "1972-01-11",
+    "status": "2024-06-07"
+  },
+  {
+    "id": "wo120956",
+    "title": "Ley Federal de Austeridad Republicana",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120956.html",
+    "publication_date": "2019-11-19",
+    "status": "2022-09-02"
+  },
+  {
+    "id": "wo53986",
+    "title": "Ley Federal de Cinematografía",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo53986.html",
+    "publication_date": "1992-12-29",
+    "status": "2021-03-22"
+  },
+  {
+    "id": "wo95395",
+    "title": "Ley Federal de Competencia Económica",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo95395.html",
+    "publication_date": "2014-05-23",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo92766",
+    "title": "Ley Federal de Consulta Popular",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo92766.html",
+    "publication_date": "2014-03-14",
+    "status": "2021-05-19"
+  },
+  {
+    "id": "wo17042",
+    "title": "Ley Federal de Correduría Pública",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17042.html",
+    "publication_date": "1992-12-29",
+    "status": "2012-04-09"
+  },
+  {
+    "id": "wo120905",
+    "title": "Ley Federal de Declaración Especial de Ausencia para Personas Desaparecidas.",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120905.html",
+    "publication_date": "2018-06-22",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo17043",
+    "title": "Ley Federal de Defensoría Pública",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17043.html",
+    "publication_date": "1998-05-28",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo90880",
+    "title": "Ley Federal de Derechos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo90880.html",
+    "publication_date": "1981-12-31",
+    "status": "2024-04-23"
+  },
+  {
+    "id": "wo83186",
+    "title": "Ley Federal de Deuda Pública",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83186.html",
+    "publication_date": "1976-12-31",
+    "status": "2018-01-30"
+  },
+  {
+    "id": "wo5435",
+    "title": "Ley Federal de Fomento a las Actividades Realizadas por Organizaciones de la Sociedad Civil",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo5435.html",
+    "publication_date": "2004-02-09",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo17048",
+    "title": "Ley Federal de Juegos y Sorteos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17048.html",
+    "publication_date": "1947-12-31",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo13211",
+    "title": "Ley Federal de las Entidades Paraestatales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13211.html",
+    "publication_date": "1986-05-14",
+    "status": "2023-05-08"
+  },
+  {
+    "id": "wo32",
+    "title": "Ley Federal de los Derechos del Contribuyente",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo32.html",
+    "publication_date": "2005-06-23",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo17051",
+    "title": "Ley Federal de los Trabajadores al Servicio del Estado, Reglamentaria del Apartado B) del Artículo 123 Constitucional",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17051.html",
+    "publication_date": "1963-12-28",
+    "status": "2022-02-18"
+  },
+  {
+    "id": "wo33",
+    "title": "Ley Federal de Presupuesto y Responsabilidad Hacendaria",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo33.html",
+    "publication_date": "2006-03-30",
+    "status": "2024-04-30"
+  },
+  {
+    "id": "wo34",
+    "title": "Ley Federal de Procedimiento Administrativo",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo34.html",
+    "publication_date": "1994-08-04",
+    "status": "2018-05-18"
+  },
+  {
+    "id": "wo15305",
+    "title": "Ley Federal de Procedimiento Contencioso Administrativo",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo15305.html",
+    "publication_date": "2005-12-01",
+    "status": "2024-05-21"
+  },
+  {
+    "id": "wo12075",
+    "title": "Ley Federal de Producción, Certificación y Comercio de Semillas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo12075.html",
+    "publication_date": "2007-06-15",
+    "status": "2018-05-11"
+  },
+  {
+    "id": "wo122873",
+    "title": "Ley Federal de Protección a la Propiedad Industrial",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo122873.html",
+    "publication_date": "2020-07-01",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo120869",
+    "title": "Ley Federal de Protección al Consumidor",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120869.html",
+    "publication_date": "1992-12-24",
+    "status": "2023-12-21"
+  },
+  {
+    "id": "wo125102",
+    "title": "Ley Federal de Protección de Datos Personales en Posesión de los Particulares",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125102.html",
+    "publication_date": "2025-03-20",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo124577",
+    "title": "Ley Federal de Protección del Patrimonio Cultural de los Pueblos y Comunidades Indígenas y Afromexicanas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124577.html",
+    "publication_date": "2022-01-17",
+    "status": "2023-11-29"
+  },
+  {
+    "id": "wo124441",
+    "title": "Ley Federal de Remuneraciones de los Servidores Públicos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124441.html",
+    "publication_date": "2021-05-19",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo82069",
+    "title": "Ley Federal de Responsabilidad Ambiental",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo82069.html",
+    "publication_date": "2013-06-07",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo13216",
+    "title": "Ley Federal de Responsabilidad Patrimonial del Estado",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13216.html",
+    "publication_date": "2004-12-31",
+    "status": "2023-12-29"
+  },
+  {
+    "id": "wo9058",
+    "title": "Ley Federal de Responsabilidades de los Servidores Públicos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo9058.html",
+    "publication_date": "1982-12-31",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo124800",
+    "title": "Ley Federal de Revocación de Mandato",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124800.html",
+    "publication_date": "2021-09-14",
+    "status": "2022-09-26"
+  },
+  {
+    "id": "wo11708",
+    "title": "Ley Federal de Sanidad Animal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo11708.html",
+    "publication_date": "2007-07-25",
+    "status": "2024-05-21"
+  },
+  {
+    "id": "wo11709",
+    "title": "Ley Federal de Sanidad Vegetal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo11709.html",
+    "publication_date": "1994-01-05",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo10806",
+    "title": "Ley Federal de Seguridad Privada",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo10806.html",
+    "publication_date": "2006-07-06",
+    "status": "2011-10-17"
+  },
+  {
+    "id": "wo97329",
+    "title": "Ley Federal de Telecomunicaciones y Radiodifusión.",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo97329.html",
+    "publication_date": "2014-07-14",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo11710",
+    "title": "Ley Federal de Variedades Vegetales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo11710.html",
+    "publication_date": "1996-10-25",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo113682",
+    "title": "Ley Federal de Zonas Económicas Especiales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo113682.html",
+    "publication_date": "2016-06-01",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo17068",
+    "title": "Ley Federal del Derecho de Autor",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17068.html",
+    "publication_date": "1996-12-24",
+    "status": "2020-07-01"
+  },
+  {
+    "id": "wo83182",
+    "title": "Ley Federal del Impuesto sobre Automóviles Nuevos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83182.html",
+    "publication_date": "1996-12-30",
+    "status": "2023-12-29"
+  },
+  {
+    "id": "wo11711",
+    "title": "Ley Federal del Mar",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo11711.html",
+    "publication_date": "1986-01-08",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo125151",
+    "title": "Ley Federal del Trabajo",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125151.html",
+    "publication_date": "1970-04-01",
+    "status": "2025-02-21"
+  },
+  {
+    "id": "wo17072",
+    "title": "Ley Federal para el Control de Precursores Químicos, Productos Químicos Esenciales y Máquinas para Elaborar Cápsulas, Tabletas y/o Comprimidos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17072.html",
+    "publication_date": "1997-12-26",
+    "status": "2023-05-03"
+  },
+  {
+    "id": "wo38915",
+    "title": "Ley Federal para el Control de Sustancias Químicas Susceptibles de Desvío para la Fabricación de Armas Químicas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo38915.html",
+    "publication_date": "2009-06-09",
+    "status": "2024-06-14"
+  },
+  {
+    "id": "wo3873",
+    "title": "Ley Federal para el Fomento de la Microindustria y la Actividad Artesanal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo3873.html",
+    "publication_date": "1988-01-26",
+    "status": "2023-03-27"
+  },
+  {
+    "id": "wo121429",
+    "title": "Ley Federal para el Fomento y Protección del Maíz Nativo",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo121429.html",
+    "publication_date": "2020-04-13",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo17074",
+    "title": "Ley Federal para la Administración y Enajenación de Bienes del Sector Público",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17074.html",
+    "publication_date": "2002-12-19",
+    "status": "2024-04-30"
+  },
+  {
+    "id": "wo74107",
+    "title": "Ley Federal para la Prevención e Identificación de Operaciones con Recursos de Procedencia Ilícita",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo74107.html",
+    "publication_date": "2012-10-17",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo71396",
+    "title": "Ley Federal para la Protección a Personas que Intervienen en el Procedimiento Penal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo71396.html",
+    "publication_date": "2012-06-08",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo13222",
+    "title": "Ley Federal para Prevenir y Eliminar la Discriminación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13222.html",
+    "publication_date": "2003-06-11",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo110416",
+    "title": "Ley Federal para Prevenir y Sancionar los delitos cometidos en materia de Hidrocarburos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo110416.html",
+    "publication_date": "2016-01-12",
+    "status": "2021-11-12"
+  },
+  {
+    "id": "wo14097",
+    "title": "Ley Federal sobre Monumentos y Zonas Arqueológicos, Artísticos e Históricos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo14097.html",
+    "publication_date": "1972-05-06",
+    "status": "2018-02-16"
+  },
+  {
+    "id": "wo17079",
+    "title": "Ley General de Acceso de las Mujeres a una Vida Libre de Violencia",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17079.html",
+    "publication_date": "2007-02-01",
+    "status": "2024-01-26"
+  },
+  {
+    "id": "wo120902",
+    "title": "Ley General de Archivos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120902.html",
+    "publication_date": "2018-06-15",
+    "status": "2023-01-19"
+  },
+  {
+    "id": "wo118961",
+    "title": "Ley General de Asentamientos Humanos, Ordenamiento Territorial y Desarrollo Urbano",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo118961.html",
+    "publication_date": "2016-11-28",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo124465",
+    "title": "Ley General de Bibliotecas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124465.html",
+    "publication_date": "2021-06-01",
+    "status": "2023-11-29"
+  },
+  {
+    "id": "wo124893",
+    "title": "Ley General de Bienes Nacionales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124893.html",
+    "publication_date": "2004-05-20",
+    "status": "2023-05-03"
+  },
+  {
+    "id": "wo71395",
+    "title": "Ley General de Cambio Climático",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo71395.html",
+    "publication_date": "2012-06-06",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo120890",
+    "title": "Ley General de Comunicación Social",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120890.html",
+    "publication_date": "2018-05-11",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo96846",
+    "title": "Ley General de Contabilidad Gubernamental",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo96846.html",
+    "publication_date": "2008-12-31",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo82065",
+    "title": "Ley General de Cultura Física y Deporte",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo82065.html",
+    "publication_date": "2013-06-07",
+    "status": "2023-10-18"
+  },
+  {
+    "id": "wo120190",
+    "title": "Ley General de Cultura y Derechos Culturales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120190.html",
+    "publication_date": "2017-06-19",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo108985",
+    "title": "Ley General de Derechos Lingüísticos de los Pueblos Indígenas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo108985.html",
+    "publication_date": "2003-03-13",
+    "status": "2023-10-18"
+  },
+  {
+    "id": "wo120913",
+    "title": "Ley General de Desarrollo forestal Sustentable",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120913.html",
+    "publication_date": "2018-06-05",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo83185",
+    "title": "Ley General de Desarrollo Social",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83185.html",
+    "publication_date": "2004-01-20",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo124435",
+    "title": "Ley General de Educación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124435.html",
+    "publication_date": "2019-09-30",
+    "status": "2024-06-07"
+  },
+  {
+    "id": "wo124400",
+    "title": "Ley General de Educación Superior",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124400.html",
+    "publication_date": "2021-04-20",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo95383",
+    "title": "Ley General de Instituciones y Procedimientos Electorales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo95383.html",
+    "publication_date": "2014-05-23",
+    "status": "2024-10-14"
+  },
+  {
+    "id": "wo124843",
+    "title": "Ley General De La Alimentación Adecuada y Sostenible",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124843.html",
+    "publication_date": "2024-04-17",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo99957",
+    "title": "Ley General de los Derechos de Niñas, Niños y Adolescentes",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo99957.html",
+    "publication_date": "2014-12-04",
+    "status": "2024-05-27"
+  },
+  {
+    "id": "wo124816",
+    "title": "Ley General De Mecanismos Alternativos De Solución De Controversias",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124816.html",
+    "publication_date": "2024-01-26",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo120894",
+    "title": "Ley General de Mejora Regulatoria",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120894.html",
+    "publication_date": "2018-05-18",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo124595",
+    "title": "Ley General de Movilidad y Seguridad Vial",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124595.html",
+    "publication_date": "2022-05-17",
+    "status": "2023-12-29"
+  },
+  {
+    "id": "wo39",
+    "title": "Ley General de Organizaciones y Actividades Auxiliares del Crédito",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo39.html",
+    "publication_date": "1985-01-14",
+    "status": "2024-03-26"
+  },
+  {
+    "id": "wo95384",
+    "title": "Ley General de Partidos Políticos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo95384.html",
+    "publication_date": "2014-05-23",
+    "status": "2023-11-24"
+  },
+  {
+    "id": "wo91198",
+    "title": "Ley General de Pesca y Acuacultura Sustentables",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo91198.html",
+    "publication_date": "2007-07-24",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo65308",
+    "title": "Ley General de Población",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo65308.html",
+    "publication_date": "1974-01-07",
+    "status": "2018-07-12"
+  },
+  {
+    "id": "wo65728",
+    "title": "Ley General de Prestación de Servicios para la Atención, Cuidado y Desarrollo Integral Infantil",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo65728.html",
+    "publication_date": "2011-10-24",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo71347",
+    "title": "Ley General de Protección Civil",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo71347.html",
+    "publication_date": "2012-06-06",
+    "status": "2023-12-21"
+  },
+  {
+    "id": "wo125096",
+    "title": "Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125096.html",
+    "publication_date": "2025-03-20",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo114654",
+    "title": "Ley General de Responsabilidades Administrativas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo114654.html",
+    "publication_date": "2016-07-18",
+    "status": "2025-01-02"
+  },
+  {
+    "id": "wo11037",
+    "title": "Ley General de Salud",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo11037.html",
+    "publication_date": "1984-02-07",
+    "status": "2024-06-07"
+  },
+  {
+    "id": "wo40",
+    "title": "Ley General de Sociedades Cooperativas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo40.html",
+    "publication_date": "1994-08-03",
+    "status": "2018-01-19"
+  },
+  {
+    "id": "wo41",
+    "title": "Ley General de Sociedades Mercantiles",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo41.html",
+    "publication_date": "1934-08-04",
+    "status": "2024-12-30"
+  },
+  {
+    "id": "wo125097",
+    "title": "Ley General de Transparencia y Acceso a la Información Pública",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125097.html",
+    "publication_date": "2025-03-20",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo83188",
+    "title": "Ley General de Turismo",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83188.html",
+    "publication_date": "2009-06-17",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo42",
+    "title": "Ley General de Títulos y Operaciones de Crédito",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo42.html",
+    "publication_date": "1932-08-27",
+    "status": "2024-03-26"
+  },
+  {
+    "id": "wo83190",
+    "title": "Ley General de Vida Silvestre",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83190.html",
+    "publication_date": "2000-07-03",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo83189",
+    "title": "Ley General de Víctimas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83189.html",
+    "publication_date": "2013-01-09",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo83191",
+    "title": "Ley General del Equilibrio Ecológico y la Protección al Ambiente",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83191.html",
+    "publication_date": "1988-01-28",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo14640",
+    "title": "Ley General del Sistema de Medios de Impugnación en Materia Electoral",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo14640.html",
+    "publication_date": "1996-11-22",
+    "status": "2024-10-15"
+  },
+  {
+    "id": "wo118520",
+    "title": "Ley General del Sistema Nacional Anticorrupción",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo118520.html",
+    "publication_date": "2016-07-18",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo96855",
+    "title": "Ley General del Sistema Nacional de Seguridad Pública",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo96855.html",
+    "publication_date": "2009-01-02",
+    "status": "2024-12-16"
+  },
+  {
+    "id": "wo124436",
+    "title": "Ley General del Sistema para la Carrera de las Maestras y los Maestros",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124436.html",
+    "publication_date": "2019-09-30",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo95385",
+    "title": "Ley General en Materia de Delitos Electorales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo95385.html",
+    "publication_date": "2014-05-23",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo120847",
+    "title": "Ley General en Materia de Desaparición Forzada de Personas, Desaparición Cometida por Particulares y del Sistema Nacional de Búsqueda de Personas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120847.html",
+    "publication_date": "2017-11-17",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo124801",
+    "title": "Ley General en Materia de Humanidades, Ciencias, Tecnologías e Innovación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124801.html",
+    "publication_date": "2023-05-08",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo83192",
+    "title": "Ley General para el Control del Tabaco",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83192.html",
+    "publication_date": "2008-05-30",
+    "status": "2022-02-17"
+  },
+  {
+    "id": "wo102858",
+    "title": "Ley General para la Atención y Protección a Personas con la Condición del Espectro Autista",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo102858.html",
+    "publication_date": "2015-04-30",
+    "status": "2016-05-27"
+  },
+  {
+    "id": "wo124103",
+    "title": "Ley General para la Detección Oportuna del Cáncer en la Infancia y la Adolescencia",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124103.html",
+    "publication_date": "2021-01-07",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo17106",
+    "title": "Ley General para la Igualdad entre Mujeres y Hombres",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17106.html",
+    "publication_date": "2006-08-02",
+    "status": "2023-12-29"
+  },
+  {
+    "id": "wo61725",
+    "title": "Ley General para la Inclusión de las Personas con Discapacidad",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo61725.html",
+    "publication_date": "2011-05-30",
+    "status": "2024-06-14"
+  },
+  {
+    "id": "wo67721",
+    "title": "Ley General para la Prevención Social de la Violencia y la Delincuencia",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo67721.html",
+    "publication_date": "2012-01-24",
+    "status": "2021-05-04"
+  },
+  {
+    "id": "wo83193",
+    "title": "Ley General para la Prevención y Gestión Integral de los Residuos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83193.html",
+    "publication_date": "2003-10-08",
+    "status": "2023-05-08"
+  },
+  {
+    "id": "wo56114",
+    "title": "Ley General para Prevenir y Sancionar los Delitos en Materia de Secuestro, Reglamentaria de la fracción XXI del Artículo 73 de la Constitución Política de los Estados Unidos Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo56114.html",
+    "publication_date": "2010-11-30",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo120208",
+    "title": "Ley General para Prevenir, Investigar y Sancionar la Tortura y otros Tratos o Penas Crueles, Inhumanos o Degradantes",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120208.html",
+    "publication_date": "2017-06-26",
+    "status": "2022-04-28"
+  },
+  {
+    "id": "wo71511",
+    "title": "Ley General para Prevenir, Sancionar y Erradicar los Delitos en Materia de Trata de Personas y para la Protección y Asistencia a las Víctimas de estos Delitos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo71511.html",
+    "publication_date": "2012-06-14",
+    "status": "2024-06-07"
+  },
+  {
+    "id": "wo14412",
+    "title": "Ley Monetaria de los Estados Unidos Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo14412.html",
+    "publication_date": "1931-07-27",
+    "status": "2009-01-20"
+  },
+  {
+    "id": "wo114658",
+    "title": "Ley Nacional de Ejecución Penal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo114658.html",
+    "publication_date": "2016-06-16",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo120954",
+    "title": "Ley Nacional de Extinción de Dominio",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120954.html",
+    "publication_date": "2019-08-09",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo100106",
+    "title": "Ley Nacional de Mecanismos Alternativos de Solución de Controversias en Materia Penal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo100106.html",
+    "publication_date": "2014-12-29",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo120949",
+    "title": "Ley Nacional del Registro de Detenciones",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120949.html",
+    "publication_date": "2019-05-27",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo114657",
+    "title": "Ley Nacional del Sistema Integral de Justicia Penal para Adolescentes",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo114657.html",
+    "publication_date": "2016-06-16",
+    "status": "2022-12-20"
+  },
+  {
+    "id": "wo120950",
+    "title": "Ley Nacional sobre el Uso de la Fuerza",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120950.html",
+    "publication_date": "2019-05-27",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo13235",
+    "title": "Ley Orgánica de la Administración Pública Federal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13235.html",
+    "publication_date": "1976-12-29",
+    "status": "2024-11-28"
+  },
+  {
+    "id": "wo124567",
+    "title": "Ley Orgánica de la Armada de México",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124567.html",
+    "publication_date": "2021-10-14",
+    "status": "2023-12-01"
+  },
+  {
+    "id": "wo17114",
+    "title": "Ley Orgánica de la Procuraduría de la Defensa del Contribuyente",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17114.html",
+    "publication_date": "2006-09-04",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo110800",
+    "title": "Ley Orgánica de la Procuraduría General de Justicia del Distrito Federal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo110800.html",
+    "publication_date": "2011-06-20",
+    "status": "2012-02-24"
+  },
+  {
+    "id": "wo13138",
+    "title": "Ley Orgánica de la Universidad Autónoma Agraria Antonio Narro",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13138.html",
+    "publication_date": "2006-04-26",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo15291",
+    "title": "Ley Orgánica de la Universidad Autónoma Metropolitana",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo15291.html",
+    "publication_date": "1973-12-17",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo14350",
+    "title": "Ley Orgánica de la Universidad Nacional Autónoma de México",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo14350.html",
+    "publication_date": "1945-01-06",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo15393",
+    "title": "Ley Orgánica de los Tribunales Agrarios",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo15393.html",
+    "publication_date": "1992-02-26",
+    "status": "1998-01-23"
+  },
+  {
+    "id": "wo13543",
+    "title": "Ley Orgánica de Nacional Financiera",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13543.html",
+    "publication_date": "1986-12-26",
+    "status": "2014-01-10"
+  },
+  {
+    "id": "wo44",
+    "title": "Ley Orgánica de Sociedad Hipotecaria Federal",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo44.html",
+    "publication_date": "2001-10-11",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo45",
+    "title": "Ley Orgánica del Banco del Bienestar (antes Ley Orgánica del Banco del Ahorro Nacional y Servicios Financieros)",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo45.html",
+    "publication_date": "2001-06-01",
+    "status": "2019-07-19"
+  },
+  {
+    "id": "wo83195",
+    "title": "Ley Orgánica del Banco Nacional de Comercio Exterior",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83195.html",
+    "publication_date": "1986-01-20",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo96856",
+    "title": "Ley Orgánica del Banco Nacional de Obras y Servicios Públicos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo96856.html",
+    "publication_date": "1986-01-20",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo17127",
+    "title": "Ley Orgánica del Banco Nacional del Ejército, Fuerza Aérea y Armada",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17127.html",
+    "publication_date": "1986-01-13",
+    "status": "2014-01-10"
+  },
+  {
+    "id": "wo123631",
+    "title": "Ley Orgánica del Centro Federal de Conciliación y Registro Laboral",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo123631.html",
+    "publication_date": "2020-01-06",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo16815",
+    "title": "Ley Orgánica del Congreso General de los Estados Unidos Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16815.html",
+    "publication_date": "1999-09-03",
+    "status": "2022-12-09"
+  },
+  {
+    "id": "wo13238",
+    "title": "Ley Orgánica del Ejército y Fuerza Aérea Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13238.html",
+    "publication_date": "1986-12-26",
+    "status": "2024-05-03"
+  },
+  {
+    "id": "wo17131",
+    "title": "Ley Orgánica del Instituto Nacional de Antropología e Historia",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17131.html",
+    "publication_date": "1939-02-03",
+    "status": "2015-12-17"
+  },
+  {
+    "id": "wo13135",
+    "title": "Ley Orgánica del Instituto Politécnico Nacional",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13135.html",
+    "publication_date": "1981-12-29",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo125024",
+    "title": "Ley Orgánica del Poder Judicial de la Federación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125024.html",
+    "publication_date": "2024-12-20",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo17134",
+    "title": "Ley Orgánica del Seminario de Cultura Mexicana",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17134.html",
+    "publication_date": "1949-12-31",
+    "status": "2022-05-11"
+  },
+  {
+    "id": "wo117705",
+    "title": "Ley Orgánica del Tribunal Federal de Justicia Administrativa",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo117705.html",
+    "publication_date": "2016-07-18",
+    "status": "2024-01-26"
+  },
+  {
+    "id": "wo17136",
+    "title": "Ley para Conservar la Neutralidad del País",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17136.html",
+    "publication_date": "1939-11-10",
+    "status": "2018-06-21"
+  },
+  {
+    "id": "wo120912",
+    "title": "Ley para Determinar el Valor de la Unidad de Medida y Actualización",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120912.html",
+    "publication_date": "2016-12-30",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo83198",
+    "title": "Ley para el Desarrollo de la Competitividad de la Micro, Pequeña y Mediana Empresa",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83198.html",
+    "publication_date": "2002-12-30",
+    "status": "2023-10-20"
+  },
+  {
+    "id": "wo17139",
+    "title": "Ley para el Diálogo, la Conciliación y la Paz Digna en Chiapas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17139.html",
+    "publication_date": "1995-03-11",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo13241",
+    "title": "Ley para el uso y protección de la denominación y del emblema de la Cruz Roja",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13241.html",
+    "publication_date": "2007-03-23",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo102924",
+    "title": "Ley para Impulsar el Incremento Sostenido de la Productividad y la Competitividad de la Economía Nacional",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo102924.html",
+    "publication_date": "2015-05-06",
+    "status": "2024-04-17"
+  },
+  {
+    "id": "wo17142",
+    "title": "Ley para la Comprobación, Ajuste y Cómputo de Servicios de la Armada de México",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17142.html",
+    "publication_date": "2004-06-14",
+    "status": "2009-06-12"
+  },
+  {
+    "id": "wo17143",
+    "title": "Ley para la Comprobación, Ajuste y Cómputo de Servicios en el Ejército y Fuerza Aérea Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17143.html",
+    "publication_date": "2006-02-09",
+    "status": "2024-05-03"
+  },
+  {
+    "id": "wo71683",
+    "title": "Ley para la Protección de Personas Defensoras de Derechos Humanos y Periodistas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo71683.html",
+    "publication_date": "2012-06-25",
+    "status": "2022-04-28"
+  },
+  {
+    "id": "wo46",
+    "title": "Ley para la Transparencia y Ordenamiento de los Servicios Financieros",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo46.html",
+    "publication_date": "2007-06-15",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo124487",
+    "title": "Ley para la Transparencia, Prevención y Combate de Prácticas Indebidas en Materia de Contratación de Publicidad.",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124487.html",
+    "publication_date": "2021-06-03",
+    "status": "2023-12-22"
+  },
+  {
+    "id": "wo37634",
+    "title": "Ley para Regular las Actividades de las Sociedades Cooperativas de Ahorro y Préstamo",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo37634.html",
+    "publication_date": "2009-08-13",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo89834",
+    "title": "Ley para Regular las Agrupaciones Financieras",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo89834.html",
+    "publication_date": "2014-01-10",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo120920",
+    "title": "Ley para Regular las Instituciones de Tecnología Financiera",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120920.html",
+    "publication_date": "2018-03-09",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo48",
+    "title": "Ley para regular las Sociedades de Información Crediticia",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo48.html",
+    "publication_date": "2002-01-15",
+    "status": "2024-01-24"
+  },
+  {
+    "id": "wo17151",
+    "title": "Ley que aprueba la Adhesión de México al Convenio Constitutivo del Banco de Desarrollo del Caribe y su Ejecución",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17151.html",
+    "publication_date": "1982-01-05",
+    "status": "2014-12-29"
+  },
+  {
+    "id": "wo83799",
+    "title": "Ley que crea el Fondo de Garantía y Fomento para la Agricultura, Ganadería y Avicultura",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83799.html",
+    "publication_date": "1954-12-31",
+    "status": "2012-04-09"
+  },
+  {
+    "id": "wo17156",
+    "title": "Ley que crea el Instituto Nacional de Bellas Artes y Literatura",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17156.html",
+    "publication_date": "1946-12-31",
+    "status": "2015-12-17"
+  },
+  {
+    "id": "wo51809",
+    "title": "Ley que crea la Agencia Espacial Mexicana",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo51809.html",
+    "publication_date": "2010-07-30",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo15604",
+    "title": "Ley que crea la Universidad Autónoma Chapingo",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo15604.html",
+    "publication_date": "1974-12-30",
+    "status": "1977-12-30"
+  },
+  {
+    "id": "wo17159",
+    "title": "Ley que crea la Universidad del Ejército y Fuerza Aérea",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17159.html",
+    "publication_date": "1975-12-29",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo17160",
+    "title": "Ley que declara Reservas Mineras Nacionales los Yacimientos de Uranio, Torio y las demás Substancias de las cuales se obtengan Isótopos Hendibles que puedan producir Energía Nuclear",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17160.html",
+    "publication_date": "1950-01-26",
+    "status": "1972-01-12"
+  },
+  {
+    "id": "wo83556",
+    "title": "Ley que establece Bases para la Ejecución en México, por el Poder Ejecutivo Federal, del Convenio Constitutivo de la Asociación Internacional de Fomento",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83556.html",
+    "publication_date": "1960-12-31",
+    "status": "2014-12-29"
+  },
+  {
+    "id": "wo83199",
+    "title": "Ley que establece Bases para la Ejecución en México, por el Poder Ejecutivo Federal, del Convenio Constitutivo del Banco Interamericano de Desarrollo",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83199.html",
+    "publication_date": "1959-12-19",
+    "status": "2014-12-29"
+  },
+  {
+    "id": "wo17167",
+    "title": "Ley Reglamentaria de la Fracción V del Artículo 76 de la Constitución General de la República",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17167.html",
+    "publication_date": "1978-12-29",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo16816",
+    "title": "Ley Reglamentaria de la Fracción VI del Artículo 76 de la Constitución Política de los Estados Unidos Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16816.html",
+    "publication_date": "2007-08-31",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo17169",
+    "title": "Ley Reglamentaria de la Fracción XIII Bis del Apartado B, del Artículo 123 de la Constitución Política de los Estados Unidos Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17169.html",
+    "publication_date": "1983-12-30",
+    "status": "2021-07-31"
+  },
+  {
+    "id": "wo17170",
+    "title": "Ley Reglamentaria de la Fracción XVIII del Artículo 73 Constitucional, en lo que se refiere a la facultad del Congreso para dictar reglas para determinar el valor relativo de la Moneda Extranjera",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17170.html",
+    "publication_date": "1982-12-27",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo16344",
+    "title": "Ley Reglamentaria de las Fracciones I y II del Artículo 105 de la Constitución Política de los Estados Unidos Mexicanos",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16344.html",
+    "publication_date": "1995-05-11",
+    "status": "2022-02-18"
+  },
+  {
+    "id": "wo17173",
+    "title": "Ley Reglamentaria del Artículo 27 Constitucional en Materia Nuclear",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17173.html",
+    "publication_date": "1985-02-04",
+    "status": "2012-04-09"
+  },
+  {
+    "id": "wo124437",
+    "title": "Ley Reglamentaria del Artículo 3o. de la Constitución Política de los Estados Unidos Mexicanos, en materia de Mejora Continua de la Educación",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124437.html",
+    "publication_date": "2019-09-30",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo110802",
+    "title": "Ley Reglamentaria del Artículo 6o. párrafo primero, de la Constitución Política de los Estados Unidos Mexicanos en materia del Derecho de Réplica",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo110802.html",
+    "publication_date": "2015-11-04",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo17175",
+    "title": "Ley Reglamentaria del Servicio Ferroviario",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17175.html",
+    "publication_date": "1995-05-12",
+    "status": "2023-05-03"
+  },
+  {
+    "id": "wo16945",
+    "title": "Ley sobre Cámaras Agrícolas, que en lo sucesivo se denominarán Asociaciones Agrícolas",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo16945.html",
+    "publication_date": "1932-08-27",
+    "status": "2012-04-09"
+  },
+  {
+    "id": "wo83200",
+    "title": "Ley sobre el Contrato de Seguro",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83200.html",
+    "publication_date": "1935-08-31",
+    "status": "2013-04-04"
+  },
+  {
+    "id": "wo13243",
+    "title": "Ley sobre el Escudo, la Bandera y el Himno Nacionales",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo13243.html",
+    "publication_date": "1984-02-08",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo17179",
+    "title": "Ley sobre Elaboración y Venta de Café Tostado",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17179.html",
+    "publication_date": "1972-05-25",
+    "status": "2004-12-10"
+  },
+  {
+    "id": "wo3874",
+    "title": "Ley sobre la Aprobación de Tratados Internacionales en Materia Económica",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo3874.html",
+    "publication_date": "2004-09-02",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo17181",
+    "title": "Ley sobre la Celebración de Tratados",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo17181.html",
+    "publication_date": "1992-01-02",
+    "status": "2021-05-20"
+  },
+  {
+    "id": "wo57819",
+    "title": "Ley sobre Refugiados, Protección Complementaria y Asilo Político",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo57819.html",
+    "publication_date": "2011-01-27",
+    "status": "2022-02-18"
+  },
+  {
+    "id": "wo83201",
+    "title": "Ordenanza General de la Armada",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo83201.html",
+    "publication_date": "1912-01-01",
+    "status": "2000-10-19"
+  },
+  {
+    "id": "wo102496",
+    "title": "Reglamento de la Ley Aduanera",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo102496.html",
+    "publication_date": "2015-04-20",
+    "status": "2023-12-28"
+  },
+  {
+    "id": "wo88373",
+    "title": "Reglamento de la Ley Agraria en Materia de Certificación de Derechos Ejidales y Titulación de Solares",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88373.html",
+    "publication_date": "1993-01-06",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88379",
+    "title": "Reglamento de la Ley Agraria en Materia de Ordenamiento de la Propiedad Rural",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88379.html",
+    "publication_date": "2012-11-28",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88405",
+    "title": "Reglamento de la Ley Agraria para Fomentar la Organización y Desarrollo de la Mujer Campesina",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88405.html",
+    "publication_date": "1998-05-08",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88406",
+    "title": "Reglamento de la Ley de Adquisiciones, Arrendamientos y Servicios del Sector Público",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88406.html",
+    "publication_date": "2010-07-28",
+    "status": "2024-02-14"
+  },
+  {
+    "id": "wo88407",
+    "title": "Reglamento de la Ley de Aeropuertos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88407.html",
+    "publication_date": "2000-02-17",
+    "status": "2018-06-21"
+  },
+  {
+    "id": "wo88408",
+    "title": "Reglamento de la Ley de Aguas Nacionales",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88408.html",
+    "publication_date": "1994-01-12",
+    "status": "2014-08-25"
+  },
+  {
+    "id": "wo88409",
+    "title": "Reglamento de la Ley de Ascensos de la Armada de México",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88409.html",
+    "publication_date": "2006-11-09",
+    "status": "2020-03-06"
+  },
+  {
+    "id": "wo88410",
+    "title": "Reglamento de la Ley de Ascensos y Recompensas del Ejército y Fuerza Aérea Mexicanos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88410.html",
+    "publication_date": "2004-07-19",
+    "status": "2023-05-03"
+  },
+  {
+    "id": "wo88411",
+    "title": "Reglamento de la Ley de Asociaciones Público Privadas",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88411.html",
+    "publication_date": "2012-11-05",
+    "status": "2017-02-20"
+  },
+  {
+    "id": "wo88412",
+    "title": "Reglamento de la Ley de Asociaciones Religiosas y Culto Público",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88412.html",
+    "publication_date": "2003-11-06",
+    "status": "2012-09-28"
+  },
+  {
+    "id": "wo88413",
+    "title": "Reglamento de la Ley de Aviación Civil",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88413.html",
+    "publication_date": "1998-12-07",
+    "status": "2023-05-31"
+  },
+  {
+    "id": "wo103321",
+    "title": "Reglamento de la Ley de Ayuda Alimentaria para los Trabajadores",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo103321.html",
+    "publication_date": "2015-06-04",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88414",
+    "title": "Reglamento de la Ley de Bioseguridad de Organismos Genéticamente Modificados",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88414.html",
+    "publication_date": "2008-03-19",
+    "status": "2009-03-06"
+  },
+  {
+    "id": "wo88419",
+    "title": "Reglamento de la Ley de Comercio Exterior",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88419.html",
+    "publication_date": "1993-12-30",
+    "status": "2014-05-22"
+  },
+  {
+    "id": "wo88418",
+    "title": "Reglamento de la Ley de Cámaras Empresariales y sus Confederaciones",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88418.html",
+    "publication_date": "2012-02-09",
+    "status": "2013-02-13"
+  },
+  {
+    "id": "wo88420",
+    "title": "Reglamento de la Ley de Desarrollo Rural Sustentable en Materia de Organismos, Instancias de Representación, Sistemas y Servicios Especializados",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88420.html",
+    "publication_date": "2004-10-05",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88421",
+    "title": "Reglamento de la Ley de Educación Militar del Ejército y Fuerza Aérea Mexicanos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88421.html",
+    "publication_date": "2006-08-14",
+    "status": "2024-08-05"
+  },
+  {
+    "id": "wo120959",
+    "title": "Reglamento de la Ley de Educación Naval",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120959.html",
+    "publication_date": "2020-01-27",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo99697",
+    "title": "Reglamento de la Ley de Energía Geotérmica",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo99697.html",
+    "publication_date": "2014-10-31",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88422",
+    "title": "Reglamento de la Ley de Energía para el Campo",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88422.html",
+    "publication_date": "2003-12-04",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo93113",
+    "title": "Reglamento de la Ley de Firma Electrónica Avanzada",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo93113.html",
+    "publication_date": "2014-03-21",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88424",
+    "title": "Reglamento de la Ley de Fomento para la Lectura y el Libro",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88424.html",
+    "publication_date": "2010-04-23",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo99699",
+    "title": "Reglamento de la Ley de Hidrocarburos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo99699.html",
+    "publication_date": "2014-10-31",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88425",
+    "title": "Reglamento de la Ley de Información Estadística y Geográfica",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88425.html",
+    "publication_date": "1982-11-03",
+    "status": "2004-03-24"
+  },
+  {
+    "id": "wo99689",
+    "title": "Reglamento de la Ley de Ingresos sobre Hidrocarburos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo99689.html",
+    "publication_date": "2014-10-31",
+    "status": "2017-05-22"
+  },
+  {
+    "id": "wo88426",
+    "title": "Reglamento de la Ley de Inversión Extranjera y del Registro Nacional de Inversiones Extranjeras",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88426.html",
+    "publication_date": "1998-09-08",
+    "status": "2016-08-17"
+  },
+  {
+    "id": "wo101967",
+    "title": "Reglamento de la Ley de la Comisión Federal de Electricidad",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo101967.html",
+    "publication_date": "2014-10-31",
+    "status": "2015-02-09"
+  },
+  {
+    "id": "wo120952",
+    "title": "Reglamento de la Ley de la Guardia Nacional",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120952.html",
+    "publication_date": "2019-06-29",
+    "status": "2020-12-11"
+  },
+  {
+    "id": "wo99692",
+    "title": "Reglamento de la Ley de la Industria Eléctrica",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo99692.html",
+    "publication_date": "2014-10-31",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88427",
+    "title": "Reglamento de la Ley de la Policía Federal",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88427.html",
+    "publication_date": "2010-05-17",
+    "status": "2014-08-22"
+  },
+  {
+    "id": "wo88428",
+    "title": "Reglamento de la Ley de la Propiedad Industrial",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88428.html",
+    "publication_date": "1994-11-23",
+    "status": "2016-12-16"
+  },
+  {
+    "id": "wo88429",
+    "title": "Reglamento de la Ley de los Sistemas de Ahorro para el Retiro",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88429.html",
+    "publication_date": "2009-08-24",
+    "status": "2024-09-27"
+  },
+  {
+    "id": "wo88430",
+    "title": "Reglamento de la Ley de Migración",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88430.html",
+    "publication_date": "2012-09-28",
+    "status": "2014-05-23"
+  },
+  {
+    "id": "wo88431",
+    "title": "Reglamento de la Ley de Nacionalidad",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88431.html",
+    "publication_date": "2009-06-17",
+    "status": "2013-11-25"
+  },
+  {
+    "id": "wo101981",
+    "title": "Reglamento de la Ley de Navegación y Comercio Marítimos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo101981.html",
+    "publication_date": "2015-03-04",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88434",
+    "title": "Reglamento de la Ley de Obras Públicas y Servicios Relacionados con las Mismas",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88434.html",
+    "publication_date": "2010-07-28",
+    "status": "2023-02-24"
+  },
+  {
+    "id": "wo88435",
+    "title": "Reglamento de la Ley de Organizaciones Ganaderas",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88435.html",
+    "publication_date": "1999-12-24",
+    "status": "2000-01-10"
+  },
+  {
+    "id": "wo88436",
+    "title": "Reglamento de la Ley de Pesca",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88436.html",
+    "publication_date": "1999-09-29",
+    "status": "2004-01-28"
+  },
+  {
+    "id": "wo101965",
+    "title": "Reglamento de la Ley de Petróleos Mexicanos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo101965.html",
+    "publication_date": "2014-10-31",
+    "status": "2015-02-09"
+  },
+  {
+    "id": "wo88438",
+    "title": "Reglamento de la Ley de Productos Orgánicos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88438.html",
+    "publication_date": "2010-04-01",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88439",
+    "title": "Reglamento de la Ley de Promoción y Desarrollo de los Bioenergéticos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88439.html",
+    "publication_date": "2009-06-18",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88440",
+    "title": "Reglamento de la Ley de Puertos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88440.html",
+    "publication_date": "2021-12-16",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo120324",
+    "title": "Reglamento de la Ley de Tesorería de la Federación",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120324.html",
+    "publication_date": "2017-06-30",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo120152",
+    "title": "Reglamento de la Ley de Transición Energética",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120152.html",
+    "publication_date": "2017-05-04",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88442",
+    "title": "Reglamento de la Ley del Impuesto al Valor Agregado",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88442.html",
+    "publication_date": "2006-12-04",
+    "status": "2014-09-25"
+  },
+  {
+    "id": "wo88443",
+    "title": "Reglamento de la Ley del Impuesto Especial sobre Producción y Servicios",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88443.html",
+    "publication_date": "2006-12-04",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo106775",
+    "title": "Reglamento de la Ley del Impuesto sobre la Renta",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo106775.html",
+    "publication_date": "2015-10-08",
+    "status": "2016-05-06"
+  },
+  {
+    "id": "wo88445",
+    "title": "Reglamento de la Ley del Instituto de Seguridad Social para las Fuerzas Armadas Mexicanas",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88445.html",
+    "publication_date": "2013-05-10",
+    "status": "2019-02-19"
+  },
+  {
+    "id": "wo88446",
+    "title": "Reglamento de la Ley del Instituto del Fondo Nacional de la Vivienda para los Trabajadores en Materia de Transparencia y Acceso a la Información",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88446.html",
+    "publication_date": "2005-12-12",
+    "status": "2006-02-24"
+  },
+  {
+    "id": "wo88447",
+    "title": "Reglamento de la Ley del Instituto del Fondo Nacional para el Consumo de los Trabajadores",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88447.html",
+    "publication_date": "2006-11-30",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88448",
+    "title": "Reglamento de la Ley del Registro Público Vehicular",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88448.html",
+    "publication_date": "2007-12-05",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88450",
+    "title": "Reglamento de la Ley del Seguro Social en Materia de Afiliación, Clasificación de Empresas, Recaudación y Fiscalización",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88450.html",
+    "publication_date": "2002-11-01",
+    "status": "2005-07-15"
+  },
+  {
+    "id": "wo88451",
+    "title": "Reglamento de la Ley del Seguro Social para la Constitución, Inversión y Uso para la Operación de las Reservas Financieras y Actuariales y la Reserva General Financiera y Actuarial, así como para la Determinación de los Costos Financieros que Deberán Reintegrarse a la Reserva de Operación para Contingencias y Financiamiento",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88451.html",
+    "publication_date": "2013-08-20",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88452",
+    "title": "Reglamento de la Ley del Seguro Social, en Materia de Administración y Enajenación de Bienes Adjudicados con Motivo de la Aplicación del Procedimiento Administrativo de Ejecución",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88452.html",
+    "publication_date": "2012-11-20",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88454",
+    "title": "Reglamento de la Ley del Servicio Exterior Mexicano",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88454.html",
+    "publication_date": "2017-04-28",
+    "status": "2019-10-17"
+  },
+  {
+    "id": "wo88455",
+    "title": "Reglamento de la Ley del Servicio Militar",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88455.html",
+    "publication_date": "1942-11-10",
+    "status": "1947-06-06"
+  },
+  {
+    "id": "wo88456",
+    "title": "Reglamento de la Ley del Servicio Profesional de Carrera en la Administración Pública Federal",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88456.html",
+    "publication_date": "2007-09-06",
+    "status": "2024-01-04"
+  },
+  {
+    "id": "wo88459",
+    "title": "Reglamento de la Ley del Servicio Público de Energía Eléctrica, en Materia de Aportaciones",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88459.html",
+    "publication_date": "1998-11-10",
+    "status": "2014-10-31"
+  },
+  {
+    "id": "wo95017",
+    "title": "Reglamento de la Ley Federal de Archivos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo95017.html",
+    "publication_date": "2014-05-13",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88463",
+    "title": "Reglamento de la Ley Federal de Armas de Fuego y Explosivos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88463.html",
+    "publication_date": "1972-05-06",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88466",
+    "title": "Reglamento de la Ley Federal de Cinematografía",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88466.html",
+    "publication_date": "2001-03-29",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88467",
+    "title": "Reglamento de la Ley Federal de Competencia Económica",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88467.html",
+    "publication_date": "2007-10-12",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88468",
+    "title": "Reglamento de la Ley Federal de Correduría Pública",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88468.html",
+    "publication_date": "1993-06-04",
+    "status": "2012-11-26"
+  },
+  {
+    "id": "wo88469",
+    "title": "Reglamento de la Ley Federal de Fomento a las Actividades Realizadas por Organizaciones de la Sociedad Civil",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88469.html",
+    "publication_date": "2005-06-07",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88470",
+    "title": "Reglamento de la Ley Federal de Juegos y Sorteos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88470.html",
+    "publication_date": "2004-09-17",
+    "status": "2023-11-16"
+  },
+  {
+    "id": "wo88471",
+    "title": "Reglamento de la Ley Federal de las Entidades Paraestatales",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88471.html",
+    "publication_date": "1990-01-26",
+    "status": "2010-11-23"
+  },
+  {
+    "id": "wo88472",
+    "title": "Reglamento de la Ley Federal de Presupuesto y Responsabilidad Hacendaria",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88472.html",
+    "publication_date": "2006-06-28",
+    "status": "2024-09-27"
+  },
+  {
+    "id": "wo88473",
+    "title": "Reglamento de la Ley Federal de Producción, Certificación y Comercio de Semillas",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88473.html",
+    "publication_date": "2011-09-02",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo120957",
+    "title": "Reglamento de la Ley Federal de Protección al Consumidor",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120957.html",
+    "publication_date": "2019-12-19",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88475",
+    "title": "Reglamento de la Ley Federal de Protección de Datos Personales en Posesión de los Particulares",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88475.html",
+    "publication_date": "2011-12-21",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88476",
+    "title": "Reglamento de la Ley Federal de Radio y Televisión, en Materia de Concesiones, Permisos y Contenido de las Transmisiones de Radio y Televisión",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88476.html",
+    "publication_date": "2002-10-10",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88477",
+    "title": "Reglamento de la Ley Federal de Sanidad Animal",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88477.html",
+    "publication_date": "2012-05-21",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo116279",
+    "title": "Reglamento de la Ley Federal de Sanidad Vegetal",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo116279.html",
+    "publication_date": "2016-07-15",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88479",
+    "title": "Reglamento de la Ley Federal de Seguridad Privada",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88479.html",
+    "publication_date": "2011-10-18",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo125027",
+    "title": "Reglamento de la Ley Federal de Telecomunicaciones y Radiodifusión en Materia de Capacidad Satelital como reserva del Estado",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo125027.html",
+    "publication_date": "2024-04-25",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88480",
+    "title": "Reglamento de la Ley Federal de Transparencia y Acceso a la Información Pública Gubernamental",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88480.html",
+    "publication_date": "2003-06-11",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88482",
+    "title": "Reglamento de la Ley Federal de Variedades Vegetales",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88482.html",
+    "publication_date": "1998-09-24",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo120914",
+    "title": "Reglamento de la Ley Federal de Zonas Económicas Especiales",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo120914.html",
+    "publication_date": "2016-06-30",
+    "status": "2017-09-29"
+  },
+  {
+    "id": "wo88520",
+    "title": "Reglamento de la Ley Federal del Derecho de Autor",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88520.html",
+    "publication_date": "1998-05-22",
+    "status": "2005-09-14"
+  },
+  {
+    "id": "wo88521",
+    "title": "Reglamento de la Ley Federal para el Control de Precursores Químicos, Productos Químicos Esenciales y Máquinas para Elaborar Cápsulas, Tabletas y/o Comprimidos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88521.html",
+    "publication_date": "1999-09-15",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88522",
+    "title": "Reglamento de la Ley Federal para la Administración y Enajenación de Bienes del Sector Público",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88522.html",
+    "publication_date": "2003-06-17",
+    "status": "2006-11-29"
+  },
+  {
+    "id": "wo88523",
+    "title": "Reglamento de la Ley Federal para la Prevención e Identificación de Operaciones con Recursos de Procedencia Ilícita",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88523.html",
+    "publication_date": "2013-08-16",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88524",
+    "title": "Reglamento de la Ley Federal sobre Metrología y Normalización",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88524.html",
+    "publication_date": "1999-01-14",
+    "status": "2012-11-28"
+  },
+  {
+    "id": "wo88525",
+    "title": "Reglamento de la Ley Federal sobre Monumentos y Zonas Arqueológicas, Artísticos e Históricos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88525.html",
+    "publication_date": "1975-12-08",
+    "status": "2020-12-03"
+  },
+  {
+    "id": "wo88526",
+    "title": "Reglamento de la Ley General de Acceso de las Mujeres a una Vida Libre de Violencia",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88526.html",
+    "publication_date": "2008-03-11",
+    "status": "2014-03-14"
+  },
+  {
+    "id": "wo99644",
+    "title": "Reglamento de la Ley General de Cambio Climático en Materia del Registro Nacional de Emisiones",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo99644.html",
+    "publication_date": "2014-10-28",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo95393",
+    "title": "Reglamento de la Ley General de Cultura Física y Deporte",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo95393.html",
+    "publication_date": "2014-05-23",
+    "status": "2024-04-01"
+  },
+  {
+    "id": "wo124486",
+    "title": "Reglamento de la Ley General de Cultura y Derechos Culturales",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124486.html",
+    "publication_date": "2018-11-29",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo124485",
+    "title": "Reglamento de la Ley General de Desarrollo Forestal Sustentable",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124485.html",
+    "publication_date": "2020-12-09",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88529",
+    "title": "Reglamento de la Ley General de Desarrollo Social",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88529.html",
+    "publication_date": "2006-01-18",
+    "status": "2008-08-28"
+  },
+  {
+    "id": "wo88530",
+    "title": "Reglamento de la Ley General de la Infraestructura Física Educativa",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88530.html",
+    "publication_date": "2013-07-05",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo108379",
+    "title": "Reglamento de la Ley General de los Derechos de Niñas, Niños y Adolescentes",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo108379.html",
+    "publication_date": "2015-12-02",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88531",
+    "title": "Reglamento de la Ley General de Población",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88531.html",
+    "publication_date": "2000-04-14",
+    "status": "2012-09-28"
+  },
+  {
+    "id": "wo88532",
+    "title": "Reglamento de la Ley General de Prestación de Servicios para la Atención, Cuidado y Desarrollo Integral Infantil",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88532.html",
+    "publication_date": "2012-08-22",
+    "status": "2016-05-10"
+  },
+  {
+    "id": "wo95018",
+    "title": "Reglamento de la Ley General de Protección Civil",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo95018.html",
+    "publication_date": "2014-05-13",
+    "status": "2015-12-09"
+  },
+  {
+    "id": "wo88533",
+    "title": "Reglamento de la Ley General de Salud en Materia de Control Sanitario de Actividades, Establecimientos, Productos y Servicios",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88533.html",
+    "publication_date": "1988-01-18",
+    "status": "2004-12-28"
+  },
+  {
+    "id": "wo88534",
+    "title": "Reglamento de la Ley General de Salud en Materia de Control Sanitario de la Disposición de Órganos, Tejidos y Cadáveres de Seres Humanos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88534.html",
+    "publication_date": "1985-02-20",
+    "status": "2014-03-26"
+  },
+  {
+    "id": "wo124111",
+    "title": "REGLAMENTO de la Ley General de Salud en Materia de Control Sanitario para la Producción, Investigación y Uso Medicinal de la Cannabis y sus Derivados Farmacológicos.",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124111.html",
+    "publication_date": "2021-01-12",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88535",
+    "title": "Reglamento de la Ley General de Salud en Materia de Investigación para la Salud",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88535.html",
+    "publication_date": "1987-01-06",
+    "status": "2014-04-02"
+  },
+  {
+    "id": "wo88536",
+    "title": "Reglamento de la Ley General de Salud en Materia de Prestación de Servicios de Atención Médica",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88536.html",
+    "publication_date": "1986-05-14",
+    "status": "2018-07-17"
+  },
+  {
+    "id": "wo88537",
+    "title": "Reglamento de la Ley General de Salud en Materia de Protección Social en Salud",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88537.html",
+    "publication_date": "2004-04-05",
+    "status": "2014-12-17"
+  },
+  {
+    "id": "wo88538",
+    "title": "Reglamento de la Ley General de Salud en Materia de Publicidad",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88538.html",
+    "publication_date": "2000-05-04",
+    "status": "2022-09-08"
+  },
+  {
+    "id": "wo88539",
+    "title": "Reglamento de la Ley General de Salud en Materia de Sanidad Internacional",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88539.html",
+    "publication_date": "1985-02-18",
+    "status": "1985-07-10"
+  },
+  {
+    "id": "wo93313",
+    "title": "Reglamento de la Ley General de Salud en Materia de Trasplantes",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo93313.html",
+    "publication_date": "2014-03-26",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo104167",
+    "title": "Reglamento de la Ley General de Turismo",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo104167.html",
+    "publication_date": "2015-07-06",
+    "status": "2017-08-16"
+  },
+  {
+    "id": "wo88540",
+    "title": "Reglamento de la Ley General de Vida Silvestre",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88540.html",
+    "publication_date": "2006-11-30",
+    "status": "2014-05-09"
+  },
+  {
+    "id": "wo99937",
+    "title": "Reglamento de la Ley General de Víctimas",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo99937.html",
+    "publication_date": "2014-11-28",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88542",
+    "title": "Reglamento de la Ley General del Equilibrio Ecológico y la Protección al Ambiente en Materia de Autorregulación y Auditorías Ambientales",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88542.html",
+    "publication_date": "2010-04-29",
+    "status": "2014-10-31"
+  },
+  {
+    "id": "wo88543",
+    "title": "Reglamento de la Ley General del Equilibrio Ecológico y la Protección al Ambiente en Materia de Evaluación del Impacto Ambiental",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88543.html",
+    "publication_date": "2000-05-30",
+    "status": "2014-10-31"
+  },
+  {
+    "id": "wo88544",
+    "title": "Reglamento de la Ley General del Equilibrio Ecológico y la Protección al Ambiente en Materia de Ordenamiento Ecológico",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88544.html",
+    "publication_date": "2003-08-08",
+    "status": "2014-10-31"
+  },
+  {
+    "id": "wo88545",
+    "title": "Reglamento de la Ley General del Equilibrio Ecológico y la Protección al Ambiente en Materia de Prevención y Control de la Contaminación de la Atmósfera",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88545.html",
+    "publication_date": "1988-11-25",
+    "status": "2014-10-31"
+  },
+  {
+    "id": "wo88546",
+    "title": "Reglamento de la Ley General del Equilibrio Ecológico y la Protección al Ambiente en Materia de Registro de Emisiones y Transferencia de Contaminantes",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88546.html",
+    "publication_date": "2004-06-03",
+    "status": "2014-10-31"
+  },
+  {
+    "id": "wo88541",
+    "title": "Reglamento de la Ley General del Equilibrio Ecológico y la Protección al Ambiente en Materia de Áreas Naturales Protegidas",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88541.html",
+    "publication_date": "2000-11-30",
+    "status": "2014-05-21"
+  },
+  {
+    "id": "wo88547",
+    "title": "Reglamento de la Ley General para el Control del Tabaco",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88547.html",
+    "publication_date": "2009-05-31",
+    "status": "2012-10-09"
+  },
+  {
+    "id": "wo116491",
+    "title": "Reglamento de la Ley General para la Atención y Protección a Personas con la Condición del Espectro Autista",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo116491.html",
+    "publication_date": "2016-07-21",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88548",
+    "title": "Reglamento de la Ley General para la Inclusión de las Personas con Discapacidad",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88548.html",
+    "publication_date": "2012-11-30",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo98969",
+    "title": "Reglamento de la Ley General para la Prevención Social de la Violencia y la Delincuencia",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo98969.html",
+    "publication_date": "2014-09-19",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88549",
+    "title": "Reglamento de la Ley General para la Prevención y Gestión Integral de los Residuos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88549.html",
+    "publication_date": "2006-11-30",
+    "status": "2014-10-31"
+  },
+  {
+    "id": "wo88550",
+    "title": "Reglamento de la Ley General para Prevenir, Sancionar y Erradicar los Delitos en Materia de Trata de Personas y para la Protección y Asistencia a las Víctimas de estos Delitos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88550.html",
+    "publication_date": "2013-09-23",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88551",
+    "title": "Reglamento de la Ley Minera",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88551.html",
+    "publication_date": "2012-10-12",
+    "status": "2014-10-31"
+  },
+  {
+    "id": "wo88555",
+    "title": "Reglamento de la Ley Orgánica de la Procuraduría General de la República",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88555.html",
+    "publication_date": "2012-07-23",
+    "status": "2012-09-21"
+  },
+  {
+    "id": "wo124460",
+    "title": "Reglamento de la Ley Orgánica del Instituto Nacional de Antropología e Historia",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo124460.html",
+    "publication_date": "2021-05-24",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88558",
+    "title": "Reglamento de la Ley para el Desarrollo de la Competitividad de la Micro, Pequeña y Mediana Empresa",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88558.html",
+    "publication_date": "2006-05-24",
+    "status": "2018-05-24"
+  },
+  {
+    "id": "wo93264",
+    "title": "Reglamento de la Ley para el Uso y Protección de la Denominación y del Emblema de la Cruz Roja",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo93264.html",
+    "publication_date": "2014-03-25",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88560",
+    "title": "Reglamento de la Ley para la Protección de Personas Defensoras de Derechos Humanos y Periodistas",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88560.html",
+    "publication_date": "2012-11-30",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88561",
+    "title": "Reglamento de la Ley que Crea el Fondo de Garantía y Fomento para la Agricultura, Ganadería y Avicultura",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88561.html",
+    "publication_date": "1955-05-06",
+    "status": "2007-05-10"
+  },
+  {
+    "id": "wo88562",
+    "title": "Reglamento de la Ley que Declara Reservas Mineras Nacionales los Yacimientos de Uranio, Torio y las demás Substancias de las cuales se obtengan Isótopos Hendibles que puedan producir Energía Nuclear",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88562.html",
+    "publication_date": "1952-01-17",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88564",
+    "title": "Reglamento de la Ley sobre Refugiados y Protección Complementaria",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88564.html",
+    "publication_date": "2012-02-21",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo99700",
+    "title": "Reglamento de las actividades a que se refiere el Título Tercero de la Ley de Hidrocarburos",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo99700.html",
+    "publication_date": "2014-10-31",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo95867",
+    "title": "Reglamento de los Artículos 121 y 122 de la Ley Federal del Trabajo",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo95867.html",
+    "publication_date": "2014-06-05",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88646",
+    "title": "Reglamento del Artículo 122 de la Ley Federal de Protección al Consumidor",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88646.html",
+    "publication_date": "1997-08-27",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88647",
+    "title": "Reglamento del Artículo 95 de la Ley Federal de Instituciones de Fianzas, para el cobro de fianzas otorgadas a favor de la Federación, del Distrito Federal, de los Estados y de los Municipios, distintas de las que garantizan obligaciones fiscales federales a cargo de terceros",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88647.html",
+    "publication_date": "1991-01-15",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo88653",
+    "title": "Reglamento del Código de Comercio en Materia de Prestadores de Servicios de Certificación",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo88653.html",
+    "publication_date": "2004-07-19",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo93536",
+    "title": "Reglamento del Código Fiscal de la Federación",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.ordenjuridico.gob.mx/Documentos/Federal/html/wo93536.html",
+    "publication_date": "2014-04-02",
+    "status": "Sin Reforma"
+  }
+]

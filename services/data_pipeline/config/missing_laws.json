@@ -1,0 +1,22 @@
+[
+  {
+    "id": "wo125096",
+    "title": "Ley General de Protección de Datos Personales en Posesión de Sujetos Obligados",
+    "type": "LEY",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.diputados.gob.mx/LeyesBiblio/pdf/LGPDPPSO.pdf",
+    "publication_date": "2025-03-20",
+    "status": "Sin Reforma"
+  },
+  {
+    "id": "wo125027",
+    "title": "Reglamento de la Ley Federal de Telecomunicaciones y Radiodifusión en Materia de Capacidad Satelital como reserva del Estado",
+    "type": "REGLAMENTO",
+    "source": "DOF",
+    "jurisdiction": "FEDERAL",
+    "url": "https://www.diputados.gob.mx/LeyesBiblio/regley/Reg_LFTR_MCSRE.pdf",
+    "publication_date": "2024-04-25",
+    "status": "Sin Reforma"
+  }
+]
