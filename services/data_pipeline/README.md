@@ -32,6 +32,37 @@ The Pipenv environment now includes `sentence-transformers`, so you can run loca
 
 The resulting vectors are stored in `data/legal_chunks.db`, ready for pgvector import or direct querying.
 
+## Embedding chunks (OpenAI or local) and exporting for vector DBs
+
+OpenAI (default choice):
+```bash
+OPENAI_API_KEY=... \
+pipenv run python -m services.data_pipeline.embed_chunks \
+  --backend openai \
+  --embedding-model text-embedding-3-large \
+  --chunks-dir data/chunks \
+  --output-db data/legal_chunks.db \
+  --batch-size 64 \
+  --export-jsonl data/embeddings_export.jsonl \
+  --export-limit 100000  # optional
+  # --validate-query "amparo fiscal" --validate-limit 200 --validate-topk 5
+```
+
+Local (offline fallback):
+```bash
+pipenv run python -m services.data_pipeline.embed_chunks \
+  --backend local \
+  --local-model intfloat/multilingual-e5-base \
+  --local-device cuda \
+  --chunks-dir data/chunks \
+  --output-db data/legal_chunks.db \
+  --batch-size 32 \
+  --export-jsonl data/embeddings_export.jsonl
+```
+
+- `--export-jsonl` writes per-chunk embedding rows (chunk_id, doc_id, metadata, tokenizer_model, embedding) for pgvector/Qdrant loading.
+- `--validate-query` runs a small in-memory cosine search over stored embeddings to sanity-check quality.
+
 ## Tokenizing chunks for OpenAI models
 
 Use `tokenize_chunks.py` to attach token counts (and optionally raw token ids) using `tiktoken` so downstream OpenAI agents can enforce context windows:
