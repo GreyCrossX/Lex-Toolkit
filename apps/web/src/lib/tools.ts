@@ -30,6 +30,14 @@ export const TOOLS: Tool[] = [
     cta: "Iniciar pregunta",
   },
   {
+    id: "upload",
+    name: "Carga de documentos",
+    category: "Ingesta",
+    description: "Sube PDFs para ingestarlos y dejarlos listos para búsqueda vectorial.",
+    status: "coming-soon",
+    pingPath: "/health?tool=upload",
+  },
+  {
     id: "summary-single",
     name: "Resumen de un documento",
     category: "Síntesis",

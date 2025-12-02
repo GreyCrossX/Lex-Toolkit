@@ -1,16 +1,23 @@
 from typing import Any, Dict, List, Optional
 
-from pydantic import BaseModel, Field, conlist
+from pydantic import BaseModel, Field, conlist, model_validator
 
 
 class SearchRequest(BaseModel):
-    embedding: conlist(float, min_length=1)  # type: ignore[type-arg]
+    query: Optional[str] = None
+    embedding: Optional[conlist(float, min_length=1)] = None  # type: ignore[type-arg]
     limit: int = Field(default=5, ge=1, le=100)
     doc_ids: Optional[List[str]] = None
     jurisdictions: Optional[List[str]] = None
     sections: Optional[List[str]] = None
     # Optional maximum distance filter (L2) if the caller wants to prune results.
     max_distance: Optional[float] = Field(default=None, ge=0.0)
+
+    @model_validator(mode="after")
+    def ensure_query_or_embedding(self) -> "SearchRequest":
+        if self.query is None and self.embedding is None:
+            raise ValueError("Provide either query text or embedding.")
+        return self
 
 
 class SearchResult(BaseModel):

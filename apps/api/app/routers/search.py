@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from psycopg_pool import ConnectionPool
 
-from app import db
+from app import db, llm
 from app.schemas import SearchRequest, SearchResponse
 from app.services.search import run_search
 
@@ -13,6 +13,23 @@ def search(
     req: SearchRequest,
     pool: ConnectionPool = Depends(db.get_pool),
 ) -> SearchResponse:
+    embedding = req.embedding
+    if embedding is None:
+        if not req.query:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Provide either query text or embedding.",
+            )
+        try:
+            embedding = llm.embed_text(req.query)
+        except Exception as exc:  # pragma: no cover - runtime protection
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Failed to embed query: {exc}",
+            ) from exc
+
+    req.embedding = embedding
+
     try:
         results = run_search(pool, req)
     except Exception as exc:  # pragma: no cover - runtime protection
