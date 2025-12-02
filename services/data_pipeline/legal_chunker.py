@@ -230,6 +230,7 @@ def build_chunks_from_units(
     """
     chunks: List[LegalChunk] = []
     enc = encoding or tiktoken.get_encoding("cl100k_base")
+    seen_ids: Dict[str, int] = {}
     doc_meta = {
         "title": doc.title,
         "type": doc.type,
@@ -258,10 +259,13 @@ def build_chunks_from_units(
                 fraction_part = f"frac{_safe_id_component(unit.fraction_label)}"
             else:
                 fraction_part = "fraclead"
-            chunk_id = (
-                f"{doc.id}:art{article_part}:"
+            base_chunk_id = (
+                f"{doc.id}:{section}:art{article_part}:"
                 f"{fraction_part}:p{unit.paragraph_index}:c{idx}"
             )
+            dup_count = seen_ids.get(base_chunk_id, 0)
+            seen_ids[base_chunk_id] = dup_count + 1
+            chunk_id = base_chunk_id if dup_count == 0 else f"{base_chunk_id}:v{dup_count}"
             chunks.append(
                 LegalChunk(
                     chunk_id=chunk_id,

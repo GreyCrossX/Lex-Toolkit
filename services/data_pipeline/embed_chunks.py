@@ -113,7 +113,7 @@ def upsert_chunk(
             metadata,
             tokenizer_model,
             embedding
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         ON CONFLICT(chunk_id) DO UPDATE SET
             doc_id=excluded.doc_id,
             article_number=excluded.article_number,

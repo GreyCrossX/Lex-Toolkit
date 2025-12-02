@@ -1,0 +1,52 @@
+@import "tailwindcss";
+
+:root {
+  --color-background: #0d141f;
+  --color-surface: #111a2c;
+  --color-card: #16233a;
+  --color-contrast: #0a0f18;
+  --color-border: #1f2f4a;
+  --color-foreground: #e8edf6;
+  --color-muted: #a3b7d4;
+  --color-accent: #d7b46a;
+  --color-accent-strong: #b58f3a;
+  --color-success: #46c2ae;
+  --color-danger: #f27c7c;
+}
+
+@theme inline {
+  --color-background: var(--color-background);
+  --color-foreground: var(--color-foreground);
+  --color-muted: var(--color-muted);
+  --color-surface: var(--color-surface);
+  --color-card: var(--color-card);
+  --color-contrast: var(--color-contrast);
+  --color-border: var(--color-border);
+  --color-accent: var(--color-accent);
+  --color-accent-strong: var(--color-accent-strong);
+  --color-success: var(--color-success);
+  --color-danger: var(--color-danger);
+  --font-body: var(--font-body);
+  --font-heading: var(--font-heading);
+}
+
+body {
+  background: radial-gradient(circle at 20% 20%, rgba(36, 59, 112, 0.2), transparent 25%),
+    radial-gradient(circle at 80% 0%, rgba(20, 34, 68, 0.25), transparent 30%),
+    var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-body), system-ui, sans-serif;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-heading), Georgia, "Times New Roman", serif;
+}
+
+::selection {
+  background: rgba(215, 180, 106, 0.25);
+  color: var(--color-foreground);
+}

@@ -2,13 +2,13 @@
 Statuses shown as Local / Linear.
 
 - GRE-21 Define initial data sources — Local: Done / Linear: Done.
-- GRE-22 Build PDF/text ingestion pipeline — Local: In Review (ingestion scripts exist; needs finalization) / Linear: In Review.
+- GRE-22 Build PDF/text ingestion pipeline — Local: Done (full corpus re-chunked, embeddings regenerated, loaded to pgvector) / Linear: Done.
 - GRE-23 Implement chunking strategy — Local: Done / Linear: Done.
 - GRE-24 Choose embedding model — Local: Done (`embedding_model_decision.md`) / Linear: Done.
 - GRE-25 Embedding pipeline implementation — Local: Done (`services/data_pipeline/embed_chunks.py`) / Linear: Done.
-- GRE-26 Set up vector database — Local: Done (pgvector via root compose, 1536-dim HNSW) / Linear: Todo (needs status update).
-- GRE-27 Semantic search API — Local: Done (`apps/api` /search) / Linear: Todo (needs status update).
-- GRE-28 Q&A API with citations — Local: Not started / Linear: Todo.
+- GRE-26 Set up vector database — Local: Done (pgvector via root compose, 1536-dim HNSW) / Linear: Done.
+- GRE-27 Semantic search API — Local: Done (`apps/api` /search) / Linear: Done.
+- GRE-28 Q&A API with citations — Local: Done (`apps/api` /qa uses OpenAI, returns citations) / Linear: Done.
 - GRE-29 Search interface UI — Local: Not started / Linear: Todo.
 - GRE-30 Upload document UI — Local: Not started / Linear: Todo.
 - GRE-31 Define summarization templates — Local: Not started / Linear: Todo.
@@ -19,6 +19,6 @@ Statuses shown as Local / Linear.
 - GRE-50 End-to-end smoke test, GRE-49 test plan, GRE-48 API docs — Local: Not started / Linear: Backlog.
 
 Next immediate actions (keep Local + Linear aligned):
-1) Update Linear statuses for GRE-26 and GRE-27 to Done when ready to report.
-2) Start GRE-28 (Q&A API) using existing `/search` as retrieval.
-3) Decide on frontend scope for GRE-29/30 to unblock upload/search UI.
+1) GRE-29/30/34: define minimal frontend scope (search + upload + summary UX) now that APIs exist; stub UI tasks.
+2) GRE-44/45/46/47: finish env var doc + Dockerfiles/runbook to match current compose.
+3) GRE-48/49/50: draft API docs, test plan, and a basic end-to-end smoke test once ingestion/frontends are underway.

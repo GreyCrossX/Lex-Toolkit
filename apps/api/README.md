@@ -12,6 +12,7 @@ docker compose --profile api up --build
 ## Endpoints
 - `GET /health` – liveness probe.
 - `POST /search` – vector similarity search over `legal_chunks`.
+- `POST /qa` – retrieval + answer with citations (uses OpenAI if configured, otherwise offline stub).
 
 ### Search request body
 ```json
@@ -24,6 +25,40 @@ docker compose --profile api up --build
   "max_distance": 1.2
 }
 ```
+
+### QA request body
+```json
+{
+  "query": "¿Qué dice el artículo 5?",
+  "top_k": 5,
+  "doc_ids": ["doc123"],
+  "jurisdictions": ["cdmx"],
+  "sections": ["article"],
+  "max_distance": 1.2,
+  "max_tokens": 400
+}
+```
+
+### QA response
+```json
+{
+  "answer": "…",
+  "citations": [
+    {
+      "chunk_id": "chunk-1",
+      "doc_id": "doc123",
+      "section": "article",
+      "jurisdiction": "cdmx",
+      "metadata": {},
+      "content": "...",
+      "distance": 0.42
+    }
+  ]
+}
+```
+
+Notes:
+- Embeddings in `/qa` are computed with OpenAI `text-embedding-3-small` when `OPENAI_API_KEY` is set. Without it, `/qa` falls back to an offline stub answer using retrieved snippets.
 
 ### Response shape
 ```json

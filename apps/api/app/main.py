@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
 from app import db
-from app.routers import search
+from app.routers import qa, search
 
 app = FastAPI(title="LegalScraper API", version="0.0.1")
 
@@ -22,3 +22,4 @@ def _shutdown() -> None:
 
 
 app.include_router(search.router)
+app.include_router(qa.router)
