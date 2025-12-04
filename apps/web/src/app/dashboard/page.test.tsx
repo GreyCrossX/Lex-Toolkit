@@ -109,7 +109,7 @@ describe("DashboardPage search flows", () => {
         return Promise.resolve(
           new Response(
             JSON.stringify({
-              citations: [{ chunk_id: "c3", doc_id: "doc-3", section: "s3", jurisdiction: "cdmx", content: "C", distance: 0.1 }],
+              results: [{ chunk_id: "c3", doc_id: "doc-3", section: "s3", jurisdiction: "cdmx", content: "C", distance: 0.1 }],
             }),
             { status: 200 }
           )
@@ -126,6 +126,7 @@ describe("DashboardPage search flows", () => {
     fireEvent.click(screen.getByRole("button", { name: "Ejecutar búsqueda / Q&A" }));
 
     await waitFor(() => expect(fetchMock).toHaveBeenCalledWith(expect.stringContaining("/search"), expect.anything()));
+    await screen.findByText("doc-3");
   });
 
   test("surfaces toast error when backend responds non-200", async () => {
@@ -171,14 +172,20 @@ describe("DashboardPage summary and upload flows", () => {
       const u = url.toString();
       const method = (options as RequestInit | undefined)?.method;
       if (u.includes("/summary") && method === "POST") {
+        const ndjson = [
+          JSON.stringify({
+            type: "citation",
+            data: { chunk_id: "c1", doc_id: "doc-1", section: "s1", jurisdiction: "mx", content: "texto" },
+          }),
+          JSON.stringify({ type: "summary_chunk", data: "Resumen " }),
+          JSON.stringify({ type: "summary_chunk", data: "listo" }),
+          JSON.stringify({ type: "done", data: { model: "stub", chunks_used: 1 } }),
+        ].join("\n");
         return Promise.resolve(
-          new Response(
-            JSON.stringify({
-              summary: "Resumen listo",
-              citations: [{ chunk_id: "c1", doc_id: "doc-1", section: "s1", jurisdiction: "mx", content: "texto" }],
-            }),
-            { status: 200 }
-          )
+          new Response(ndjson, {
+            status: 200,
+            headers: { "Content-Type": "application/x-ndjson" },
+          })
         );
       }
       return Promise.resolve(new Response("{}", { status: 200 }));
@@ -225,7 +232,23 @@ describe("DashboardPage summary and upload flows", () => {
       const method = (options as RequestInit | undefined)?.method;
       if (url.toString().includes("/upload") && method === "POST") {
         expect((options as RequestInit).body).toBeInstanceOf(FormData);
-        return Promise.resolve(new Response("{}", { status: 200 }));
+        return Promise.resolve(
+          new Response(JSON.stringify({ job_id: "job-1", status: "queued", message: "en cola" }), { status: 200 })
+        );
+      }
+      if (url.toString().includes("/upload/job-1")) {
+        return Promise.resolve(
+          new Response(
+            JSON.stringify({
+              job_id: "job-1",
+              filename: "demo.pdf",
+              status: "completed",
+              progress: 100,
+              doc_ids: ["doc-1"],
+            }),
+            { status: 200 }
+          )
+        );
       }
       return Promise.resolve(new Response("{}", { status: 200 }));
     });
@@ -237,7 +260,7 @@ describe("DashboardPage summary and upload flows", () => {
     const file = new File(["hello"], "demo.pdf", { type: "application/pdf" });
     fireEvent.change(fileInput, { target: { files: [file] } });
 
-    await screen.findByText(/Documento enviado/);
+    await screen.findByText(/Estado: completed/);
     expect(toast.success).toHaveBeenCalled();
   });
 
@@ -258,7 +281,7 @@ describe("DashboardPage summary and upload flows", () => {
     const file = new File(["hello"], "demo.pdf", { type: "application/pdf" });
     fireEvent.change(fileInput, { target: { files: [file] } });
 
-    await screen.findByText(/Endpoint no disponible/);
+    await screen.findByText(/No se pudo iniciar la ingesta/);
     expect(toast.error).toHaveBeenCalled();
   });
 });

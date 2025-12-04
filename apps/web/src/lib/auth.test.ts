@@ -1,19 +1,19 @@
 /// <reference types="vitest" />
-import { clearFakeToken, getFakeToken, setFakeToken } from "./auth";
+import { clearAccessToken, getAccessToken, setAccessToken } from "./auth";
 
-describe("auth localStorage helpers", () => {
+describe("auth access token memory store", () => {
   beforeEach(() => {
-    localStorage.clear();
+    clearAccessToken();
   });
 
-  test("stores and retrieves fake token", () => {
-    setFakeToken("demo-token");
-    expect(getFakeToken()).toBe("demo-token");
+  test("stores and retrieves access token", () => {
+    setAccessToken("demo-token");
+    expect(getAccessToken()).toBe("demo-token");
   });
 
-  test("clears fake token", () => {
-    setFakeToken("demo-token");
-    clearFakeToken();
-    expect(getFakeToken()).toBeNull();
+  test("clears access token", () => {
+    setAccessToken("demo-token");
+    clearAccessToken();
+    expect(getAccessToken()).toBeNull();
   });
 });

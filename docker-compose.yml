@@ -27,8 +27,10 @@ services:
       OPENAI_API_KEY: ${OPENAI_API_KEY:-}
       OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
       OPENAI_EMBED_MODEL: ${OPENAI_EMBED_MODEL:-text-embedding-3-small}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL:-redis://redis:6379/0}
     depends_on:
       - pgvector
+      - redis
     ports:
       - "8000:8000"
     healthcheck:
@@ -38,17 +40,37 @@ services:
       retries: 5
       start_period: 15s
     profiles: ["api"]
+    volumes:
+      - uploads-data:/workspace/apps/api/data/uploads
 
-  agent:
+  worker:
     build:
       context: .
-      dockerfile: apps/agent/Dockerfile
+      dockerfile: apps/api/Dockerfile
+    env_file:
+      - .env
     environment:
       <<: *db-env
       DATABASE_URL: postgresql://${POSTGRES_USER:-vector}:${POSTGRES_PASSWORD:-vectorpass}@pgvector:5432/${POSTGRES_DB:-legalscraper}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      OPENAI_MODEL: ${OPENAI_MODEL:-gpt-4o-mini}
+      OPENAI_EMBED_MODEL: ${OPENAI_EMBED_MODEL:-text-embedding-3-small}
+      CELERY_BROKER_URL: ${CELERY_BROKER_URL:-redis://redis:6379/0}
     depends_on:
       - pgvector
-    profiles: ["agent"]
+      - redis
+    volumes:
+      - uploads-data:/workspace/apps/api/data/uploads
+    command: ["celery", "-A", "app.infrastructure.messaging.celery_app", "worker", "-l", "info", "-Q", "ingest", "--concurrency=1"]
+    profiles: ["api"]
+
+  redis:
+    image: redis:7-alpine
+    container_name: legalscraper-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    profiles: ["api"]
 
   web:
     image: node:20-bullseye
@@ -65,3 +87,4 @@ services:
 
 volumes:
   pgvector-data:
+  uploads-data:

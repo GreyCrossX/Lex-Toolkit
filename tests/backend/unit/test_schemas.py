@@ -1,6 +1,6 @@
 import pytest
 
-from app.schemas import SearchRequest
+from app.interfaces.api.schemas import SearchRequest
 
 
 def test_search_request_requires_query_or_embedding():

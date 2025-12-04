@@ -24,9 +24,9 @@ if not DATABASE_URL:
 fastapi = pytest.importorskip("fastapi")
 TestClient = pytest.importorskip("fastapi.testclient").TestClient
 
-from app import db  # noqa: E402
-from app.schemas import SearchRequest  # noqa: E402
-from app.services.search import run_search  # noqa: E402
+from app.application.search_service import run_search  # noqa: E402
+from app.infrastructure.db import connection as db  # noqa: E402
+from app.interfaces.api.schemas import SearchRequest  # noqa: E402
 
 
 def ensure_pool():
@@ -65,7 +65,7 @@ def test_run_search_live_sorted_results():
 
 def test_qa_live_respects_max_distance_and_sort(monkeypatch):
     app_module = importlib.import_module("app.main")
-    qa_module = importlib.import_module("app.routers.qa")
+    qa_module = importlib.import_module("app.interfaces.api.routers.qa")
     pool = ensure_pool()
     dims = get_vector_dims(pool)
 

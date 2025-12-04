@@ -1,15 +1,39 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import { CircleCheck, CircleDashed, Loader2, LogOut, ShieldCheck, Sparkles, Upload, Wand2 } from "lucide-react";
+import {
+  ArrowLeftRight,
+  CheckCircle2,
+  ChevronDown,
+  ChevronUp,
+  FileText,
+  Loader2,
+  LogOut,
+  Menu,
+  ShieldCheck,
+  Sparkles,
+  Upload,
+  Wand2,
+  X,
+} from "lucide-react";
 import { useBackendHealth } from "@/hooks/use-backend-health";
+import { useServiceHealth } from "@/hooks/use-service-health";
 import { API_BASE_URL } from "@/lib/config";
-import { clearFakeToken, getFakeToken } from "@/lib/auth";
+import { clearAccessToken, getAccessToken } from "@/lib/auth";
+import { authFetch } from "@/lib/auth-fetch";
+import { apiLogout } from "@/lib/auth-client";
 import { TOOLS, type Tool } from "@/lib/tools";
 
-type ChatMessage = { role: "user" | "assistant"; content: string; ts: string };
+type ChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  content: string;
+  citations?: Citation[];
+  results?: Citation[];
+  meta?: { tool: string; mode?: string };
+};
 type Citation = {
   chunk_id: string;
   doc_id: string;
@@ -20,693 +44,813 @@ type Citation = {
   distance?: number;
 };
 type SummaryResponse = { summary?: string; citations?: Citation[] };
+type UploadJobStatus = "queued" | "uploading" | "processing" | "completed" | "failed";
+type UploadResponsePayload = { job_id: string; status: UploadJobStatus; message?: string };
+type UploadStatusPayload = {
+  job_id: string;
+  filename: string;
+  status: UploadJobStatus;
+  progress?: number;
+  message?: string;
+  error?: string;
+  doc_ids?: string[];
+};
 
 export default function DashboardPage() {
   const health = useBackendHealth();
-  const [pendingTool, setPendingTool] = useState<string | null>(null);
-  const [selectedTool, setSelectedTool] = useState<Tool>(TOOLS[0]);
+  const summaryHealth = useServiceHealth("/summary/health", 30000);
+  const [selectedTool, setSelectedTool] = useState<Tool>(TOOLS.find((t) => t.id === "qa") || TOOLS[0]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
-  const [searchQuery, setSearchQuery] = useState("");
+  const [filtersOpen, setFiltersOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchDocIds, setSearchDocIds] = useState("");
   const [searchJurisdictions, setSearchJurisdictions] = useState("");
   const [searchSections, setSearchSections] = useState("");
   const [searchTopK, setSearchTopK] = useState(5);
   const [searchMode, setSearchMode] = useState<"qa" | "search">("qa");
-  const [searchLoading, setSearchLoading] = useState(false);
-  const [searchAnswer, setSearchAnswer] = useState<string | null>(null);
-  const [searchResults, setSearchResults] = useState<Citation[]>([]);
-  const [searchPage, setSearchPage] = useState(1);
-  const [searchPageSize] = useState(5);
-  const [summaryInput, setSummaryInput] = useState("");
-  const [summaryOutput, setSummaryOutput] = useState<string | null>(null);
-  const [summaryCitations, setSummaryCitations] = useState<Citation[]>([]);
+  const [summaryDocIds, setSummaryDocIds] = useState("");
   const [summaryLoading, setSummaryLoading] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [summaryBuffer, setSummaryBuffer] = useState("");
+  const [summaryFileName, setSummaryFileName] = useState<string | null>(null);
+  const [sessionToken, setSessionToken] = useState(() => getAccessToken());
   const [uploadName, setUploadName] = useState<string | null>(null);
   const [uploadStatus, setUploadStatus] = useState<string | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadDocIds, setUploadDocIds] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [sortByScoreAsc, setSortByScoreAsc] = useState(true);
-  const [citationsPage, setCitationsPage] = useState(1);
-  const [citationsPageSize] = useState(5);
+  const uploadInputRef = useRef<HTMLInputElement | null>(null);
+  const activeUploadJobId = useRef<string | null>(null);
+  const chatBottomRef = useRef<HTMLDivElement | null>(null);
+  const [summaryDragActive, setSummaryDragActive] = useState(false);
+  const [uploadDragActive, setUploadDragActive] = useState(false);
 
   const readyTools = useMemo(() => TOOLS.filter((t) => t.status === "ready"), []);
-  const fakeToken = typeof window !== "undefined" ? getFakeToken() : null;
+  const syncSessionToken = () => setSessionToken(getAccessToken());
 
-  const pingTool = async (tool: Tool) => {
-    setPendingTool(tool.id);
-    const signalUrl = `${API_BASE_URL}${tool.pingPath}`;
+  useEffect(() => {
+    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages.length, actionLoading]);
 
-    try {
-      const res = await fetch(signalUrl, { method: "GET" });
-
-      if (!res.ok) {
-        const message = `El endpoint respondió ${res.status}`;
-        throw new Error(message);
-      }
-
-      toast.success(`${tool.name} está disponible`, {
-        description: `Ping a ${tool.pingPath}`,
-      });
-    } catch (error) {
-      console.error(`No se pudo alcanzar el backend para ${tool.id}`, error);
-      toast.error("Backend no disponible", {
-        description:
-          error instanceof Error ? error.message : "No se pudo contactar la API. Revisa Docker/compose.",
-      });
-    } finally {
-      setPendingTool(null);
-    }
+  const pushMessage = (msg: ChatMessage) => {
+    setMessages((prev) => [...prev, msg]);
   };
 
   const onSelectTool = (tool: Tool) => {
     setSelectedTool(tool);
-    pingTool(tool);
+    setSidebarOpen(false);
   };
 
-  const onSend = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!input.trim()) return;
-    const now = new Date().toISOString();
-    const userMsg: ChatMessage = { role: "user", content: input.trim(), ts: now };
-    const assistantMsg: ChatMessage =
-      selectedTool.status === "ready" && health === "online"
+  const formatList = (value: string) =>
+    value
+      .split(",")
+      .map((v) => v.trim())
+      .filter(Boolean);
+
+  const runQAOrSearch = async (query: string) => {
+    setActionLoading(true);
+    const body =
+      searchMode === "qa"
         ? {
-            role: "assistant",
-            content:
-              "Placeholder. Conecta este chat al endpoint correspondiente para usar prompts y datasets (usa /qa para respuestas con citas).",
-            ts: now,
+            query,
+            top_k: searchTopK,
+            doc_ids: formatList(searchDocIds),
+            jurisdictions: formatList(searchJurisdictions),
+            sections: formatList(searchSections),
+            max_distance: 1.5,
           }
         : {
-            role: "assistant",
-            content: "Esta herramienta aún no está lista; el backend sigue pendiente.",
-            ts: now,
+            query,
+            limit: searchTopK,
+            doc_ids: formatList(searchDocIds),
+            jurisdictions: formatList(searchJurisdictions),
+            sections: formatList(searchSections),
+            max_distance: 1.5,
           };
-    setMessages((prev) => [...prev, userMsg, assistantMsg]);
-    setInput("");
-  };
-
-  const runSearch = async () => {
-    setSearchLoading(true);
-    if (searchMode === "qa") setSearchAnswer(null);
-    setSearchResults([]);
-    setCitationsPage(1);
-    setSearchPage(1);
-
+    const endpoint = searchMode === "qa" ? "/qa" : "/search";
     try {
-      const body =
-        searchMode === "qa"
-          ? {
-              query: searchQuery,
-              top_k: searchTopK,
-              doc_ids: formatList(searchDocIds),
-              jurisdictions: formatList(searchJurisdictions),
-              sections: formatList(searchSections),
-              max_distance: 1.5,
-            }
-          : {
-              query: searchQuery,
-              limit: searchTopK,
-              doc_ids: formatList(searchDocIds),
-              jurisdictions: formatList(searchJurisdictions),
-              sections: formatList(searchSections),
-              max_distance: 1.5,
-            };
-
-      const endpoint = searchMode === "qa" ? "/qa" : "/search";
-
-      const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+      const res = await authFetch(`${API_BASE_URL}${endpoint}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(body),
       });
-
-      if (!res.ok) {
-        const message = `Respuesta ${res.status}`;
-        throw new Error(message);
-      }
-
-      const data = (await res.json()) as {
-        answer?: string;
-        citations?: Citation[];
+      if (!res.ok) throw new Error(`Respuesta ${res.status}`);
+      const data = (await res.json()) as { answer?: string; citations?: Citation[]; results?: Citation[] };
+      const assistantMsg: ChatMessage = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content:
+          searchMode === "qa"
+            ? data.answer ?? "Sin respuesta."
+            : `Resultados de búsqueda (${(data.results ?? data.citations ?? []).length})`,
+        citations: searchMode === "qa" ? data.citations ?? [] : undefined,
+        results: searchMode === "search" ? data.results ?? data.citations ?? [] : undefined,
+        meta: { tool: searchMode, mode: searchMode },
       };
-
-      setSearchAnswer(data.answer ?? null);
-      const sorted = (data.citations ?? []).sort((a, b) => {
-        if (a.distance === undefined || b.distance === undefined) return 0;
-        return sortByScoreAsc ? a.distance - b.distance : b.distance - a.distance;
-      });
-      setSearchResults(sorted);
-      toast.success(searchMode === "qa" ? "Q&A ejecutado" : "Búsqueda ejecutada");
+      pushMessage(assistantMsg);
+      syncSessionToken();
     } catch (error) {
       console.error("Error en búsqueda/QA", error);
-      toast.error("No se pudo ejecutar la búsqueda", {
+      toast.error("No se pudo ejecutar la consulta", {
         description: error instanceof Error ? error.message : "Error desconocido",
       });
     } finally {
-      setSearchLoading(false);
+      setActionLoading(false);
     }
   };
 
-  const runSummary = async () => {
-    if (!summaryInput.trim()) {
-      toast.info("Escribe un texto para resumir");
-      return;
-    }
+  const runSummary = async (text: string) => {
     setSummaryLoading(true);
-    setSummaryOutput(null);
-    setSummaryCitations([]);
+    setActionLoading(true);
+    const docIds = formatList(summaryDocIds);
+    const payload = { text, doc_ids: docIds.length > 0 ? docIds : undefined, stream: true };
+    let assembled = "";
+    const citations: Citation[] = [];
+
+    const consumeStream = async (res: Response) => {
+      if (!res.body) {
+        const data = (await res.json()) as SummaryResponse;
+        assembled = data.summary ?? "";
+        citations.push(...(data.citations ?? []));
+        return;
+      }
+      const reader = res.body.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+          try {
+            const evt = JSON.parse(trimmed) as { type: string; data: unknown };
+            if (evt.type === "citation" && evt.data) {
+              citations.push(evt.data as Citation);
+            } else if (evt.type === "summary_chunk" && typeof evt.data === "string") {
+              assembled += evt.data;
+            }
+          } catch (err) {
+            console.error("No se pudo parsear evento de resumen", err);
+          }
+        }
+      }
+    };
+
     try {
-      const res = await fetch(`${API_BASE_URL}/summary`, {
+      const res = await authFetch(`${API_BASE_URL}/summary/document`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ text: summaryInput }),
+        body: JSON.stringify(payload),
       });
-
-      if (!res.ok) {
-        throw new Error(`Respuesta ${res.status}`);
+      if (!res.ok) throw new Error(`Respuesta ${res.status}`);
+      const contentType = res.headers.get("content-type") || "";
+      if (contentType.includes("application/x-ndjson")) {
+        await consumeStream(res);
+      } else {
+        const data = (await res.json()) as SummaryResponse;
+        assembled = data.summary ?? "";
+        citations.push(...(data.citations ?? []));
       }
-
-      const data = (await res.json()) as SummaryResponse;
-      setSummaryOutput(data.summary ?? "Resumen generado sin contenido");
-      setSummaryCitations(data.citations ?? []);
-      toast.success("Resumen generado");
+      const assistantMsg: ChatMessage = {
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: assembled || "(sin contenido)",
+        citations,
+        meta: { tool: "summary" },
+      };
+      pushMessage(assistantMsg);
+      syncSessionToken();
     } catch (error) {
       console.error("Error en resumen", error);
-      const snippet = summaryInput.slice(0, 240);
-      setSummaryOutput(`Resumen placeholder (conecta a /summary): ${snippet}...`);
-      toast.error("No se pudo generar el resumen; usando placeholder", {
+      toast.error("No se pudo generar el resumen", {
         description: error instanceof Error ? error.message : "Error desconocido",
       });
     } finally {
       setSummaryLoading(false);
+      setActionLoading(false);
     }
+  };
+
+  const onSend = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const text = input.trim();
+    if (!text) return;
+    const now = new Date().toISOString();
+    pushMessage({ id: `user-${now}`, role: "user", content: text });
+    setInput("");
+    if (selectedTool.id === "research") {
+      await runQAOrSearch(text);
+    } else if (selectedTool.id === "summary") {
+      toast.info("Usa el dropzone de resumen para cargar texto o .txt.");
+    } else if (selectedTool.id === "communication") {
+      await runQAOrSearch(text);
+    } else {
+      pushMessage({
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: "Esta herramienta aún no está conectada.",
+      });
+    }
+  };
+
+  const resetUpload = () => {
+    setUploadName(null);
+    setUploadStatus(null);
+    setUploadProgress(0);
+    setUploadDocIds([]);
+    setUploadError(null);
+    setUploading(false);
+    activeUploadJobId.current = null;
+  };
+
+  const pollUploadStatus = async (jobId: string, attempt = 0) => {
+    if (activeUploadJobId.current !== jobId) return;
+    try {
+      const res = await authFetch(`${API_BASE_URL}/upload/${jobId}`);
+      if (!res.ok) throw new Error(`Respuesta ${res.status}`);
+      const data = (await res.json()) as UploadStatusPayload;
+      setUploadStatus(data.message ?? `Estado: ${data.status}`);
+      setUploadProgress(data.progress ?? 0);
+      setUploadDocIds(data.doc_ids ?? []);
+      syncSessionToken();
+      if (data.status === "completed") {
+        setUploading(false);
+        activeUploadJobId.current = null;
+        toast.success("Ingesta completada", { description: data.message ?? "Listo para búsqueda." });
+        return;
+      }
+      if (data.status === "failed") {
+        setUploading(false);
+        activeUploadJobId.current = null;
+        const message = data.error ?? "Error en ingesta.";
+        setUploadError(message);
+        toast.error("Ingesta fallida", { description: message });
+        return;
+      }
+      setTimeout(() => pollUploadStatus(jobId, attempt + 1), 1200);
+    } catch (error) {
+      console.error("Error al consultar estatus de ingesta", error);
+      if (attempt >= 4) {
+        setUploading(false);
+        activeUploadJobId.current = null;
+        const message =
+          error instanceof Error ? error.message : "No se pudo consultar el estado de la ingesta (placeholder).";
+        setUploadError(message);
+        toast.error("No se pudo consultar ingesta", { description: message });
+        return;
+      }
+      setTimeout(() => pollUploadStatus(jobId, attempt + 1), 1800);
+    }
+  };
+
+  const handleSummaryFile = (file: File) => {
+    if (file.type !== "text/plain") {
+      toast.error("Solo archivos .txt por ahora para resumen directo. Si es PDF, pega el texto.");
+      return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+      const text = typeof reader.result === "string" ? reader.result : "";
+      setInput(text);
+      toast.success("Texto cargado para resumen", { description: file.name });
+    };
+    reader.readAsText(file);
   };
 
   const runUpload = async (file: File) => {
     setUploading(true);
+    setUploadError(null);
     setUploadStatus(null);
+    setUploadProgress(0);
+    setUploadDocIds([]);
+    setUploadStatus("Preparando archivo para ingesta...");
+    activeUploadJobId.current = null;
+
     try {
       const formData = new FormData();
       formData.append("file", file);
-
-      const res = await fetch(`${API_BASE_URL}/upload`, {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        throw new Error(`Respuesta ${res.status}`);
-      }
-
-      toast.success("Documento cargado");
-      setUploadStatus("Documento enviado. Esperando ingesta...");
+      const res = await authFetch(`${API_BASE_URL}/upload`, { method: "POST", body: formData });
+      if (!res.ok) throw new Error(`Respuesta ${res.status}`);
+      const data = (await res.json()) as UploadResponsePayload;
+      if (!data.job_id) throw new Error("Respuesta de ingesta inválida (sin job_id).");
+      activeUploadJobId.current = data.job_id;
+      setUploadStatus(data.message ?? "Trabajo en cola.");
+      setUploadProgress(5);
+      syncSessionToken();
+      toast.success("Documento enviado", { description: "Seguimiento de ingesta en progreso." });
+      pollUploadStatus(data.job_id);
     } catch (error) {
       console.error("Error en carga", error);
-      toast.error("No se pudo cargar el documento", {
-        description:
-          error instanceof Error
-            ? error.message
-            : "Endpoint de ingesta no disponible. Conectar cuando exista.",
-      });
-      setUploadStatus("Endpoint no disponible (placeholder).");
-    } finally {
+      const description =
+        error instanceof Error ? error.message : "Endpoint de ingesta no disponible. Conectar cuando exista.";
+      toast.error("No se pudo cargar el documento", { description });
+      setUploadStatus("No se pudo iniciar la ingesta.");
+      setUploadError(description);
       setUploading(false);
     }
   };
 
-  const paginatedCitations = searchResults.slice(
-    (citationsPage - 1) * citationsPageSize,
-    citationsPage * citationsPageSize
-  );
-  const paginatedResults = searchResults.slice((searchPage - 1) * searchPageSize, searchPage * searchPageSize);
-
-  const renderToolContent = () => {
-    if (selectedTool.id === "search" || selectedTool.id === "qa") {
-      return (
-        <div className="space-y-4">
-          <div className="flex flex-wrap gap-3 text-xs text-muted">
-            <button
-              onClick={() => setSearchMode("qa")}
-              className={`rounded-full border px-3 py-1 ${
-                searchMode === "qa" ? "border-accent text-accent bg-accent/10" : "border-border"
-              }`}
-            >
-              Q&A (respuesta + citas)
-            </button>
-            <button
-              onClick={() => setSearchMode("search")}
-              className={`rounded-full border px-3 py-1 ${
-                searchMode === "search" ? "border-accent text-accent bg-accent/10" : "border-border"
-              }`}
-            >
-              Búsqueda (lista de resultados)
-            </button>
-            <span className="rounded-full border border-border px-3 py-1">
-              Endpoint: {searchMode === "qa" ? "/qa" : "/qa (placeholder para /search)"}
-            </span>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <label className="flex flex-col gap-2 text-sm text-muted">
-              Pregunta o consulta
-              <input
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Ej. requisitos para licitaciones en CDMX"
-                className="rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground outline-none transition focus:border-accent"
-              />
-            </label>
-            <label className="flex flex-col gap-2 text-sm text-muted">
-              Doc IDs (coma)
-              <input
-                value={searchDocIds}
-                onChange={(e) => setSearchDocIds(e.target.value)}
-                placeholder="doc123, doc456"
-                className="rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground outline-none transition focus:border-accent"
-              />
-            </label>
-            <label className="flex flex-col gap-2 text-sm text-muted">
-              Jurisdicciones (coma)
-              <input
-                value={searchJurisdictions}
-                onChange={(e) => setSearchJurisdictions(e.target.value)}
-                placeholder="cdmx, federal"
-                className="rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground outline-none transition focus:border-accent"
-              />
-            </label>
-            <label className="flex flex-col gap-2 text-sm text-muted">
-              Secciones (coma)
-              <input
-                value={searchSections}
-                onChange={(e) => setSearchSections(e.target.value)}
-                placeholder="artículo, capítulo"
-                className="rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground outline-none transition focus:border-accent"
-              />
-            </label>
-            <label className="flex flex-col gap-2 text-sm text-muted">
-              Resultados (top_k)
-              <input
-                type="number"
-                min={1}
-                max={20}
-                value={searchTopK}
-                onChange={(e) => setSearchTopK(Number(e.target.value))}
-                className="rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground outline-none transition focus:border-accent"
-              />
-            </label>
-          </div>
-          <button
-            onClick={runSearch}
-            disabled={searchLoading || !searchQuery.trim()}
-            className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-contrast transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            <Wand2 className="h-4 w-4" />
-            {searchLoading ? "Buscando..." : "Ejecutar búsqueda / Q&A"}
-          </button>
-
-          <div className="rounded-xl border border-border/60 bg-background/40 p-4">
-            <p className="text-sm font-semibold text-foreground">
-              {searchMode === "qa" ? "Respuesta" : "Resultados"}
-            </p>
-            {searchMode === "qa" ? (
-              <p className="mt-2 text-sm text-muted">
-                {searchAnswer ?? "Sin respuesta aún. Ejecuta una consulta para ver contenido."}
-              </p>
-            ) : (
-              <p className="mt-2 text-sm text-muted">
-                Resultados listados abajo (ahora usando /search con embedding server-side).
-              </p>
-            )}
-          </div>
-
-          <div className="rounded-xl border border-border/60 bg-background/40 p-4">
-            <p className="text-sm font-semibold text-foreground">
-              {searchMode === "qa" ? "Citas" : "Resultados"}
-            </p>
-            <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted">
-              <button
-                className="rounded-full border border-border px-3 py-1 hover:border-accent hover:text-accent"
-                onClick={() => {
-                  setSortByScoreAsc((prev) => !prev);
-                  setSearchResults((prev) => {
-                    const sorted = [...prev].sort((a, b) => {
-                      if (a.distance === undefined || b.distance === undefined) return 0;
-                      return !sortByScoreAsc ? a.distance - b.distance : b.distance - a.distance;
-                    });
-                    return sorted;
-                  });
-                }}
-              >
-                Ordenar por distancia {sortByScoreAsc ? "↑" : "↓"}
-              </button>
-              <span>
-                Página {citationsPage} / {Math.max(1, Math.ceil(searchResults.length / citationsPageSize))}
-              </span>
-              <div className="flex items-center gap-1">
-                <button
-                  disabled={citationsPage === 1}
-                  onClick={() => setCitationsPage((p) => Math.max(1, p - 1))}
-                  className="rounded-full border border-border px-2 py-1 disabled:opacity-50"
-                >
-                  ◀
-                </button>
-                <button
-                  disabled={citationsPage >= Math.max(1, Math.ceil(searchResults.length / citationsPageSize))}
-                  onClick={() =>
-                    setCitationsPage((p) =>
-                      Math.min(Math.max(1, Math.ceil(searchResults.length / citationsPageSize)), p + 1)
-                    )
-                  }
-                  className="rounded-full border border-border px-2 py-1 disabled:opacity-50"
-                >
-                  ▶
-                </button>
-              </div>
-            </div>
-
-            {searchMode === "search" && paginatedResults.length > 0 && (
-              <div className="mt-3 overflow-hidden rounded-lg border border-border/60">
-                <table className="w-full text-left text-sm text-muted">
-                  <thead className="bg-card/80 text-xs uppercase tracking-wide text-muted">
-                    <tr>
-                      <th className="px-3 py-2">Doc</th>
-                      <th className="px-3 py-2">Sección</th>
-                      <th className="px-3 py-2">Jurisdicción</th>
-                      <th className="px-3 py-2">Distancia</th>
-                      <th className="px-3 py-2">Fragmento</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {paginatedResults.map((r) => (
-                      <tr key={r.chunk_id} className="border-t border-border/60">
-                        <td className="px-3 py-2 text-foreground">{r.doc_id}</td>
-                        <td className="px-3 py-2">{r.section ?? "—"}</td>
-                        <td className="px-3 py-2">{r.jurisdiction ?? "—"}</td>
-                        <td className="px-3 py-2">{r.distance !== undefined ? r.distance.toFixed(3) : "—"}</td>
-                        <td className="px-3 py-2 text-foreground">{r.content}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
-
-            {paginatedCitations.length === 0 && searchMode === "qa" ? (
-              <p className="text-sm text-muted">Sin citas aún.</p>
-            ) : null}
-
-            {searchMode === "qa" && paginatedCitations.length > 0 && (
-              <ul className="mt-3 space-y-3 text-sm text-muted">
-                {paginatedCitations.map((c) => (
-                  <li key={c.chunk_id} className="rounded-lg border border-border/60 bg-card/70 p-3">
-                    <p className="text-xs uppercase tracking-wide text-muted">
-                      {c.doc_id} • {c.section ?? "sección"} • {c.jurisdiction ?? "jurisdicción"}
-                    </p>
-                    <p className="mt-1 text-foreground">{c.content}</p>
-                    {c.distance !== undefined && (
-                      <p className="text-[11px] text-muted">distancia: {c.distance.toFixed(3)}</p>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      );
-    }
-
-    if (selectedTool.id === "upload") {
-      return (
-        <div className="space-y-4">
-          <p className="text-sm text-muted">
-            Carga de documentos hacia el backend de ingesta (intentará llamar a /upload). Si no existe el endpoint,
-            verás un error y mensaje de placeholder.
-          </p>
-          <label className="flex flex-col items-center justify-center gap-3 rounded-xl border border-dashed border-border/70 bg-background/30 p-6 text-sm text-muted">
-            <Upload className="h-6 w-6 text-accent" />
-            <span>{uploadName ?? "Arrastra un PDF o haz clic para seleccionar"}</span>
-            <input
-              type="file"
-              accept=".pdf"
-              className="hidden"
-              onChange={(e) => {
-                if (!e.target.files?.length) return;
-                const file = e.target.files[0];
-                setUploadName(file.name);
-                runUpload(file);
-              }}
-            />
-          </label>
-          {uploadStatus && <p className="text-sm text-muted">{uploadStatus}</p>}
-          <button
-            disabled={uploading}
-            onClick={() => toast.info("Elige un archivo para subir")}
-            className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-contrast transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            Registrar documento
-          </button>
-        </div>
-      );
-    }
-
-    if (selectedTool.id === "summary-single" || selectedTool.id === "summary-multi") {
-      return (
-        <div className="space-y-4">
-          <p className="text-sm text-muted">
-            Resumen usando `/summary` (si está disponible). Pega texto o selecciona un doc; si falla, verás un
-            placeholder.
-          </p>
-          <textarea
-            value={summaryInput}
-            onChange={(e) => setSummaryInput(e.target.value)}
-            rows={6}
-            placeholder="Pega texto a resumir..."
-            className="w-full rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground outline-none transition focus:border-accent"
-          />
-          <button
-            onClick={runSummary}
-            disabled={summaryLoading}
-            className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-contrast transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            <Wand2 className="h-4 w-4" />
-            {summaryLoading ? "Resumiendo..." : "Generar resumen"}
-          </button>
-          <div className="rounded-xl border border-border/60 bg-background/40 p-4">
-            <p className="text-sm font-semibold text-foreground">Salida</p>
-            <p className="mt-2 text-sm text-muted">
-              {summaryOutput ?? "Aún no hay resumen. Ejecuta para ver el placeholder."}
-            </p>
-            {summaryCitations.length > 0 && (
-              <div className="mt-3 space-y-2">
-                <p className="text-xs uppercase tracking-wide text-muted">Citas</p>
-                <ul className="space-y-2 text-sm text-muted">
-                  {summaryCitations.map((c) => (
-                    <li key={c.chunk_id} className="rounded-lg border border-border/60 bg-card/70 p-2">
-                      <p className="text-xs uppercase tracking-wide text-muted">
-                        {c.doc_id} • {c.section ?? "sección"} • {c.jurisdiction ?? "jurisdicción"}
-                      </p>
-                      <p className="mt-1 text-foreground">{c.content}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </div>
-      );
-    }
-
+  const renderMessage = (msg: ChatMessage) => {
     return (
-      <div className="space-y-4">
-        <div className="mt-4 flex min-h-[280px] flex-col gap-3 rounded-xl bg-background/40 p-4">
-          {messages.length === 0 ? (
-            <div className="rounded-xl border border-border/60 bg-card/80 p-4 text-sm text-muted">
-              Aún no hay mensajes. Escribe tu petición para {selectedTool.name}.
-            </div>
-          ) : (
-            messages.map((msg, idx) => (
-              <div
-                key={`${msg.ts}-${idx}`}
-                className={`max-w-xl rounded-xl border border-border/60 p-3 text-sm ${
-                  msg.role === "user"
-                    ? "self-end bg-accent/15 text-foreground border-accent/40"
-                    : "self-start bg-card/70 text-muted"
-                }`}
-              >
-                <p className="text-[11px] uppercase tracking-wide text-muted">
-                  {msg.role === "user" ? "Usuario" : "Asistente"}
-                </p>
-                <p className="mt-1 leading-relaxed text-foreground">{msg.content}</p>
-              </div>
-            ))
-          )}
-        </div>
+      <div
+        key={msg.id}
+        className={`max-w-3xl rounded-2xl border border-border/60 px-4 py-3 text-sm shadow-sm ${
+          msg.role === "user" ? "self-end bg-accent/10 text-foreground border-accent/30" : "self-start bg-card/80 text-muted"
+        }`}
+      >
+        <p className="text-[11px] uppercase tracking-wide text-muted">
+          {msg.role === "user" ? "Usuario" : msg.meta?.tool ? `Asistente · ${msg.meta.tool}` : "Asistente"}
+        </p>
+        <p className="mt-2 whitespace-pre-wrap leading-relaxed text-foreground">{msg.content}</p>
+        {msg.citations && msg.citations.length > 0 && (
+          <div className="mt-3 space-y-2">
+            <p className="text-[11px] uppercase tracking-wide text-muted">Citas</p>
+            <ul className="space-y-2">
+              {msg.citations.map((c) => (
+                <li key={c.chunk_id} className="rounded-lg border border-border/60 bg-background/60 p-2">
+                  <p className="text-[12px] text-muted">
+                    {c.doc_id} • {c.section ?? "sección"} • {c.jurisdiction ?? "jurisdicción"} •{" "}
+                    {c.distance !== undefined ? c.distance.toFixed(3) : "—"}
+                  </p>
+                  <p className="text-foreground">{c.content}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+        {msg.results && msg.results.length > 0 && (
+          <div className="mt-3">
+            <p className="text-[11px] uppercase tracking-wide text-muted">Resultados</p>
+            <ul className="mt-1 space-y-2 text-muted">
+              {msg.results.map((r) => (
+                <li key={r.chunk_id} className="rounded-lg border border-border/60 bg-background/60 p-2">
+                  <p className="text-[12px] text-muted">
+                    {r.doc_id} • {r.section ?? "sección"} • {r.jurisdiction ?? "jurisdicción"} •{" "}
+                    {r.distance !== undefined ? r.distance.toFixed(3) : "—"}
+                  </p>
+                  <p className="text-foreground">{r.content}</p>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+      </div>
+    );
+  };
 
-        <form className="mt-4 flex gap-2" onSubmit={onSend}>
-          <input
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder={`Pregúntale a ${selectedTool.name}...`}
-            className="flex-1 rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground outline-none transition focus:border-accent"
-          />
-          <button
-            type="submit"
-            className="flex items-center gap-2 rounded-xl bg-accent px-4 py-3 text-sm font-semibold text-contrast transition hover:bg-accent-strong"
-          >
-            Enviar
-          </button>
-        </form>
+  const StatusBadge = ({ status }: { status: "online" | "offline" | "checking" }) => {
+    if (status === "checking") {
+      return (
+        <div className="flex items-center gap-2 rounded-full border border-border px-4 py-2 text-xs text-muted">
+          <Loader2 className="h-4 w-4 animate-spin text-accent" />
+          Verificando backend...
+        </div>
+      );
+    }
+    const isOnline = status === "online";
+    return (
+      <div
+        className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold ${
+          isOnline ? "border-emerald-500/40 text-emerald-300" : "border-danger/40 text-danger"
+        }`}
+      >
+        {isOnline ? <CheckCircle2 className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4" />}
+        {isOnline ? "Backend en línea" : "Backend no disponible"}
       </div>
     );
   };
 
   return (
-    <div className="min-h-screen bg-background px-6 py-8">
-      <header className="mx-auto flex max-w-6xl flex-col gap-4 rounded-3xl border border-border/60 bg-surface/80 px-6 py-5 shadow-xl shadow-black/30 md:flex-row md:items-center md:justify-between">
+    <div className="min-h-screen bg-background">
+      <header className="sticky top-0 z-40 flex items-center justify-between border-b border-border/50 bg-surface/80 px-4 py-3 backdrop-blur">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-xl font-semibold text-foreground">
+          <button
+            className="flex h-10 w-10 items-center justify-center rounded-full border border-border text-sm text-foreground transition hover:border-accent hover:text-accent md:hidden"
+            onClick={() => setSidebarOpen((v) => !v)}
+            aria-label="Toggle sidebar"
+          >
+            {sidebarOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+          </button>
+          <Link
+            href="/"
+            className="flex h-12 w-12 items-center justify-center rounded-xl border border-accent/40 bg-accent/15 text-xl font-semibold text-foreground"
+          >
             LT
-          </div>
-          <div>
+          </Link>
+          <div className="hidden md:block">
             <p className="text-lg font-semibold text-foreground">Panel LexToolkit</p>
             <p className="text-sm text-muted">Selecciona una herramienta y conversa.</p>
           </div>
         </div>
-
-        <div className="flex flex-wrap items-center gap-3">
+        <div className="flex items-center gap-2">
           <StatusBadge status={health} />
-          <div className="rounded-full border border-border px-4 py-2 text-xs text-muted">
-            Sesión: {fakeToken ? "JWT de demo en localStorage" : "Sin token"}
+          <div className="hidden rounded-full border border-border px-4 py-2 text-xs text-muted md:flex">
+            Sesión: {sessionToken ? "Activa" : "No autenticado"}
           </div>
           <button
-            onClick={() => {
-              clearFakeToken();
-              toast.info("Sesión de demo eliminada");
+            onClick={async () => {
+              try {
+                await apiLogout();
+                clearAccessToken();
+                setSessionToken(null);
+                toast.info("Sesión cerrada");
+              } catch (error) {
+                console.error("No se pudo cerrar sesión", error);
+                toast.error("No se pudo cerrar sesión", {
+                  description: error instanceof Error ? error.message : "Error desconocido",
+                });
+              }
             }}
-            className="flex items-center gap-2 rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground transition hover:border-accent hover:text-accent"
+            className="hidden items-center gap-2 rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground transition hover:border-accent hover:text-accent md:flex"
           >
             <LogOut className="h-4 w-4" />
-            Limpiar demo
+            Cerrar sesión
           </button>
         </div>
       </header>
 
-      <main className="mx-auto mt-8 max-w-6xl space-y-8">
-        <section className="rounded-3xl border border-border/60 bg-surface/80 p-6 shadow-lg shadow-black/20">
-          <nav className="flex flex-wrap gap-3 border-b border-border/60 pb-4">
-            {TOOLS.map((tool) => (
+      <div className="flex min-h-[calc(100vh-64px)]">
+        {/* Sidebar */}
+        <aside
+          className={`fixed inset-y-0 left-0 z-30 w-72 transform border-r border-border/60 bg-surface/90 p-4 transition-transform duration-300 md:relative md:translate-x-0 ${
+            sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+          }`}
+        >
+          <div className="mb-3 flex items-center justify-between">
+            <p className="text-sm font-semibold text-foreground">Herramientas</p>
+            <button
+              className="md:hidden text-muted"
+              aria-label="Cerrar"
+              onClick={() => setSidebarOpen(false)}
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </div>
+          <div className="space-y-2">
+            {readyTools.map((tool) => (
               <button
                 key={tool.id}
                 onClick={() => onSelectTool(tool)}
-                className={`flex items-center gap-2 rounded-full px-4 py-2 text-sm transition ${
+                className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-sm transition ${
                   selectedTool.id === tool.id
-                    ? "bg-accent text-contrast"
-                    : "border border-border text-muted hover:border-accent hover:text-accent"
+                    ? "border-accent bg-accent/10 text-foreground"
+                    : "border-border text-muted hover:border-accent hover:text-accent"
                 }`}
               >
-                <Sparkles className="h-4 w-4" />
-                {tool.name}
+                <span>{tool.name}</span>
+                {tool.id === "summary" && (
+                  <span
+                    className={`h-2 w-2 rounded-full ${
+                      summaryHealth.status === "online"
+                        ? "bg-emerald-400"
+                        : summaryHealth.status === "checking"
+                          ? "bg-amber-300"
+                          : "bg-red-400"
+                    }`}
+                  />
+                )}
               </button>
             ))}
-          </nav>
-
-          <div className="mt-6 grid gap-6 md:grid-cols-[1.1fr,0.9fr]">
-            <div className="relative rounded-2xl border border-border/70 bg-card/70 p-4">
-              <div className="flex items-center justify-between border-b border-border/60 pb-3">
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-muted">Herramienta</p>
-                  <p className="text-lg font-semibold text-foreground">{selectedTool.name}</p>
-                  <p className="text-sm text-muted">
-                    {selectedTool.status === "ready"
-                      ? "Disponible para probar."
-                      : "Placeholder de UI hasta que el backend esté listo."}
-                  </p>
-                </div>
-                {pendingTool === selectedTool.id && (
-                  <div className="flex items-center gap-2 rounded-full border border-border bg-background/60 px-3 py-2 text-xs text-muted">
-                    <Loader2 className="h-4 w-4 animate-spin text-accent" />
-                    Probando endpoint...
-                  </div>
-                )}
-              </div>
-
-              {renderToolContent()}
-            </div>
-
-            <div className="rounded-2xl border border-border/70 bg-card/70 p-4">
-              <p className="text-xs uppercase tracking-wide text-muted">Disponibilidad</p>
-              <div className="mt-3 space-y-2">
-                {readyTools.map((tool) => (
-                  <div
-                    key={tool.id}
-                    className="flex items-center justify-between rounded-xl border border-border/60 bg-background/40 px-4 py-3"
-                  >
-                    <div>
-                      <p className="text-sm font-semibold text-foreground">{tool.name}</p>
-                      <p className="text-xs text-muted">{tool.description}</p>
-                    </div>
-                    <button
-                      onClick={() => pingTool(tool)}
-                      className="rounded-full border border-accent/50 px-3 py-1 text-[11px] font-semibold text-accent transition hover:bg-accent/10"
-                    >
-                      Probar endpoint
-                    </button>
-                  </div>
-                ))}
-              </div>
-
-              <div className="mt-4 flex items-center gap-3 rounded-xl border border-border/60 bg-background/40 px-4 py-3">
-                <ShieldCheck className="h-5 w-5 text-accent" />
-                <div>
-                  <p className="text-sm font-semibold text-foreground">Autenticación (nota)</p>
-                  <p className="text-sm text-muted">
-                    El UI está listo para JWT. Hoy solo guardamos un token de demo en localStorage sin middleware.
-                  </p>
-                </div>
-              </div>
-
-              <Link
-                href="/"
-                className="mt-4 inline-flex items-center rounded-full border border-border px-4 py-2 text-xs font-semibold text-foreground transition hover:border-accent hover:text-accent"
-              >
-                Volver al landing
-              </Link>
-            </div>
           </div>
-        </section>
-      </main>
-    </div>
-  );
-}
 
-function StatusBadge({ status }: { status: ReturnType<typeof useBackendHealth> }) {
-  if (status === "checking") {
-    return (
-      <div className="flex items-center gap-2 rounded-full border border-border px-4 py-2 text-xs text-muted">
-        <Loader2 className="h-4 w-4 animate-spin text-accent" />
-        Verificando backend...
+          <div className="mt-6 space-y-3 rounded-2xl border border-border/60 bg-card/70 p-3 text-sm text-muted">
+            <button
+              className="flex w-full items-center justify-between text-foreground"
+              onClick={() => setFiltersOpen((v) => !v)}
+            >
+              <span className="flex items-center gap-2">
+                <ArrowLeftRight className="h-4 w-4" />
+                Filtros avanzados
+              </span>
+              {filtersOpen ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+            {filtersOpen && (
+              <div className="space-y-3 pt-2">
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Doc IDs (coma)</span>
+                  <input
+                    value={searchDocIds}
+                    onChange={(e) => setSearchDocIds(e.target.value)}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Jurisdicciones (coma)</span>
+                  <input
+                    value={searchJurisdictions}
+                    onChange={(e) => setSearchJurisdictions(e.target.value)}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Secciones (coma)</span>
+                  <input
+                    value={searchSections}
+                    onChange={(e) => setSearchSections(e.target.value)}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Resultados (top_k)</span>
+                  <input
+                    type="number"
+                    min={1}
+                    max={20}
+                    value={searchTopK}
+                    onChange={(e) => setSearchTopK(Number(e.target.value))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                  />
+                </label>
+                <div className="flex items-center gap-2 text-xs text-muted">
+                  <button
+                    onClick={() => setSearchMode("qa")}
+                    className={`rounded-full border px-3 py-1 ${
+                      searchMode === "qa" ? "border-accent text-accent" : "border-border"
+                    }`}
+                  >
+                    Q&A
+                  </button>
+                  <button
+                    onClick={() => setSearchMode("search")}
+                    className={`rounded-full border px-3 py-1 ${
+                      searchMode === "search" ? "border-accent text-accent" : "border-border"
+                    }`}
+                  >
+                    Búsqueda
+                  </button>
+                </div>
+                <div className="rounded-xl border border-border/60 bg-background/60 p-3 text-xs">
+                  <p className="font-semibold text-foreground">Resumen (doc_ids opcionales)</p>
+                  <input
+                    value={summaryDocIds}
+                    onChange={(e) => setSummaryDocIds(e.target.value)}
+                    placeholder="doc123, doc456"
+                    className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                  />
+                  <p className="mt-1 text-muted">/summary/health: {summaryHealth.status}</p>
+                </div>
+              </div>
+            )}
+          </div>
+
+          <div className="mt-6 space-y-2 rounded-2xl border border-border/60 bg-card/70 p-3 text-sm text-muted">
+            <div className="flex items-center gap-2 text-foreground">
+              <Upload className="h-4 w-4" />
+              <span>Subir documento</span>
+            </div>
+            <div
+              className={`flex cursor-pointer flex-col gap-2 rounded-xl border border-dashed p-3 text-xs transition ${
+                uploadDragActive ? "border-accent bg-accent/5" : "border-border/60 bg-background/60"
+              }`}
+              onDragOver={(e) => {
+                e.preventDefault();
+                setUploadDragActive(true);
+              }}
+              onDragLeave={() => setUploadDragActive(false)}
+              onDrop={(e) => {
+                e.preventDefault();
+                setUploadDragActive(false);
+                const file = e.dataTransfer.files?.[0];
+                if (file) {
+                  setUploadName(file.name);
+                  runUpload(file);
+                }
+              }}
+              onClick={() => uploadInputRef.current?.click()}
+            >
+              <p className="text-foreground">Arrastra o selecciona un PDF</p>
+              <p className="text-muted">Ingesta y tracking automático.</p>
+              <input
+                ref={uploadInputRef}
+                type="file"
+                accept="application/pdf"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (!file) return;
+                  setUploadName(file.name);
+                  runUpload(file);
+                }}
+                disabled={uploading}
+              />
+            </div>
+            {uploadName && <p className="text-xs text-muted">Archivo: {uploadName}</p>}
+            {uploadStatus && (
+              <div className="rounded-lg border border-border/60 bg-background/70 p-2 text-xs text-muted">
+                <p>{uploadStatus}</p>
+                <div className="mt-1 h-2 w-full rounded-full bg-border/50">
+                  <div
+                    className="h-2 rounded-full bg-accent"
+                    style={{ width: `${Math.min(uploadProgress, 100)}%` }}
+                  />
+                </div>
+                {uploadDocIds.length > 0 && <p className="mt-1">Doc IDs: {uploadDocIds.join(", ")}</p>}
+                {uploadError && <p className="mt-1 text-danger">Error: {uploadError}</p>}
+                <button
+                  className="mt-2 text-foreground underline"
+                  onClick={resetUpload}
+                  type="button"
+                  disabled={uploading}
+                >
+                  Limpiar
+                </button>
+              </div>
+            )}
+          </div>
+        </aside>
+
+        {/* Main chat area */}
+        <main className="flex flex-1 flex-col bg-background px-4 py-4 md:ml-0 md:px-8">
+          <div className="mb-3 flex items-center gap-2 rounded-full border border-accent/50 bg-accent/10 px-4 py-2 text-sm font-semibold text-foreground shadow-sm">
+            <Sparkles className="h-4 w-4 text-accent" />
+            <span>{selectedTool.name}</span>
+            <span className="rounded-full bg-card/60 px-2 py-1 text-[11px] font-normal text-muted">
+              {selectedTool.description}
+            </span>
+          </div>
+
+          <div className="flex flex-1 flex-col gap-3 overflow-y-auto rounded-2xl border border-border/60 bg-surface/80 p-4">
+            {messages.length === 0 ? (
+              <div className="rounded-xl border border-border/60 bg-card/80 p-4 text-sm text-muted">
+                Aún no hay mensajes. Escribe tu petición para {selectedTool.name}. Usa filtros a la izquierda para
+                acotar doc_ids, jurisdicciones y secciones.
+              </div>
+            ) : (
+              messages.map(renderMessage)
+            )}
+            {actionLoading && (
+              <div className="flex items-center gap-2 text-sm text-muted">
+                <Loader2 className="h-4 w-4 animate-spin text-accent" />
+                Procesando...
+              </div>
+            )}
+            <div ref={chatBottomRef} />
+          </div>
+
+          {selectedTool.id === "summary" ? (
+            <div className="sticky bottom-2 mt-3 rounded-2xl border border-border/60 bg-card/90 p-4 shadow-lg">
+              <div
+                className={`flex flex-col gap-2 rounded-xl border border-dashed p-3 text-sm ${
+                  summaryDragActive ? "border-accent bg-accent/5" : "border-border/70 bg-background/60"
+                }`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setSummaryDragActive(true);
+                }}
+                onDragLeave={() => setSummaryDragActive(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setSummaryDragActive(false);
+                  const file = e.dataTransfer.files?.[0];
+                  if (file) handleSummaryFile(file);
+                }}
+              >
+                <div className="flex items-center gap-2 text-foreground">
+                  <FileText className="h-4 w-4 text-accent" />
+                  <span className="font-semibold">Arrastra un .txt o selecciona un documento</span>
+                </div>
+                <p className="text-xs text-muted">
+                  Cargaremos el texto y lo resumiremos. Para PDF pega el texto manualmente (sin input visible).
+                </p>
+                <input
+                  type="file"
+                  accept=".txt"
+                  className="text-xs text-muted"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) handleSummaryFile(file);
+                  }}
+                />
+              </div>
+              {summaryBuffer && (
+                <div className="mt-3 rounded-xl border border-border/60 bg-background/60 p-3 text-sm text-muted">
+                  <p className="text-[12px] uppercase tracking-wide text-muted">Texto listo para resumir</p>
+                  <p className="text-foreground line-clamp-3">{summaryBuffer.slice(0, 500)}...</p>
+                  {summaryFileName && <p className="text-[11px] text-muted">Archivo: {summaryFileName}</p>}
+                </div>
+              )}
+              <div className="mt-3 flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => (summaryBuffer.trim() ? runSummary(summaryBuffer) : toast.info("Carga un .txt primero"))}
+                  disabled={summaryLoading || actionLoading || !summaryBuffer.trim()}
+                  className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-contrast transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {summaryLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                  Resumir documento
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSummaryBuffer("");
+                    setSummaryFileName(null);
+                  }}
+                  className="text-xs text-muted underline"
+                >
+                  Limpiar
+                </button>
+              </div>
+            </div>
+          ) : selectedTool.id === "upload" ? (
+            <div className="sticky bottom-2 mt-3 rounded-2xl border border-border/60 bg-card/90 p-4 shadow-lg text-sm text-muted">
+              <div className="flex items-center gap-2 text-foreground">
+                <Upload className="h-4 w-4" />
+                <span>Subir documento</span>
+              </div>
+              <div
+                className={`mt-2 flex cursor-pointer flex-col gap-2 rounded-xl border border-dashed p-3 text-xs transition ${
+                  uploadDragActive ? "border-accent bg-accent/5" : "border-border/60 bg-background/60"
+                }`}
+                onDragOver={(e) => {
+                  e.preventDefault();
+                  setUploadDragActive(true);
+                }}
+                onDragLeave={() => setUploadDragActive(false)}
+                onDrop={(e) => {
+                  e.preventDefault();
+                  setUploadDragActive(false);
+                  const file = e.dataTransfer.files?.[0];
+                  if (file) {
+                    setUploadName(file.name);
+                    runUpload(file);
+                  }
+                }}
+                onClick={() => uploadInputRef.current?.click()}
+              >
+                <p className="text-foreground">Arrastra o selecciona un PDF</p>
+                <p className="text-muted">Ingesta y tracking automático.</p>
+                <input
+                  ref={uploadInputRef}
+                  type="file"
+                  accept="application/pdf"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    setUploadName(file.name);
+                    runUpload(file);
+                  }}
+                  disabled={uploading}
+                />
+              </div>
+              {uploadName && <p className="text-xs text-muted">Archivo: {uploadName}</p>}
+              {uploadStatus && (
+                <div className="mt-2 rounded-lg border border-border/60 bg-background/70 p-2 text-xs text-muted">
+                  <p>{uploadStatus}</p>
+                  <div className="mt-1 h-2 w-full rounded-full bg-border/50">
+                    <div
+                      className="h-2 rounded-full bg-accent"
+                      style={{ width: `${Math.min(uploadProgress, 100)}%` }}
+                    />
+                  </div>
+                  {uploadDocIds.length > 0 && <p className="mt-1">Doc IDs: {uploadDocIds.join(", ")}</p>}
+                  {uploadError && <p className="mt-1 text-danger">Error: {uploadError}</p>}
+                  <button
+                    className="mt-2 text-foreground underline"
+                    onClick={resetUpload}
+                    type="button"
+                    disabled={uploading}
+                  >
+                    Limpiar
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <form
+              className="sticky bottom-2 mt-3 flex items-end gap-3 rounded-2xl border border-border/60 bg-card/90 p-3 shadow-lg"
+              onSubmit={onSend}
+            >
+              <div className="flex-1">
+                <textarea
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  placeholder={`Pregúntale a ${selectedTool.name}...`}
+                  rows={2}
+                  className="w-full resize-none rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground outline-none transition focus:border-accent"
+                />
+                <p className="mt-1 text-[11px] text-muted">
+                  Enter para enviar. Herramienta activa: {selectedTool.name} ({selectedTool.id}).
+                </p>
+              </div>
+              <button
+                type="submit"
+                disabled={actionLoading || summaryLoading}
+                className="flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-contrast transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
+              >
+                {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                Enviar
+              </button>
+            </form>
+          )}
+        </main>
       </div>
-    );
-  }
-
-  const isOnline = status === "online";
-
-  return (
-    <div
-      className={`flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-semibold ${
-        isOnline ? "border-accent/50 text-accent" : "border-danger/40 text-danger"
-      }`}
-    >
-      {isOnline ? <CircleCheck className="h-4 w-4" /> : <CircleDashed className="h-4 w-4" />}
-      {isOnline ? "Backend en línea" : "Backend no disponible"}
     </div>
   );
 }
-
-function formatList(value: string) {
-  return value
-    .split(",")
-    .map((v) => v.trim())
-    .filter(Boolean);
-}
-
-export { formatList };

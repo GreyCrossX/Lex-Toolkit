@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { Check, Shield, Headset, Lock, ArrowRight } from "lucide-react";
-import { SiteHeader } from "@/components/site-header";
 
 const plans = [
   {
@@ -58,7 +57,6 @@ const plans = [
 export default function PricingPage() {
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <SiteHeader />
       <div className="mx-auto max-w-5xl px-6 pb-12">
         <div className="mt-4 flex flex-col gap-4 text-center">
           <p className="inline-flex items-center gap-2 self-center rounded-full border border-accent/30 bg-accent/10 px-4 py-1 text-xs font-semibold text-accent">

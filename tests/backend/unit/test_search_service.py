@@ -1,5 +1,5 @@
-from app.schemas import SearchRequest
-from app.services.search import run_search
+from app.application.search_service import run_search
+from app.interfaces.api.schemas import SearchRequest
 
 
 class FakeCursor:

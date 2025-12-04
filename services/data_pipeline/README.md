@@ -4,25 +4,25 @@ Home for ingestion, normalization, and chunking scripts. Existing scrapers and R
 
 ## Setup
 
+Install deps from the repo root (single uv environment):
 ```bash
-cd services/data_pipeline
-pipenv install
+uv sync
 ```
 
-The Pipenv environment now includes `sentence-transformers`, so you can run local embedding jobs (e.g., `intfloat/multilingual-e5-base`) directly on your GPU.
+The environment includes `sentence-transformers`, so you can run local embedding jobs (e.g., `intfloat/multilingual-e5-base`) directly on your GPU.
 
 ## Embedding chunks locally
 
 1. Generate chunks with `build_chunks.py` (already run across the corpus):
    ```bash
-   pipenv run python -m services.data_pipeline.build_chunks \
+   uv run python -m services.data_pipeline.build_chunks \
      --tokenizer-model gpt-4o-mini \
      --max-tokens 320 \
      --overlap-tokens 60
    ```
 2. Encode them with the local embedder (defaults shown):
    ```bash
-   pipenv run python -m services.data_pipeline.embed_chunks \
+   uv run python -m services.data_pipeline.embed_chunks \
      --backend local \
      --local-model intfloat/multilingual-e5-base \
      --local-device cuda
@@ -37,7 +37,7 @@ The resulting vectors are stored in `data/legal_chunks.db`, ready for pgvector i
 OpenAI (default choice):
 ```bash
 OPENAI_API_KEY=... \
-pipenv run python -m services.data_pipeline.embed_chunks \
+uv run python -m services.data_pipeline.embed_chunks \
   --backend openai \
   --embedding-model text-embedding-3-large \
   --chunks-dir data/chunks \
@@ -50,7 +50,7 @@ pipenv run python -m services.data_pipeline.embed_chunks \
 
 Local (offline fallback):
 ```bash
-pipenv run python -m services.data_pipeline.embed_chunks \
+uv run python -m services.data_pipeline.embed_chunks \
   --backend local \
   --local-model intfloat/multilingual-e5-base \
   --local-device cuda \
@@ -68,7 +68,7 @@ pipenv run python -m services.data_pipeline.embed_chunks \
 Use `tokenize_chunks.py` to attach token counts (and optionally raw token ids) using `tiktoken` so downstream OpenAI agents can enforce context windows:
 
 ```bash
-pipenv run python -m services.data_pipeline.tokenize_chunks \
+uv run python -m services.data_pipeline.tokenize_chunks \
   --model gpt-4o-mini \
   --chunks-dir data/chunks \
   --output-dir data/tokenized_chunks \
@@ -77,7 +77,7 @@ pipenv run python -m services.data_pipeline.tokenize_chunks \
   # --validate-decode  # optional sanity check: ensures decoded text matches input
 
 # Optional (debug): include raw token ids and store sidecar .npz for compact storage
-# pipenv run python -m services.data_pipeline.tokenize_chunks \
+# uv run python -m services.data_pipeline.tokenize_chunks \
 #   --include-token-ids \
 #   --save-token-ids-npy \
 #   --chunks-dir data/chunks \

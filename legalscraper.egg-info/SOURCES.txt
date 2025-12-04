@@ -1,0 +1,8 @@
+README.md
+pyproject.toml
+legalscraper.egg-info/PKG-INFO
+legalscraper.egg-info/SOURCES.txt
+legalscraper.egg-info/dependency_links.txt
+legalscraper.egg-info/requires.txt
+legalscraper.egg-info/top_level.txt
+tests/test_research_graph.py

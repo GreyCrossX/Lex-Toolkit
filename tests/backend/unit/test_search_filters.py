@@ -1,5 +1,5 @@
-from app.schemas import SearchRequest
-from app.services.search import _build_where_clauses
+from app.application.search_service import _build_where_clauses
+from app.interfaces.api.schemas import SearchRequest
 
 
 def test_build_where_clauses_with_filters_and_distance():

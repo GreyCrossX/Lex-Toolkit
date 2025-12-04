@@ -1,0 +1,90 @@
+Metadata-Version: 2.4
+Name: legalscraper
+Version: 0.1.0
+Summary: Legal RAG stack (FastAPI + pgvector + Celery worker + data pipeline)
+Requires-Python: >=3.12
+Description-Content-Type: text/markdown
+Requires-Dist: fastapi==0.111.0
+Requires-Dist: uvicorn[standard]==0.30.1
+Requires-Dist: openai==1.51.2
+Requires-Dist: httpx==0.27.2
+Requires-Dist: psycopg==3.2.1
+Requires-Dist: psycopg-binary==3.2.1
+Requires-Dist: psycopg-pool==3.2.1
+Requires-Dist: pgvector==0.2.5
+Requires-Dist: redis==5.1.1
+Requires-Dist: celery==5.4.0
+Requires-Dist: python-multipart==0.0.12
+Requires-Dist: pypdf==5.3.0
+Requires-Dist: pypdf2
+Requires-Dist: pdfplumber==0.11.5
+Requires-Dist: requests
+Requires-Dist: beautifulsoup4
+Requires-Dist: torch
+Requires-Dist: sentence-transformers
+Requires-Dist: tiktoken
+Requires-Dist: langchain
+Requires-Dist: langchain-openai
+Requires-Dist: pytest
+Requires-Dist: passlib[bcrypt]
+Requires-Dist: python-jose
+
+# Legal Scraper Monorepo
+
+This repository is structured as a monorepo so we can add a Next.js frontend, FastAPI backend, LangGraph agents, and infrastructure side-by-side with the existing data pipeline. Current snapshot:
+- Search/Q&A API (FastAPI) backed by pgvector; `/search` accepts an embedding or raw query text (embeds server-side) and `/qa` returns cited answers.
+- Upload + ingest: `/upload` (defaults to statutes) or `/ingestion/{doc_type}` (statute/jurisprudence/contract/policy) save the PDF, enqueue a Celery task on a Redis broker, and a dedicated worker ingests a preview into `legal_chunks` (OpenAI embeddings) while persisting job status in Postgres (`ingestion_jobs`).
+- Next.js App Router dashboard with tool switcher: search/Q&A form with filters, sorting, pagination, upload UI hitting `/upload`, and summary UI hitting `/summary` (both with graceful placeholders). Landing/pricing/login pages share the same palette.
+- Data pipeline (chunking + embeddings) completed with OpenAI `text-embedding-3-small` (1536 dims) and loaded into pgvector.
+- Tests: pytest unit/integration + optional live pgvector checks; Vitest for dashboard page, hooks, and auth helpers (authFetch/401 retry).
+
+## Directory layout
+
+- `apps/web` – Next.js frontend (landing, dashboard tools, Vitest setup).
+- `apps/api` – FastAPI backend (health, search, QA; pgvector).
+- `apps/agent` – reserved for LangGraph agent flows and tooling.
+- `services/data_pipeline` – ingestion, normalization, and chunk/embedding code plus its Pipenv environment and configs.
+- `data` – shared datasets (raw, normalized, chunks, etc.).
+- `infra/docker` – Docker/infra manifests.
+
+## Data pipeline quick start
+
+Each script now lives under `services/data_pipeline`. Install deps once, then run modules so imports resolve cleanly:
+
+```bash
+uv sync
+uv run python -m services.data_pipeline.build_chunks --help
+uv run python -m services.data_pipeline.embed_chunks --backend local --help
+uv run python -m services.data_pipeline.dof_scraper --help
+```
+
+Config JSON files live in `services/data_pipeline/config/`, and helpers in `services/data_pipeline/paths.py` keep the scripts pointing at the right defaults regardless of your working directory.
+
+## Docker (pgvector + API/worker)
+
+Start Postgres with pgvector from the repo root:
+```bash
+docker compose up -d pgvector
+```
+- Optional: copy `.env.example` to `.env` at the repo root to override Postgres defaults.
+- Defaults are `vector/vectorpass/legalscraper` on port `5432` (override with `POSTGRES_*` envs).
+- Init scripts live in `infra/docker/init`; vector table defaults to 1536 dims (OpenAI `text-embedding-3-small`) with HNSW. If you embed at a different dimension (e.g., 3072), adjust the init SQL and drop/recreate the DB volume.
+
+API + ingestion worker (Celery on Redis broker):
+```bash
+docker compose --profile api up --build -d pgvector redis api worker
+```
+
+Service placeholder (web) uses `profiles` and simply keeps a container running so you can attach once code lands:
+```bash
+docker compose --profile web up -d web      # node:20 shell in apps/web
+```
+
+## Docs map
+- Architecture & modules: `ARCHITECTURE.md`
+- Tasks/status: `tasks.md`, `next_steps_plan.md`
+- Decisions: `embedding_model_decision.md`
+- Data pipeline: `services/data_pipeline/README.md`
+- API: `apps/api/README.md`
+- Infra (pgvector init): `infra/docker/README.md`
+- Quick index: `docs/README.md`

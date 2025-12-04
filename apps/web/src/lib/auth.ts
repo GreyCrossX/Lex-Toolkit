@@ -1,16 +1,13 @@
-const TOKEN_KEY = "lex_fake_jwt";
+let accessToken: string | null = null;
 
-export function setFakeToken(token: string) {
-  if (typeof window === "undefined") return;
-  window.localStorage.setItem(TOKEN_KEY, token);
+export function setAccessToken(token: string | null) {
+  accessToken = token;
 }
 
-export function getFakeToken() {
-  if (typeof window === "undefined") return null;
-  return window.localStorage.getItem(TOKEN_KEY);
+export function getAccessToken() {
+  return accessToken;
 }
 
-export function clearFakeToken() {
-  if (typeof window === "undefined") return;
-  window.localStorage.removeItem(TOKEN_KEY);
+export function clearAccessToken() {
+  accessToken = null;
 }

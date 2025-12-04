@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { setFakeToken } from "@/lib/auth";
+import { setAccessToken } from "@/lib/auth";
+import { apiLogin } from "@/lib/auth-client";
 import Link from "next/link";
 import { LogIn, ShieldCheck } from "lucide-react";
 
@@ -18,13 +19,15 @@ export default function LoginPage() {
     setLoading(true);
 
     try {
-      // Token falso solo para revisar UI.
-      setFakeToken("demo-jwt-token");
-      toast.success("Sesión de demo iniciada");
+      const access = await apiLogin(email, password);
+      setAccessToken(access);
+      toast.success("Sesión iniciada");
       router.push("/dashboard");
     } catch (error) {
-      console.error("No se pudo establecer la sesión de demo", error);
-      toast.error("No se pudo iniciar la sesión de demo");
+      console.error("No se pudo iniciar sesión", error);
+      toast.error("No se pudo iniciar sesión", {
+        description: error instanceof Error ? error.message : "Error desconocido",
+      });
     } finally {
       setLoading(false);
     }
@@ -70,7 +73,7 @@ export default function LoginPage() {
 
           <div className="flex items-center gap-2 rounded-xl border border-border/60 bg-background/30 px-3 py-2 text-xs text-muted">
             <ShieldCheck className="h-4 w-4 text-accent" />
-            La autenticación JWT reemplazará este flujo; hoy no enviamos credenciales al backend.
+            Las credenciales se envían al backend; el refresh token queda en cookie HttpOnly.
           </div>
 
           <button

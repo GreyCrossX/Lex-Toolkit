@@ -14,7 +14,7 @@
 ```bash
 # OpenAI default (primary)
 OPENAI_API_KEY=... \
-pipenv run python -m services.data_pipeline.embed_chunks \
+uv run python -m services.data_pipeline.embed_chunks \
   --backend openai \
   --embedding-model text-embedding-3-large \
   --chunks-dir data/chunks \
@@ -22,7 +22,7 @@ pipenv run python -m services.data_pipeline.embed_chunks \
   --batch-size 64
 
 # Fallback local (no network)
-pipenv run python -m services.data_pipeline.embed_chunks \
+uv run python -m services.data_pipeline.embed_chunks \
   --backend local \
   --local-model intfloat/multilingual-e5-base \
   --local-device cuda \

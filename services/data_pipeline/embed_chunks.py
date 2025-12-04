@@ -176,7 +176,7 @@ class LocalEmbedder:
         except ImportError as exc:  # pragma: no cover - optional dependency
             raise RuntimeError(
                 "sentence-transformers is required for local embeddings. "
-                "Install it with `pipenv install sentence-transformers`."
+                "Install it with `uv add sentence-transformers`."
             ) from exc
 
         self._model = SentenceTransformer(model_name, device=device)

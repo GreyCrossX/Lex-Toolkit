@@ -1,29 +1,35 @@
 # Legal Scraper Monorepo
 
-This repository is structured as a monorepo so we can add a Next.js frontend, FastAPI backend, LangGraph agents, and infrastructure side-by-side with the existing data pipeline.
+This repository is structured as a monorepo so we can add a Next.js frontend, FastAPI backend, LangGraph agents, and infrastructure side-by-side with the existing data pipeline. Current snapshot:
+- Search/Q&A API (FastAPI) backed by pgvector; `/search` accepts an embedding or raw query text (embeds server-side) and `/qa` returns cited answers.
+- Upload + ingest: `/upload` (defaults to statutes) or `/ingestion/{doc_type}` (statute/jurisprudence/contract/policy) save the PDF, enqueue a Celery task on a Redis broker, and a dedicated worker ingests a preview into `legal_chunks` (OpenAI embeddings) while persisting job status in Postgres (`ingestion_jobs`).
+- Next.js App Router dashboard with tool switcher: search/Q&A form with filters, sorting, pagination, upload UI hitting `/upload`, and summary UI hitting `/summary` (both with graceful placeholders). Landing/pricing/login pages share the same palette.
+- Data pipeline (chunking + embeddings) completed with OpenAI `text-embedding-3-small` (1536 dims) and loaded into pgvector.
+- Tests: pytest unit/integration + optional live pgvector checks; Vitest for dashboard page, hooks, and auth helpers (authFetch/401 retry).
 
 ## Directory layout
 
-- `apps/web` – placeholder for the Next.js frontend.
-- `apps/api` – placeholder for the FastAPI backend.
-- `apps/agent` – reserved for LangGraph agent flows and tooling.
-- `services/data_pipeline` – all ingestion, normalization, and chunk/embedding code plus its Pipenv environment and configs.
+- `apps/web` – Next.js frontend (landing, dashboard tools, Vitest setup).
+- `apps/api` – FastAPI backend (health, search, QA; pgvector).
+- `apps/agent` – LangGraph agent flows and shared tools (pgvector_inspector, web_browser, research graph).
+- `services/data_pipeline` – ingestion, normalization, and chunk/embedding code plus its Pipenv environment and configs.
 - `data` – shared datasets (raw, normalized, chunks, etc.).
-- `infra/docker` – future Docker/infra manifests.
+- `infra/docker` – Docker/infra manifests.
 
 ## Data pipeline quick start
 
-Each script now lives under `services/data_pipeline`. Run them as modules so imports resolve cleanly:
+Each script now lives under `services/data_pipeline`. Install deps once, then run modules so imports resolve cleanly:
 
 ```bash
-pipenv run python -m services.data_pipeline.build_chunks --help
-pipenv run python -m services.data_pipeline.embed_chunks --backend local --help
-pipenv run python -m services.data_pipeline.dof_scraper --help
+uv sync
+uv run python -m services.data_pipeline.build_chunks --help
+uv run python -m services.data_pipeline.embed_chunks --backend local --help
+uv run python -m services.data_pipeline.dof_scraper --help
 ```
 
 Config JSON files live in `services/data_pipeline/config/`, and helpers in `services/data_pipeline/paths.py` keep the scripts pointing at the right defaults regardless of your working directory.
 
-## Docker (pgvector + service shells)
+## Docker (pgvector + API/worker)
 
 Start Postgres with pgvector from the repo root:
 ```bash
@@ -33,11 +39,14 @@ docker compose up -d pgvector
 - Defaults are `vector/vectorpass/legalscraper` on port `5432` (override with `POSTGRES_*` envs).
 - Init scripts live in `infra/docker/init`; vector table defaults to 1536 dims (OpenAI `text-embedding-3-small`) with HNSW. If you embed at a different dimension (e.g., 3072), adjust the init SQL and drop/recreate the DB volume.
 
-Service placeholders (API/agent/web) use `profiles` and simply keep containers running so you can attach once code lands:
+API + ingestion worker (Celery on Redis broker):
 ```bash
-docker compose --profile api up -d api      # FastAPI hello-world on :8000
-docker compose --profile agent up -d agent  # LangChain placeholder prints a greeting
-docker compose --profile web up -d web    # node:20 shell in apps/web
+docker compose --profile api up --build -d pgvector redis api worker
+```
+
+Service placeholder (web) uses `profiles` and simply keeps a container running so you can attach once code lands:
+```bash
+docker compose --profile web up -d web      # node:20 shell in apps/web
 ```
 
 ## Docs map

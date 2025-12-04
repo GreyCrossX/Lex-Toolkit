@@ -3,7 +3,7 @@ from typing import Dict, List, Tuple
 from psycopg import sql
 from psycopg_pool import ConnectionPool
 
-from app.schemas import SearchRequest, SearchResult
+from app.interfaces.api.schemas import SearchRequest, SearchResult
 
 
 def _build_where_clauses(

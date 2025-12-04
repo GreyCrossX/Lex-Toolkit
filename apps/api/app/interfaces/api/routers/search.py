@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from psycopg_pool import ConnectionPool
 
-from app import db, llm
-from app.schemas import SearchRequest, SearchResponse
-from app.services.search import run_search
+from app.application.search_service import run_search
+from app.infrastructure.db import connection as db
+from app.infrastructure.llm import openai_client as llm
+from app.interfaces.api.routers.auth import get_current_user
+from app.interfaces.api.schemas import SearchRequest, SearchResponse, UserPublic
 
 router = APIRouter()
 
@@ -12,6 +14,7 @@ router = APIRouter()
 def search(
     req: SearchRequest,
     pool: ConnectionPool = Depends(db.get_pool),
+    _: UserPublic = Depends(get_current_user),
 ) -> SearchResponse:
     embedding = req.embedding
     if embedding is None:

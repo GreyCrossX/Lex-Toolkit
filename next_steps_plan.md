@@ -1,34 +1,17 @@
 # Next Steps Plan (based on Linear)
 
-Context: Chunking/tokenization validated and marked Done (GRE-23). Remaining critical path is retrieving, embedding, search, and QA APIs.
+Context: Chunking/embeddings/pgvector are done (GRE-22/23/24/25/26). Search + QA APIs are live, and the dashboard now hits `/search` + `/qa` with filters/pagination. Upload runs through Celery and is working. Auth is live (access + rotated refresh tokens) on the backend; frontend wiring is pending. Summary endpoints are live. Research agent scaffold (LangGraph) added with structured outputs + tool registry (pgvector_inspector, web_browser).
 
-## Proposed order of execution
-- Embedding model decision (GRE-24): choose default embedder for RAG (OpenAI vs local, e.g., mxbai-e5). Output: model choice, dims, cost envelope.
-- Embedding pipeline (GRE-25): wire `embed_chunks` with chosen model; produce vectors DB-ready.
-- Vector database setup (GRE-26): stand up pgvector/Qdrant/Chroma; define schema (chunk_id, doc_id, metadata, embedding, tokenizer_model).
-- Semantic search API (GRE-27): `/api/search` over the vector DB with filters; return metadata + chunk text.
-- Q&A API with citations (GRE-28): retrieval-augmented generation using search results; stream answer + citations.
-- Ingestion pipeline review (GRE-22): finish review/merge; ensure normalized docs feed chunker.
-- Frontend (GRE-29/30/34): search UI, upload UI, summary UI after backend endpoints stabilize.
-- Summarization (GRE-31/32/33): templates, single/multi-doc summarizer after search/Q&A are working.
+## Proposed order of execution (current)
+- Summaries (GRE-31/32/33/53/34): DONE — `/summary/document` + `/summary/multi` with citations + streaming; frontend wired with dropzone.
+- Ingestion hardening (GRE-52/30): keep `/upload` + `/ingestion/{doc_type}` routes, add specialized parsers (jurisprudence/contract/policy) and richer metadata as we add new doc types.
+- Docs/QA/infra (GRE-48/49/50/44/45/46/47): API docs + test plan + e2e smoke, plus Dockerfiles/env coverage to match compose.
+- Agent/Toolbox reshape: tools menu mapped to daily lawyer flows (research, summary, drafting, communication, upload/organize, review, transcribe, compliance, tasks); backend stubs under `/tools/*` and health pings for summary/tools.
+- Research agent: LangGraph graph in `apps/agent/research_graph.py` (intake → qualify → classify → facts → issues → plan → search loop → briefing) with structured outputs and tenant-aware tools (`pgvector_inspector`, `web_browser`).
 
 ## Immediate next steps (actionable)
-1) GRE-24: Decide embedder
-   - Compare: OpenAI text-embedding-3-large/small vs local intfloat/multilingual-e5-base or mxbai-large.
-   - Criteria: quality on Spanish/Legal, cost per 1M tokens, latency, context dimension.
-   - Deliverable: pick default + fallback; document env vars.
-2) GRE-25: Hook embedder into `embed_chunks.py`
-   - Parameterize backend (openai/local) and batch size; emit vectors + metadata to SQLite/pgvector loadable format.
-   - Add validation: sample similarity search vs manual query.
-3) GRE-26: Vector DB setup
-   - Choose pgvector (if Postgres available) or Qdrant (managed/local).
-   - Define schema/index; load embeddings from step 2; basic health check query.
-4) GRE-27: Semantic search API
-   - Endpoint contract (filters: jurisdiction, doc_id, section; limit/offset; score).
-   - Implement query → vector search → return scored chunks + metadata.
-5) GRE-28: Q&A API with citations
-   - Use search results → prompt template → LLM answer; return citations (chunk_id/doc_id) and token usage.
-
-## Notes
-- Token ids stay disabled by default; counts only (decision logged on GRE-23 comment).
-- Use `--validate-decode` only for sampling; production runs can omit for speed.
+1) Extend ingestion (GRE-52/30): add doc_type-specific parsers and metadata for jurisprudence/contract/policy; keep timeouts small and reuse Celery worker routing.
+2) Auth frontend wiring: add Next.js route handlers to proxy `/auth/login|register|refresh|logout`, set HttpOnly cookies, middleware guard for dashboard routes, and a small fetch client that attaches access tokens. Add smoke coverage for `/auth/health` + refresh flow.
+3) Research agent hardening: swap Pydantic v2 validators/ConfigDict, add observability/tracing around nodes + tool calls, add few-shot prompts, and build synthetic evals for structured outputs/citations.
+4) Update docs + QA (GRE-48/49/50): refresh API docs to include auth/refresh, research agent/tooling summary, and formalize test plan (incl. auth flows and agent smoke).
+5) Close infra gaps (GRE-44/45/46/47): ensure `.env.example` is accurate, add Dockerfiles for api/web, and a runbook for compose + migrations/pgvector init.
