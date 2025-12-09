@@ -17,6 +17,15 @@ vi.mock("next/link", () => ({
 vi.mock("@/hooks/use-backend-health", () => ({
   useBackendHealth: () => "online",
 }));
+vi.mock("@/hooks/use-customer-context", () => ({
+  useCustomerContext: () => ({
+    user: null,
+    firmId: null,
+    loading: false,
+    error: null,
+    isAuthenticated: false,
+  }),
+}));
 
 describe("formatList", () => {
   test("splits comma separated values and trims", () => {

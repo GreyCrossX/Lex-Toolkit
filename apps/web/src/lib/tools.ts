@@ -3,6 +3,7 @@ export type ToolStatus = "ready" | "coming-soon";
 export type Tool = {
   id: string;
   name: string;
+  ariaLabel?: string;
   category: string;
   description: string;
   status: ToolStatus;
@@ -23,6 +24,7 @@ export const TOOLS: Tool[] = [
   {
     id: "summary",
     name: "Resúmenes",
+    ariaLabel: "Resumen de un documento",
     category: "Síntesis",
     description: "Resúmenes con citas para texto o documentos.",
     status: "ready",
@@ -48,6 +50,7 @@ export const TOOLS: Tool[] = [
   {
     id: "upload",
     name: "Carga / Organización",
+    ariaLabel: "Carga de documentos",
     category: "Ingesta",
     description: "Sube PDFs para ingestarlos y taggear por matter.",
     status: "ready",

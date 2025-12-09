@@ -10,7 +10,7 @@ from pgvector.psycopg import register_vector
 from psycopg import sql
 from psycopg.rows import dict_row
 from psycopg_pool import ConnectionPool
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 logger = logging.getLogger(__name__)
@@ -59,13 +59,13 @@ class PGVectorInspectorArgs(BaseModel):
     embedding: Optional[List[float]] = Field(None, description="Precomputed embedding; skips embed step if set")
     firm_id: Optional[str] = Field(None, description="Optional tenant/firm filter (matches metadata->>'firm_id')")
 
-    @validator("jurisdictions", pre=True)
+    @field_validator("jurisdictions", mode="before")
     def _lower_juris(cls, v: Optional[List[str]]) -> Optional[List[str]]:
         if v is None:
             return v
         return [j.lower() for j in v]
 
-    @validator("embedding")
+    @field_validator("embedding")
     def _validate_dim(cls, v: Optional[List[float]]) -> Optional[List[float]]:
         if v is None:
             return v

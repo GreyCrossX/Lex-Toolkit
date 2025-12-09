@@ -7,7 +7,7 @@ from urllib.parse import urlparse, urljoin
 import httpx
 from bs4 import BeautifulSoup
 from langchain_core.tools import StructuredTool
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 
 
 USER_AGENT = "LexToolkitBot/0.1 (+https://example.com)"
@@ -21,14 +21,14 @@ class WebBrowserArgs(BaseModel):
     allowed_domains: Optional[List[str]] = Field(None, description="Optional allowlist of hostnames")
     max_bytes: int = Field(MAX_BYTES_DEFAULT, ge=10_000, le=1_000_000, description="Max bytes to read")
 
-    @validator("url")
+    @field_validator("url")
     def _validate_scheme(cls, v: str) -> str:
         parsed = urlparse(v)
         if parsed.scheme not in {"http", "https"}:
             raise ValueError("Only http/https URLs are allowed")
         return v
 
-    @validator("allowed_domains", pre=True)
+    @field_validator("allowed_domains", mode="before")
     def _normalize_domains(cls, v: Optional[List[str]]) -> Optional[List[str]]:
         if v is None:
             return v

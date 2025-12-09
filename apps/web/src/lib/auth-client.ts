@@ -1,4 +1,6 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_BASE || "http://localhost:8000";
+import { clearAccessToken, setAccessToken } from "./auth";
+
+const AUTH_BASE = "/api/auth";
 
 async function handleJsonResponse(res: Response) {
   const text = await res.text();
@@ -11,7 +13,7 @@ async function handleJsonResponse(res: Response) {
 }
 
 export async function apiLogin(email: string, password: string) {
-  const res = await fetch(`${API_BASE}/auth/login`, {
+  const res = await fetch(`${AUTH_BASE}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, password }),
@@ -19,21 +21,48 @@ export async function apiLogin(email: string, password: string) {
     cache: "no-store",
   });
   const data = await handleJsonResponse(res);
+  if (data?.access_token) setAccessToken(data.access_token as string);
+  return data?.access_token as string;
+}
+
+export async function apiRegister({
+  email,
+  password,
+  fullName,
+  role,
+  firmId,
+}: {
+  email: string;
+  password: string;
+  fullName: string;
+  role?: string;
+  firmId?: string;
+}) {
+  const res = await fetch(`${AUTH_BASE}/register`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password, full_name: fullName, role, firm_id: firmId }),
+    credentials: "include",
+    cache: "no-store",
+  });
+  const data = await handleJsonResponse(res);
+  if (data?.access_token) setAccessToken(data.access_token as string);
   return data?.access_token as string;
 }
 
 export async function apiRefresh() {
-  const res = await fetch(`${API_BASE}/auth/refresh`, {
+  const res = await fetch(`${AUTH_BASE}/refresh`, {
     method: "POST",
     credentials: "include",
     cache: "no-store",
   });
   const data = await handleJsonResponse(res);
+  if (data?.access_token) setAccessToken(data.access_token as string);
   return data?.access_token as string;
 }
 
 export async function apiLogout() {
-  const res = await fetch(`${API_BASE}/auth/logout`, {
+  const res = await fetch(`${AUTH_BASE}/logout`, {
     method: "POST",
     credentials: "include",
     cache: "no-store",
@@ -42,4 +71,23 @@ export async function apiLogout() {
     const detail = res.statusText || "Logout failed";
     throw new Error(detail);
   }
+  clearAccessToken();
+}
+
+export type AuthUser = {
+  user_id: string;
+  email: string;
+  full_name: string;
+  role: string;
+  firm_id?: string | null;
+};
+
+export async function apiMe(): Promise<AuthUser> {
+  const res = await fetch(`${AUTH_BASE}/me`, {
+    method: "GET",
+    credentials: "include",
+    cache: "no-store",
+  });
+  const data = await handleJsonResponse(res);
+  return data as AuthUser;
 }

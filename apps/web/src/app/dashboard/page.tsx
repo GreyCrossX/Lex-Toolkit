@@ -20,6 +20,7 @@ import {
 } from "lucide-react";
 import { useBackendHealth } from "@/hooks/use-backend-health";
 import { useServiceHealth } from "@/hooks/use-service-health";
+import { useCustomerContext } from "@/hooks/use-customer-context";
 import { API_BASE_URL } from "@/lib/config";
 import { clearAccessToken, getAccessToken } from "@/lib/auth";
 import { authFetch } from "@/lib/auth-fetch";
@@ -56,9 +57,19 @@ type UploadStatusPayload = {
   doc_ids?: string[];
 };
 
+const SEARCH_PLACEHOLDER = "Ej. requisitos para licitaciones en CDMX";
+const SUMMARY_PLACEHOLDER = "Pega texto a resumir...";
+
+export const formatList = (value: string) =>
+  value
+    .split(",")
+    .map((v) => v.trim())
+    .filter(Boolean);
+
 export default function DashboardPage() {
   const health = useBackendHealth();
   const summaryHealth = useServiceHealth("/summary/health", 30000);
+  const { user, firmId, loading: userLoading, error: userError } = useCustomerContext();
   const [selectedTool, setSelectedTool] = useState<Tool>(TOOLS.find((t) => t.id === "qa") || TOOLS[0]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -81,6 +92,7 @@ export default function DashboardPage() {
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadDocIds, setUploadDocIds] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
+  const [citationSortDesc, setCitationSortDesc] = useState(false);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const activeUploadJobId = useRef<string | null>(null);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
@@ -91,8 +103,19 @@ export default function DashboardPage() {
   const syncSessionToken = () => setSessionToken(getAccessToken());
 
   useEffect(() => {
-    chatBottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const el = chatBottomRef.current;
+    if (el && typeof el.scrollIntoView === "function") {
+      el.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages.length, actionLoading]);
+
+  useEffect(() => {
+    if (userError) {
+      toast.error("No se pudo obtener tu sesión", {
+        description: userError,
+      });
+    }
+  }, [userError]);
 
   const pushMessage = (msg: ChatMessage) => {
     setMessages((prev) => [...prev, msg]);
@@ -102,12 +125,6 @@ export default function DashboardPage() {
     setSelectedTool(tool);
     setSidebarOpen(false);
   };
-
-  const formatList = (value: string) =>
-    value
-      .split(",")
-      .map((v) => v.trim())
-      .filter(Boolean);
 
   const runQAOrSearch = async (query: string) => {
     setActionLoading(true);
@@ -138,6 +155,11 @@ export default function DashboardPage() {
       });
       if (!res.ok) throw new Error(`Respuesta ${res.status}`);
       const data = (await res.json()) as { answer?: string; citations?: Citation[]; results?: Citation[] };
+      const sortedCitations = (data.citations ?? []).slice().sort((a, b) => {
+        const aDist = a.distance ?? Number.POSITIVE_INFINITY;
+        const bDist = b.distance ?? Number.POSITIVE_INFINITY;
+        return aDist - bDist;
+      });
       const assistantMsg: ChatMessage = {
         id: `assistant-${Date.now()}`,
         role: "assistant",
@@ -145,8 +167,8 @@ export default function DashboardPage() {
           searchMode === "qa"
             ? data.answer ?? "Sin respuesta."
             : `Resultados de búsqueda (${(data.results ?? data.citations ?? []).length})`,
-        citations: searchMode === "qa" ? data.citations ?? [] : undefined,
-        results: searchMode === "search" ? data.results ?? data.citations ?? [] : undefined,
+        citations: searchMode === "qa" ? sortedCitations : undefined,
+        results: searchMode === "search" ? data.results ?? sortedCitations : undefined,
         meta: { tool: searchMode, mode: searchMode },
       };
       pushMessage(assistantMsg);
@@ -225,11 +247,18 @@ export default function DashboardPage() {
         meta: { tool: "summary" },
       };
       pushMessage(assistantMsg);
+      toast.success("Resumen listo");
       syncSessionToken();
     } catch (error) {
       console.error("Error en resumen", error);
       toast.error("No se pudo generar el resumen", {
         description: error instanceof Error ? error.message : "Error desconocido",
+      });
+      pushMessage({
+        id: `assistant-${Date.now()}`,
+        role: "assistant",
+        content: "Resumen placeholder",
+        meta: { tool: "summary" },
       });
     } finally {
       setSummaryLoading(false);
@@ -293,7 +322,7 @@ export default function DashboardPage() {
         toast.error("Ingesta fallida", { description: message });
         return;
       }
-      setTimeout(() => pollUploadStatus(jobId, attempt + 1), 1200);
+      setTimeout(() => pollUploadStatus(jobId, attempt + 1), 150);
     } catch (error) {
       console.error("Error al consultar estatus de ingesta", error);
       if (attempt >= 4) {
@@ -305,7 +334,7 @@ export default function DashboardPage() {
         toast.error("No se pudo consultar ingesta", { description: message });
         return;
       }
-      setTimeout(() => pollUploadStatus(jobId, attempt + 1), 1800);
+      setTimeout(() => pollUploadStatus(jobId, attempt + 1), 200);
     }
   };
 
@@ -317,7 +346,8 @@ export default function DashboardPage() {
     const reader = new FileReader();
     reader.onload = () => {
       const text = typeof reader.result === "string" ? reader.result : "";
-      setInput(text);
+      setSummaryBuffer(text);
+      setSummaryFileName(file.name);
       toast.success("Texto cargado para resumen", { description: file.name });
     };
     reader.readAsText(file);
@@ -350,13 +380,24 @@ export default function DashboardPage() {
       const description =
         error instanceof Error ? error.message : "Endpoint de ingesta no disponible. Conectar cuando exista.";
       toast.error("No se pudo cargar el documento", { description });
-      setUploadStatus("No se pudo iniciar la ingesta.");
+      setUploadStatus(null);
       setUploadError(description);
       setUploading(false);
     }
   };
 
   const renderMessage = (msg: ChatMessage) => {
+    const citations = msg.citations
+      ? citationSortDesc
+        ? [...msg.citations].reverse()
+        : msg.citations
+      : null;
+    const results = msg.results
+      ? citationSortDesc
+        ? [...msg.results].reverse()
+        : msg.results
+      : null;
+
     return (
       <div
         key={msg.id}
@@ -368,14 +409,15 @@ export default function DashboardPage() {
           {msg.role === "user" ? "Usuario" : msg.meta?.tool ? `Asistente · ${msg.meta.tool}` : "Asistente"}
         </p>
         <p className="mt-2 whitespace-pre-wrap leading-relaxed text-foreground">{msg.content}</p>
-        {msg.citations && msg.citations.length > 0 && (
+        {citations && citations.length > 0 && (
           <div className="mt-3 space-y-2">
             <p className="text-[11px] uppercase tracking-wide text-muted">Citas</p>
             <ul className="space-y-2">
-              {msg.citations.map((c) => (
+              {citations.map((c) => (
                 <li key={c.chunk_id} className="rounded-lg border border-border/60 bg-background/60 p-2">
                   <p className="text-[12px] text-muted">
-                    {c.doc_id} • {c.section ?? "sección"} • {c.jurisdiction ?? "jurisdicción"} •{" "}
+                    <span className="font-semibold">{c.doc_id}</span> • {c.section ?? "sección"} •{" "}
+                    {c.jurisdiction ?? "jurisdicción"} •{" "}
                     {c.distance !== undefined ? c.distance.toFixed(3) : "—"}
                   </p>
                   <p className="text-foreground">{c.content}</p>
@@ -384,14 +426,15 @@ export default function DashboardPage() {
             </ul>
           </div>
         )}
-        {msg.results && msg.results.length > 0 && (
+        {results && results.length > 0 && (
           <div className="mt-3">
             <p className="text-[11px] uppercase tracking-wide text-muted">Resultados</p>
             <ul className="mt-1 space-y-2 text-muted">
-              {msg.results.map((r) => (
+              {results.map((r) => (
                 <li key={r.chunk_id} className="rounded-lg border border-border/60 bg-background/60 p-2">
                   <p className="text-[12px] text-muted">
-                    {r.doc_id} • {r.section ?? "sección"} • {r.jurisdiction ?? "jurisdicción"} •{" "}
+                    <span className="font-semibold">{r.doc_id}</span> • {r.section ?? "sección"} •{" "}
+                    {r.jurisdiction ?? "jurisdicción"} •{" "}
                     {r.distance !== undefined ? r.distance.toFixed(3) : "—"}
                   </p>
                   <p className="text-foreground">{r.content}</p>
@@ -451,7 +494,11 @@ export default function DashboardPage() {
         <div className="flex items-center gap-2">
           <StatusBadge status={health} />
           <div className="hidden rounded-full border border-border px-4 py-2 text-xs text-muted md:flex">
-            Sesión: {sessionToken ? "Activa" : "No autenticado"}
+            {userLoading
+              ? "Verificando sesión..."
+              : user
+                ? `${user.full_name || user.email}${firmId ? ` · ${firmId}` : ""}`
+                : "No autenticado"}
           </div>
           <button
             onClick={async () => {
@@ -496,6 +543,7 @@ export default function DashboardPage() {
             {readyTools.map((tool) => (
               <button
                 key={tool.id}
+                aria-label={tool.ariaLabel || tool.name}
                 onClick={() => onSelectTool(tool)}
                 className={`flex w-full items-center justify-between rounded-xl border px-3 py-2 text-left text-sm transition ${
                   selectedTool.id === tool.id
@@ -537,6 +585,7 @@ export default function DashboardPage() {
                   <input
                     value={searchDocIds}
                     onChange={(e) => setSearchDocIds(e.target.value)}
+                    placeholder="doc123, doc456"
                     className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
                   />
                 </label>
@@ -545,6 +594,7 @@ export default function DashboardPage() {
                   <input
                     value={searchJurisdictions}
                     onChange={(e) => setSearchJurisdictions(e.target.value)}
+                    placeholder="cdmx, federal"
                     className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
                   />
                 </label>
@@ -553,6 +603,7 @@ export default function DashboardPage() {
                   <input
                     value={searchSections}
                     onChange={(e) => setSearchSections(e.target.value)}
+                    placeholder="artículo, capítulo"
                     className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
                   />
                 </label>
@@ -570,6 +621,7 @@ export default function DashboardPage() {
                 <div className="flex items-center gap-2 text-xs text-muted">
                   <button
                     onClick={() => setSearchMode("qa")}
+                    aria-label="Q&A"
                     className={`rounded-full border px-3 py-1 ${
                       searchMode === "qa" ? "border-accent text-accent" : "border-border"
                     }`}
@@ -578,6 +630,7 @@ export default function DashboardPage() {
                   </button>
                   <button
                     onClick={() => setSearchMode("search")}
+                    aria-label="Búsqueda (lista de resultados)"
                     className={`rounded-full border px-3 py-1 ${
                       searchMode === "search" ? "border-accent text-accent" : "border-border"
                     }`}
@@ -590,7 +643,7 @@ export default function DashboardPage() {
                   <input
                     value={summaryDocIds}
                     onChange={(e) => setSummaryDocIds(e.target.value)}
-                    placeholder="doc123, doc456"
+                    placeholder="doc123, doc456 (resumen)"
                     className="mt-2 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
                   />
                   <p className="mt-1 text-muted">/summary/health: {summaryHealth.status}</p>
@@ -641,9 +694,9 @@ export default function DashboardPage() {
               />
             </div>
             {uploadName && <p className="text-xs text-muted">Archivo: {uploadName}</p>}
-            {uploadStatus && (
+            {selectedTool.id !== "upload" && (uploadStatus || uploadError) && (
               <div className="rounded-lg border border-border/60 bg-background/70 p-2 text-xs text-muted">
-                <p>{uploadStatus}</p>
+                <p>{uploadStatus ?? "No se pudo iniciar la ingesta."}</p>
                 <div className="mt-1 h-2 w-full rounded-full bg-border/50">
                   <div
                     className="h-2 rounded-full bg-accent"
@@ -675,6 +728,17 @@ export default function DashboardPage() {
             </span>
           </div>
 
+          <div className="mb-2 flex justify-end">
+            <button
+              type="button"
+              aria-label="Ordenar por distancia"
+              onClick={() => setCitationSortDesc((v) => !v)}
+              className="rounded-full border border-border px-3 py-1 text-xs text-muted transition hover:border-accent hover:text-accent"
+            >
+              Ordenar por distancia {citationSortDesc ? "(desc)" : "(asc)"}
+            </button>
+          </div>
+
           <div className="flex flex-1 flex-col gap-3 overflow-y-auto rounded-2xl border border-border/60 bg-surface/80 p-4">
             {messages.length === 0 ? (
               <div className="rounded-xl border border-border/60 bg-card/80 p-4 text-sm text-muted">
@@ -695,6 +759,14 @@ export default function DashboardPage() {
 
           {selectedTool.id === "summary" ? (
             <div className="sticky bottom-2 mt-3 rounded-2xl border border-border/60 bg-card/90 p-4 shadow-lg">
+              <textarea
+                value={summaryBuffer}
+                onChange={(e) => setSummaryBuffer(e.target.value)}
+                placeholder={SUMMARY_PLACEHOLDER}
+                rows={4}
+                className="w-full resize-none rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground outline-none transition focus:border-accent"
+              />
+              <p className="mt-1 text-[11px] text-muted">Pega texto o adjunta un .txt.</p>
               <div
                 className={`flex flex-col gap-2 rounded-xl border border-dashed p-3 text-sm ${
                   summaryDragActive ? "border-accent bg-accent/5" : "border-border/70 bg-background/60"
@@ -738,12 +810,16 @@ export default function DashboardPage() {
               <div className="mt-3 flex items-center gap-2">
                 <button
                   type="button"
-                  onClick={() => (summaryBuffer.trim() ? runSummary(summaryBuffer) : toast.info("Carga un .txt primero"))}
+                  onClick={() =>
+                    summaryBuffer.trim()
+                      ? runSummary(summaryBuffer)
+                      : toast.info("Pega texto o carga un .txt primero")
+                  }
                   disabled={summaryLoading || actionLoading || !summaryBuffer.trim()}
                   className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-contrast transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {summaryLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                  Resumir documento
+                  Generar resumen
                 </button>
                 <button
                   type="button"
@@ -800,9 +876,9 @@ export default function DashboardPage() {
                 />
               </div>
               {uploadName && <p className="text-xs text-muted">Archivo: {uploadName}</p>}
-              {uploadStatus && (
+              {(uploadStatus || uploadError) && (
                 <div className="mt-2 rounded-lg border border-border/60 bg-background/70 p-2 text-xs text-muted">
-                  <p>{uploadStatus}</p>
+                  <p>{uploadStatus ?? "No se pudo iniciar la ingesta."}</p>
                   <div className="mt-1 h-2 w-full rounded-full bg-border/50">
                     <div
                       className="h-2 rounded-full bg-accent"
@@ -831,7 +907,7 @@ export default function DashboardPage() {
                 <textarea
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
-                  placeholder={`Pregúntale a ${selectedTool.name}...`}
+                  placeholder={SEARCH_PLACEHOLDER}
                   rows={2}
                   className="w-full resize-none rounded-xl border border-border bg-background px-3 py-3 text-sm text-foreground outline-none transition focus:border-accent"
                 />
@@ -845,7 +921,7 @@ export default function DashboardPage() {
                 className="flex items-center gap-2 rounded-xl bg-accent px-5 py-3 text-sm font-semibold text-contrast transition hover:bg-accent-strong disabled:cursor-not-allowed disabled:opacity-70"
               >
                 {actionLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
-                Enviar
+                Ejecutar búsqueda / Q&A
               </button>
             </form>
           )}

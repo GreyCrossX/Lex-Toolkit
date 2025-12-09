@@ -69,3 +69,12 @@ def test_run_next_search_step_with_stub_tool(monkeypatch):
 
     assert new_state["queries"], "Queries should be appended"
     assert new_state["queries"][0]["results"], "Tool results should propagate"
+
+
+def test_should_continue_respects_max_steps():
+    plan = [
+        {"id": "R1", "issue_id": "I1", "layer": "law", "description": "desc", "status": "pending", "query_ids": []},
+        {"id": "R2", "issue_id": "I1", "layer": "jurisprudence", "description": "desc", "status": "pending", "query_ids": []},
+    ]
+    state = {"research_plan": plan, "search_runs": 2, "max_search_steps": 2}
+    assert rg._should_continue_search(state) == "synthesize_briefing"

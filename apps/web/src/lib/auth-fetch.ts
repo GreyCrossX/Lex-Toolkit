@@ -25,9 +25,7 @@ export async function authFetch(input: RequestInfo | URL, init: AuthFetchInit = 
 
   try {
     const newToken = await apiRefresh();
-    if (newToken) {
-      setAccessToken(newToken);
-    }
+    if (newToken) setAccessToken(newToken);
     const retryInit: AuthFetchInit = { ...init, _retry: false };
     return await fetch(input, withAuthHeaders(retryInit, newToken ?? null));
   } catch (error) {

@@ -183,6 +183,67 @@ class TokenResponse(BaseModel):
     refresh_token: Optional[str] = None
 
 
+class ResearchRunRequest(BaseModel):
+    prompt: str = Field(..., min_length=4, max_length=4000)
+    max_search_steps: Optional[int] = Field(default=None, ge=1, le=10)
+    trace_id: Optional[str] = Field(default=None, min_length=8, max_length=64)
+
+
+class ResearchIssue(BaseModel):
+    id: str
+    question: str
+    priority: Optional[str] = None
+    area: Optional[str] = None
+    status: Optional[str] = None
+
+
+class ResearchStep(BaseModel):
+    id: str
+    issue_id: Optional[str] = None
+    layer: Optional[str] = None
+    description: Optional[str] = None
+    status: Optional[str] = None
+    query_ids: List[str] = Field(default_factory=list)
+    top_k: Optional[int] = None
+
+
+class ResearchQueryResult(BaseModel):
+    doc_id: Optional[str] = None
+    title: Optional[str] = None
+    citation: Optional[str] = None
+    snippet: Optional[str] = None
+    score: Optional[float] = None
+    norm_layer: Optional[str] = None
+
+
+class ResearchQuery(BaseModel):
+    id: str
+    issue_id: Optional[str] = None
+    layer: Optional[str] = None
+    query: Optional[str] = None
+    filters: Dict[str, str] = Field(default_factory=dict)
+    top_k: Optional[int] = None
+    results: List[ResearchQueryResult] = Field(default_factory=list)
+
+
+class ResearchBriefing(BaseModel):
+    overview: Optional[str] = None
+    legal_characterization: Optional[str] = None
+    recommended_strategy: Optional[str] = None
+    issue_answers: Optional[List[Dict[str, Any]]] = None
+    open_questions: Optional[List[str]] = None
+
+
+class ResearchRunResponse(BaseModel):
+    trace_id: str
+    status: str
+    issues: List[ResearchIssue] = Field(default_factory=list)
+    research_plan: List[ResearchStep] = Field(default_factory=list)
+    queries: List[ResearchQuery] = Field(default_factory=list)
+    briefing: Optional[ResearchBriefing] = None
+    errors: Optional[List[str]] = None
+
+
 # DB-facing schemas for type safety when returning raw records.
 class UserRecord(BaseModel):
     user_id: str

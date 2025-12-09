@@ -5,8 +5,8 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 from app.infrastructure.db import connection as db
-from app.infrastructure.db import ingestion_repository, user_repository, refresh_token_repository
-from app.interfaces.api.routers import auth, qa, search, upload, summary, tools
+from app.infrastructure.db import ingestion_repository, user_repository, refresh_token_repository, research_repository
+from app.interfaces.api.routers import auth, qa, research, search, upload, summary, tools
 
 
 @asynccontextmanager
@@ -15,6 +15,7 @@ async def lifespan(_: FastAPI):
     ingestion_repository.ensure_table()
     user_repository.ensure_table()
     refresh_token_repository.ensure_table()
+    research_repository.ensure_table()
     try:
         yield
     finally:
@@ -40,6 +41,7 @@ def health() -> dict:
 
 app.include_router(search.router)
 app.include_router(qa.router)
+app.include_router(research.router)
 app.include_router(auth.router)
 app.include_router(upload.router)
 app.include_router(summary.router)
