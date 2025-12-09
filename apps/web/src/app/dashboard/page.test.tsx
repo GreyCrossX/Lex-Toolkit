@@ -2,6 +2,16 @@
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import DashboardPage, { formatList } from "./page";
 
+const streamResearchMock = vi.fn();
+const getResearchRunMock = vi.fn();
+const runResearchMock = vi.fn();
+
+vi.mock("@/lib/research-client", () => ({
+  streamResearch: (...args: unknown[]) => streamResearchMock(...args),
+  getResearchRun: (...args: unknown[]) => getResearchRunMock(...args),
+  runResearch: (...args: unknown[]) => runResearchMock(...args),
+}));
+
 const toast = vi.hoisted(() => ({
   success: vi.fn(),
   error: vi.fn(),
@@ -153,6 +163,114 @@ describe("DashboardPage search flows", () => {
     fireEvent.click(screen.getByRole("button", { name: "Ejecutar búsqueda / Q&A" }));
 
     await waitFor(() => expect(toast.error).toHaveBeenCalled());
+  });
+});
+
+describe("DashboardPage research flow", () => {
+  let fetchMock: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+    toast.success.mockReset();
+    toast.error.mockReset();
+    toast.info.mockReset();
+    streamResearchMock.mockReset();
+    getResearchRunMock.mockReset();
+    runResearchMock.mockReset();
+  });
+
+  afterEach(() => {
+    vi.unstubAllGlobals();
+    vi.restoreAllMocks();
+  });
+
+  function selectResearchTool() {
+    fireEvent.click(screen.getByRole("button", { name: "Investigación" }));
+  }
+
+  test("runs research and shows briefing plus stats", async () => {
+    streamResearchMock.mockImplementation((_prompt, opts) => {
+      return {
+        start: async () => {
+          opts.onEvent({ type: "start", trace_id: "t-1", status: "running" });
+          opts.onEvent({
+            type: "update",
+            trace_id: "t-1",
+            data: {
+              issues: [{ id: "i1", question: "¿Tema 1?", priority: "alta", area: "civil", status: "open" }],
+              research_plan: [
+                { id: "p1", issue_id: "i1", layer: "facts", description: "leer docs", status: "done", query_ids: ["q1"] },
+              ],
+              queries: [
+                {
+                  id: "q1",
+                  issue_id: "i1",
+                  layer: "facts",
+                  query: "consulta",
+                  results: [{ doc_id: "d1", snippet: "resultado", score: 0.2 }],
+                },
+              ],
+            },
+          });
+          opts.onEvent({
+            type: "done",
+            trace_id: "t-1",
+            status: "answered",
+            issues: [
+              { id: "i1", question: "¿Tema 1?", priority: "alta", area: "civil", status: "open" },
+            ],
+            research_plan: [
+              { id: "p1", issue_id: "i1", layer: "facts", description: "leer docs", status: "done", query_ids: ["q1"] },
+            ],
+            queries: [
+              {
+                id: "q1",
+                issue_id: "i1",
+                layer: "facts",
+                query: "consulta",
+                results: [{ doc_id: "d1", snippet: "resultado", score: 0.2 }],
+              },
+            ],
+            briefing: { overview: "Panorama", recommended_strategy: "Estrategia A" },
+            errors: null,
+          });
+        },
+        cancel: vi.fn(),
+      };
+    });
+
+    render(<DashboardPage />);
+    selectResearchTool();
+    fireEvent.change(screen.getByPlaceholderText("Ej. requisitos para licitaciones en CDMX"), {
+      target: { value: "investigacion" },
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Ejecutar búsqueda / Q&A" }));
+
+    await screen.findByText(/Panorama/);
+    await screen.findByText(/Issues \(1\)/);
+    await waitFor(() => expect(screen.getByLabelText("Trace ID")).toHaveValue("t-1"));
+  });
+
+  test("resumes research via trace id", async () => {
+    getResearchRunMock.mockResolvedValue({
+      trace_id: "trace-xyz",
+      status: "answered",
+      issues: [{ id: "i2", question: "Recovered?", priority: "media", area: "laboral", status: "done" }],
+      research_plan: [],
+      queries: [],
+      briefing: { overview: "Recuperado", recommended_strategy: "Estrategia B" },
+      errors: null,
+    });
+
+    render(<DashboardPage />);
+    selectResearchTool();
+    fireEvent.change(screen.getByLabelText("Trace ID"), { target: { value: "trace-xyz" } });
+    fireEvent.click(screen.getByRole("button", { name: "Cargar" }));
+
+    await waitFor(() => expect(getResearchRunMock).toHaveBeenCalledWith("trace-xyz"));
+    await screen.findByText("Recuperado");
+    expect(toast.success).toHaveBeenCalled();
   });
 });
 

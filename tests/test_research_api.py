@@ -1,4 +1,5 @@
 import importlib
+import json
 
 import pytest
 
@@ -106,3 +107,32 @@ def test_research_run_rate_limited(monkeypatch):
 
     resp = client.post("/research/run", json={"prompt": "hola mundo legal"})
     assert resp.status_code == 429
+
+
+def test_research_run_stream(monkeypatch):
+    client, store = make_client(monkeypatch)
+
+    research_router = importlib.import_module("app.interfaces.api.routers.research")
+
+    class FakeGraph:
+        def compile(self):
+            return self
+
+        def stream(self, initial_state, stream_mode="updates"):
+            yield {"issues": [{"id": "I1", "question": "streamed"}]}
+            yield {"research_plan": [{"id": "P1", "issue_id": "I1", "description": "plan"}]}
+            yield {"status": "answered", "briefing": {"overview": "done"}}
+
+    monkeypatch.setattr(research_router, "build_research_graph", lambda: FakeGraph())
+
+    with client.stream("POST", "/research/run/stream", json={"prompt": "streaming test"}) as resp:
+        assert resp.status_code == 200
+        lines = list(resp.iter_lines())
+
+    assert len(lines) >= 2
+    start_evt = json.loads(lines[0])
+    done_evt = json.loads(lines[-1])
+    assert start_evt["type"] == "start"
+    assert done_evt["type"] == "done"
+    trace_id = done_evt["trace_id"]
+    assert trace_id in store

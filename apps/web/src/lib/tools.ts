@@ -13,6 +13,16 @@ export type Tool = {
 
 export const TOOLS: Tool[] = [
   {
+    id: "qa",
+    name: "Consulta rápida",
+    ariaLabel: "Consulta rápida",
+    category: "Investigación",
+    description: "Q&A semántico con citas.",
+    status: "ready",
+    pingPath: "/health?tool=search",
+    cta: "Preguntar",
+  },
+  {
     id: "research",
     name: "Investigación",
     category: "Investigación",

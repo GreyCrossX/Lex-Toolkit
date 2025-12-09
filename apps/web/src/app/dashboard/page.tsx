@@ -8,12 +8,17 @@ import {
   CheckCircle2,
   ChevronDown,
   ChevronUp,
+  ClipboardList,
   FileText,
+  History,
   Loader2,
   LogOut,
   Menu,
+  ListChecks,
+  RefreshCw,
   ShieldCheck,
   Sparkles,
+  Target,
   Upload,
   Wand2,
   X,
@@ -26,6 +31,7 @@ import { clearAccessToken, getAccessToken } from "@/lib/auth";
 import { authFetch } from "@/lib/auth-fetch";
 import { apiLogout } from "@/lib/auth-client";
 import { TOOLS, type Tool } from "@/lib/tools";
+import { getResearchRun, runResearch, streamResearch, type ResearchEvent, type ResearchRunResponse } from "@/lib/research-client";
 
 type ChatMessage = {
   id: string;
@@ -59,6 +65,7 @@ type UploadStatusPayload = {
 
 const SEARCH_PLACEHOLDER = "Ej. requisitos para licitaciones en CDMX";
 const SUMMARY_PLACEHOLDER = "Pega texto a resumir...";
+const RESEARCH_POLL_INTERVAL = 1500;
 
 export const formatList = (value: string) =>
   value
@@ -93,11 +100,18 @@ export default function DashboardPage() {
   const [uploadDocIds, setUploadDocIds] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
   const [citationSortDesc, setCitationSortDesc] = useState(false);
+  const [researchResult, setResearchResult] = useState<ResearchRunResponse | null>(null);
+  const [researchTraceInput, setResearchTraceInput] = useState("");
+  const [researchResumeLoading, setResearchResumeLoading] = useState(false);
+  const [researchPolling, setResearchPolling] = useState(false);
+  const [researchEvents, setResearchEvents] = useState<ResearchEvent[]>([]);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const activeUploadJobId = useRef<string | null>(null);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
   const [summaryDragActive, setSummaryDragActive] = useState(false);
   const [uploadDragActive, setUploadDragActive] = useState(false);
+  const researchPollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
+  const researchStreamCancelRef = useRef<null | (() => void)>(null);
 
   const readyTools = useMemo(() => TOOLS.filter((t) => t.status === "ready"), []);
   const syncSessionToken = () => setSessionToken(getAccessToken());
@@ -117,6 +131,15 @@ export default function DashboardPage() {
     }
   }, [userError]);
 
+  useEffect(() => {
+    return () => {
+      if (researchPollTimerRef.current) {
+        clearInterval(researchPollTimerRef.current);
+      }
+      stopResearchStream();
+    };
+  }, []);
+
   const pushMessage = (msg: ChatMessage) => {
     setMessages((prev) => [...prev, msg]);
   };
@@ -126,8 +149,66 @@ export default function DashboardPage() {
     setSidebarOpen(false);
   };
 
+  const stopResearchPolling = () => {
+    if (researchPollTimerRef.current) {
+      clearInterval(researchPollTimerRef.current);
+      researchPollTimerRef.current = null;
+    }
+    setResearchPolling(false);
+  };
+
+  const stopResearchStream = () => {
+    if (researchStreamCancelRef.current) {
+      researchStreamCancelRef.current();
+      researchStreamCancelRef.current = null;
+    }
+  };
+
+  const resetResearchUI = () => {
+    setResearchResult(null);
+    setResearchTraceInput("");
+    setResearchEvents([]);
+    stopResearchPolling();
+    stopResearchStream();
+  };
+
+  const handleResearchSnapshot = (res: ResearchRunResponse) => {
+    setResearchResult(res);
+    if (res.trace_id) {
+      setResearchTraceInput(res.trace_id);
+    }
+    if (res.status === "answered" || res.status === "error") {
+      stopResearchPolling();
+      stopResearchStream();
+    }
+  };
+
+  const pollResearchRun = async (traceId: string) => {
+    try {
+      const res = await getResearchRun(traceId);
+      handleResearchSnapshot(res);
+      syncSessionToken();
+    } catch (error) {
+      console.error("Error al refrescar investigación", error);
+      toast.error("No se pudo actualizar el progreso de investigación", {
+        description: error instanceof Error ? error.message : "Error desconocido",
+      });
+      stopResearchPolling();
+    }
+  };
+
+  const startResearchPolling = (traceId: string) => {
+    if (!traceId) return;
+    stopResearchPolling();
+    setResearchPolling(true);
+    researchPollTimerRef.current = setInterval(() => pollResearchRun(traceId), RESEARCH_POLL_INTERVAL);
+    // Primer fetch inmediato para no esperar al intervalo.
+    pollResearchRun(traceId);
+  };
+
   const runQAOrSearch = async (query: string) => {
     setActionLoading(true);
+    stopResearchStream();
     const body =
       searchMode === "qa"
         ? {
@@ -181,6 +262,83 @@ export default function DashboardPage() {
     } finally {
       setActionLoading(false);
     }
+  };
+
+  const runResearchFlow = async (query: string) => {
+    setActionLoading(true);
+    setResearchEvents([]);
+    stopResearchStream();
+    try {
+      const traceToUse = researchTraceInput.trim() || researchResult?.trace_id;
+      const streamer = streamResearch(query, {
+        maxSteps: 4,
+        traceId: traceToUse,
+        onEvent: (evt) => {
+          setResearchEvents((prev) => [...prev, evt]);
+          if (evt.type === "start") {
+            setResearchTraceInput(evt.trace_id);
+            setResearchPolling(true);
+          } else if (evt.type === "update") {
+            if (evt.data) {
+              setResearchResult((prev) => ({
+                ...(prev || { trace_id: evt.trace_id, status: evt.status || "running", issues: [], research_plan: [], queries: [] }),
+                ...evt.data,
+                status: evt.status || evt.data.status || prev?.status || "running",
+              }));
+            }
+          } else if (evt.type === "done") {
+            handleResearchSnapshot(evt);
+            toast.success("Investigación lista", { description: `trace: ${evt.trace_id}` });
+            setActionLoading(false);
+          } else if (evt.type === "error") {
+            toast.error("No se pudo completar la investigación", { description: evt.error });
+            setActionLoading(false);
+          }
+        },
+      });
+      researchStreamCancelRef.current = () => streamer.cancel();
+      await streamer.start();
+      syncSessionToken();
+    } catch (error) {
+      console.error("Error en investigación", error);
+      toast.error("No se pudo completar la investigación", {
+        description: error instanceof Error ? error.message : "Error desconocido",
+      });
+    }
+    setActionLoading(false);
+  };
+
+  const resumeResearchByTrace = async () => {
+    const traceId = researchTraceInput.trim();
+    if (!traceId) {
+      toast.info("Ingresa un trace_id para reanudar una investigación.");
+      return;
+    }
+    setResearchResumeLoading(true);
+    try {
+      const res = await getResearchRun(traceId);
+      handleResearchSnapshot(res);
+      const researchTool = TOOLS.find((t) => t.id === "research");
+      if (researchTool) setSelectedTool(researchTool);
+      toast.success("Investigación recuperada", { description: traceId });
+      if (res.status !== "answered" && res.status !== "error" && res.trace_id) {
+        startResearchPolling(res.trace_id);
+      } else {
+        stopResearchPolling();
+      }
+      syncSessionToken();
+    } catch (error) {
+      console.error("Error al recuperar investigación", error);
+      toast.error("No se pudo recuperar la investigación", {
+        description: error instanceof Error ? error.message : "Error desconocido",
+      });
+    } finally {
+      setResearchResumeLoading(false);
+    }
+  };
+
+  const resetResearch = () => {
+    resetResearchUI();
   };
 
   const runSummary = async (text: string) => {
@@ -274,11 +432,11 @@ export default function DashboardPage() {
     pushMessage({ id: `user-${now}`, role: "user", content: text });
     setInput("");
     if (selectedTool.id === "research") {
+      await runResearchFlow(text);
+    } else if (selectedTool.id === "qa" || selectedTool.id === "communication") {
       await runQAOrSearch(text);
     } else if (selectedTool.id === "summary") {
       toast.info("Usa el dropzone de resumen para cargar texto o .txt.");
-    } else if (selectedTool.id === "communication") {
-      await runQAOrSearch(text);
     } else {
       pushMessage({
         id: `assistant-${Date.now()}`,
@@ -465,6 +623,245 @@ export default function DashboardPage() {
       >
         {isOnline ? <CheckCircle2 className="h-4 w-4" /> : <ShieldCheck className="h-4 w-4" />}
         {isOnline ? "Backend en línea" : "Backend no disponible"}
+      </div>
+    );
+  };
+
+  const renderResearchPanels = () => {
+    const shouldShow = selectedTool.id === "research" || Boolean(researchResult);
+    if (!shouldShow) return null;
+
+    const issues = researchResult?.issues ?? [];
+    const plan = researchResult?.research_plan ?? [];
+    const queries = researchResult?.queries ?? [];
+    const briefing = researchResult?.briefing;
+    const events = researchEvents;
+
+    return (
+      <div className="mb-3 grid gap-3 md:grid-cols-3">
+        <div className="rounded-2xl border border-border/60 bg-card/80 p-3 shadow-sm">
+          <div className="flex items-start justify-between gap-2">
+            <div>
+              <p className="text-[11px] uppercase tracking-wide text-muted">Trace actual</p>
+              <p className="font-mono text-sm text-foreground">{researchResult?.trace_id ?? "—"}</p>
+              <p className="text-[11px] text-muted">
+                {researchResult ? `Estado: ${researchResult.status}` : "Lanza o reanuda una investigación."}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={resetResearch}
+              className="inline-flex items-center gap-2 rounded-lg border border-border/60 px-2 py-1 text-xs text-muted transition hover:border-accent hover:text-accent"
+            >
+              <RefreshCw className="h-3 w-3" />
+              Nueva
+            </button>
+          </div>
+
+          <form
+            className="mt-3 space-y-2"
+            onSubmit={(e) => {
+              e.preventDefault();
+              resumeResearchByTrace();
+            }}
+          >
+            <label className="text-xs text-muted" htmlFor="trace-id-input">
+              Reanudar por trace_id
+            </label>
+            <div className="flex gap-2">
+              <input
+                id="trace-id-input"
+                aria-label="Trace ID"
+                value={researchTraceInput}
+                onChange={(e) => setResearchTraceInput(e.target.value)}
+                placeholder="trace_id existente"
+                className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+              />
+              <button
+                type="submit"
+                disabled={researchResumeLoading}
+                className="inline-flex items-center gap-2 rounded-lg bg-accent px-3 py-2 text-xs font-semibold text-contrast transition hover:bg-accent-strong disabled:opacity-70"
+              >
+                {researchResumeLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <History className="h-3 w-3" />}
+                Cargar
+              </button>
+            </div>
+          </form>
+
+          <div className="mt-3 grid grid-cols-3 gap-2 text-xs text-muted">
+            <div className="rounded-lg border border-border/60 bg-background/60 p-2">
+              <p className="text-[11px] uppercase tracking-wide text-muted">Issues</p>
+              <p className="text-sm font-semibold text-foreground">{issues.length}</p>
+            </div>
+            <div className="rounded-lg border border-border/60 bg-background/60 p-2">
+              <p className="text-[11px] uppercase tracking-wide text-muted">Pasos</p>
+              <p className="text-sm font-semibold text-foreground">{plan.length}</p>
+            </div>
+            <div className="rounded-lg border border-border/60 bg-background/60 p-2">
+              <p className="text-[11px] uppercase tracking-wide text-muted">Consultas</p>
+              <p className="text-sm font-semibold text-foreground">{queries.length}</p>
+            </div>
+          </div>
+
+          {researchResult?.errors && researchResult.errors.length > 0 && (
+            <div className="mt-3 rounded-lg border border-danger/40 bg-danger/10 p-2 text-xs text-danger">
+              <p className="font-semibold">Errores</p>
+              <ul className="mt-1 space-y-1">
+                {researchResult.errors.map((err) => (
+                  <li key={err}>• {err}</li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
+
+        <div className="space-y-3 rounded-2xl border border-border/60 bg-card/80 p-3 shadow-sm md:col-span-2">
+          {researchResult ? (
+            <>
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] uppercase tracking-wide text-muted">Briefing</p>
+                  <p className="text-sm text-foreground">
+                    {briefing?.overview ?? "Aún sin briefing; ejecuta la investigación."}
+                  </p>
+                  {briefing?.recommended_strategy && (
+                    <p className="text-[12px] text-muted">Estrategia: {briefing.recommended_strategy}</p>
+                  )}
+                </div>
+                <span className="rounded-full border border-border/60 bg-background/60 px-3 py-1 text-[11px] text-muted">
+                  {researchResult.status}
+                </span>
+              </div>
+
+              <div className="flex items-center gap-2 text-[11px] text-muted">
+                {researchPolling ? (
+                  <>
+                    <Loader2 className="h-3 w-3 animate-spin text-accent" />
+                    Recibiendo actualizaciones en vivo...
+                  </>
+                ) : (
+                  <>
+                    <History className="h-3 w-3 text-muted" />
+                    Última actualización guardada
+                  </>
+                )}
+              </div>
+
+              <div className="grid gap-3 md:grid-cols-2">
+                <div className="rounded-xl border border-border/60 bg-background/60 p-3">
+                  <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted">
+                    <Target className="h-4 w-4 text-accent" />
+                    Issues ({issues.length})
+                  </div>
+                  <div className="mt-2 max-h-48 space-y-2 overflow-y-auto">
+                    {issues.length === 0 ? (
+                      <p className="text-sm text-muted">Sin issues detectados.</p>
+                    ) : (
+                      issues.map((issue) => (
+                        <div key={issue.id} className="rounded-lg border border-border/60 bg-card/80 p-2">
+                          <p className="text-sm font-semibold text-foreground">{issue.question}</p>
+                          <p className="text-[11px] text-muted">
+                            {issue.priority ? `${issue.priority} · ` : ""}
+                            {issue.area || "Área no definida"} · {issue.status || "sin estatus"}
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                <div className="rounded-xl border border-border/60 bg-background/60 p-3">
+                  <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted">
+                    <ListChecks className="h-4 w-4 text-accent" />
+                    Plan ({plan.length})
+                  </div>
+                  <div className="mt-2 max-h-48 space-y-2 overflow-y-auto">
+                    {plan.length === 0 ? (
+                      <p className="text-sm text-muted">Plan aún no generado.</p>
+                    ) : (
+                      plan.map((step) => (
+                        <div key={step.id} className="rounded-lg border border-border/60 bg-card/80 p-2">
+                          <p className="text-sm font-semibold text-foreground">
+                            {step.layer} · {step.description || "Paso"}
+                          </p>
+                          <p className="text-[11px] text-muted">
+                            Issue {step.issue_id || "n/a"} · {step.status || "pendiente"} ·{" "}
+                            {step.query_ids?.length ?? 0} consultas
+                          </p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border/60 bg-background/60 p-3">
+                <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted">
+                  <ClipboardList className="h-4 w-4 text-accent" />
+                  Consultas ({queries.length})
+                </div>
+                <div className="mt-2 grid gap-2 md:grid-cols-2">
+                  {queries.length === 0 ? (
+                    <p className="text-sm text-muted">Sin consultas aún.</p>
+                  ) : (
+                    queries.slice(0, 4).map((q) => (
+                      <div key={q.id} className="rounded-lg border border-border/60 bg-card/80 p-2">
+                        <p className="text-sm font-semibold text-foreground">{q.query || "(sin query)"}</p>
+                        <p className="text-[11px] text-muted">
+                          Issue {q.issue_id || "n/a"} · Capa {q.layer || "—"} · {q.results?.length ?? 0} resultados
+                        </p>
+                        {q.results && q.results[0] && q.results[0].snippet && (
+                          <p className="mt-1 line-clamp-2 text-sm text-foreground">{q.results[0].snippet}</p>
+                        )}
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              <div className="rounded-xl border border-border/60 bg-background/60 p-3">
+                <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted">
+                  <History className="h-4 w-4 text-accent" />
+                  Eventos ({events.length})
+                </div>
+                <div className="mt-2 max-h-48 space-y-2 overflow-y-auto text-sm text-foreground">
+                  {events.length === 0 ? (
+                    <p className="text-muted">Sin eventos aún.</p>
+                  ) : (
+                    events
+                      .slice()
+                      .reverse()
+                      .map((evt, idx) => (
+                        <div key={`${evt.type}-${idx}`} className="rounded-lg border border-border/60 bg-card/80 p-2">
+                          <p className="text-[11px] text-muted">
+                            {evt.type.toUpperCase()} • {evt.trace_id}
+                          </p>
+                          {evt.type === "error" && <p className="text-danger text-sm">{evt.error}</p>}
+                          {evt.type === "update" && (evt.status || evt.data?.status) && (
+                            <p className="text-sm text-foreground">Estatus: {evt.status || evt.data?.status}</p>
+                          )}
+                          {evt.type === "done" && <p className="text-sm text-foreground">Finalizado: {evt.status}</p>}
+                        </div>
+                      ))
+                  )}
+                </div>
+              </div>
+            </>
+          ) : (
+            <div className="rounded-xl border border-border/60 bg-background/60 p-4 text-sm text-muted">
+              <p className="text-foreground">Investigación</p>
+              <p className="mt-1">
+                Describe el asunto legal y ejecuta la investigación. Puedes reanudar con un trace_id previo o lanzar una
+                nueva para obtener issues, plan y consultas sugeridas.
+              </p>
+              <ul className="mt-2 list-disc space-y-1 pl-4">
+                <li>Incluye jurisdicción, objetivos y hechos clave.</li>
+                <li>El agente genera issues, plan y consultas de búsqueda.</li>
+                <li>Guarda el trace_id para reanudar más tarde.</li>
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
     );
   };
@@ -739,11 +1136,19 @@ export default function DashboardPage() {
             </button>
           </div>
 
+          {renderResearchPanels()}
+
           <div className="flex flex-1 flex-col gap-3 overflow-y-auto rounded-2xl border border-border/60 bg-surface/80 p-4">
             {messages.length === 0 ? (
               <div className="rounded-xl border border-border/60 bg-card/80 p-4 text-sm text-muted">
                 Aún no hay mensajes. Escribe tu petición para {selectedTool.name}. Usa filtros a la izquierda para
                 acotar doc_ids, jurisdicciones y secciones.
+                {selectedTool.id === "research" && researchResult?.trace_id && (
+                  <p className="mt-2 text-xs text-muted">
+                    Último trace: <span className="font-mono text-foreground">{researchResult.trace_id}</span> (
+                    {researchResult.status})
+                  </p>
+                )}
               </div>
             ) : (
               messages.map(renderMessage)
