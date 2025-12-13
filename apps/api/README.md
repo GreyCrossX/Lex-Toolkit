@@ -33,6 +33,7 @@ docker compose --profile api up --build -d pgvector redis api worker
 - `POST /auth/refresh` – rotates refresh token (returns new access + refresh tokens).
 - `POST /auth/logout` – revokes refresh token.
 - `GET /auth/me` – returns current user (requires `Authorization: Bearer ...`).
+- `GET /auth/jwks` – returns JWKS (public keys) when RS256 is configured.
 
 Notes:
 - Access token is short-lived and returned in the JSON body; refresh token is returned in the body and should be stored as an HttpOnly/Secure cookie at the frontend proxy layer.

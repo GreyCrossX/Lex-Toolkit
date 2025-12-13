@@ -3,9 +3,9 @@ import json
 import os
 import secrets
 from datetime import datetime, timedelta, timezone
-from typing import Dict, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
-from jose import JWTError, jwt
+from jose import JWTError, jwk, jwt
 from passlib.context import CryptContext
 
 from app.infrastructure.db import refresh_token_repository
@@ -180,3 +180,24 @@ def _resolve_decode_key(token: str) -> Optional[str]:
             return JWT_PRIVATE_KEY
         return None
     return JWT_SECRET
+
+
+def get_public_jwks() -> List[dict]:
+    """
+    Return JWKS entries for configured public keys (RS256). Empty for HS256.
+    """
+    if not JWT_ALGORITHM.startswith("RS"):
+        return []
+    keys = []
+    for kid, pub in _PUBLIC_KEYS.items():
+        keys.append(_pem_to_jwk(pub, kid))
+    # Also expose current signing key if not present in the map (helps dev/local).
+    if JWT_PRIVATE_KEY and JWT_PRIVATE_KEY_ID not in _PUBLIC_KEYS:
+        keys.append(_pem_to_jwk(JWT_PRIVATE_KEY, JWT_PRIVATE_KEY_ID))
+    return keys
+
+
+def _pem_to_jwk(pem: str, kid: str) -> dict:
+    jwk_dict = jwk.construct(pem, algorithm="RS256").to_dict()
+    jwk_dict.update({"kid": kid, "use": "sig", "alg": "RS256"})
+    return jwk_dict

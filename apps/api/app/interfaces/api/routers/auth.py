@@ -194,6 +194,16 @@ def auth_health() -> dict:
     return {"status": "ok", "auth": "ok"}
 
 
+@router.get("/auth/jwks")
+def auth_jwks() -> dict:
+    """
+    Return public keys in JWKS format for RS256 verification.
+    Only present when RS256 is configured; otherwise returns empty keys.
+    """
+    keys = security.get_public_jwks()
+    return {"keys": keys}
+
+
 @router.post("/auth/refresh", response_model=TokenResponse)
 def refresh_token(
     response: Response,

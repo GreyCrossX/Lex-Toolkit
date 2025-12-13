@@ -17,3 +17,8 @@ data/
 
 # Local logs
 *.log
+
+# Node/Next artifacts
+node_modules/
+.next/
+.turbo/

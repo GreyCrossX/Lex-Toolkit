@@ -1,8 +1,5 @@
 import importlib
 import json
-import os
-
-import pytest
 
 OLD_PRIV = """-----BEGIN PRIVATE KEY-----
 MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAMfoz8k9ba9if2jL
@@ -74,3 +71,12 @@ def test_rs256_rotation_keeps_old_tokens_valid(monkeypatch):
 
     # Old token should still validate via published public key map.
     assert auth.decode_token(token_old)["sub"] == "u1"
+
+
+def test_jwks_exposes_public_keys(monkeypatch):
+    auth = _reload_auth(monkeypatch, NEW_PRIV, "kid-new", {"kid-old": OLD_PUB, "kid-new": NEW_PUB})
+    jwks = auth.get_public_jwks()
+    assert len(jwks) >= 2
+    kids = {entry["kid"] for entry in jwks}
+    assert "kid-new" in kids
+    assert "kid-old" in kids
