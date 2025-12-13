@@ -38,3 +38,7 @@ Source of truth for how agents should reason through a matter. Each tool should 
 - Streaming/resume: `/research/run/stream` emits start/update/done/error and persists snapshots on start and each update. Frontend falls back to polling and non-stream run on errors. Errors include `trace_id` for support.
 - Smoke/eval: `scripts/smoke_api.sh` now runs an offline-safe synthetic eval stub; useful for CI without network or tools.
 - Keepalive: streaming emits periodic `keepalive` events to keep proxies from timing out during long searches.
+
+## Drafting agent intake (schema-first)
+- Endpoint `/draft` (stub) accepts: `doc_type`, `objective`, `audience`, `tone`, `language`, `context`, `facts[]`, `requirements[{label,value}]`, `research_trace_id?`, `research_summary?`, `constraints[]`.
+- Output (stub): `draft` (text) + `sections[]`, `assumptions`, `open_questions`, `risks`. This schema should drive the future drafting UI (doc type selector, requirements list, research trace picker).

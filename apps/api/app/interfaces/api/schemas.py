@@ -245,6 +245,43 @@ class ResearchRunResponse(BaseModel):
     errors: Optional[List[str]] = None
 
 
+# -------- Drafting --------
+
+
+class DraftRequirement(BaseModel):
+    label: str
+    value: str
+
+
+class DraftRequest(BaseModel):
+    doc_type: str = Field(..., min_length=3, max_length=64, description="Tipo de documento: carta, contrato, demanda, memo.")
+    objective: Optional[str] = Field(default=None, max_length=4000, description="Propósito del documento.")
+    audience: Optional[str] = Field(default=None, max_length=200, description="Destinatario principal.")
+    tone: Optional[str] = Field(default=None, max_length=100, description="Tono deseado (formal, directo, etc).")
+    language: Optional[str] = Field(default="es", max_length=5)
+    context: Optional[str] = Field(default=None, max_length=6000, description="Hechos clave o instrucciones.")
+    facts: List[str] = Field(default_factory=list, description="Lista de hechos relevantes.")
+    requirements: List[DraftRequirement] = Field(default_factory=list, description="Requisitos específicos o cláusulas obligatorias.")
+    research_trace_id: Optional[str] = Field(default=None, min_length=8, max_length=64, description="Trace previo de investigación.")
+    research_summary: Optional[str] = Field(default=None, max_length=4000, description="Resumen breve de investigación/estrategia.")
+    constraints: List[str] = Field(default_factory=list, description="Límites: jurisdicción, extensión máxima, exclusiones.")
+
+
+class DraftSection(BaseModel):
+    title: str
+    content: str
+
+
+class DraftResponse(BaseModel):
+    status: str
+    doc_type: str
+    draft: str
+    sections: List[DraftSection] = Field(default_factory=list)
+    assumptions: List[str] = Field(default_factory=list)
+    open_questions: List[str] = Field(default_factory=list)
+    risks: List[str] = Field(default_factory=list)
+
+
 # DB-facing schemas for type safety when returning raw records.
 class UserRecord(BaseModel):
     user_id: str

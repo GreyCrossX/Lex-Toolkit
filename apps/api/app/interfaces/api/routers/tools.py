@@ -3,7 +3,11 @@ from typing import Any, Dict, List
 from fastapi import APIRouter, Depends, status
 
 from app.interfaces.api.routers.auth import get_current_user
-from app.interfaces.api.schemas import UserPublic
+from app.interfaces.api.schemas import (
+    DraftRequest,
+    DraftResponse,
+    UserPublic,
+)
 
 router = APIRouter()
 
@@ -13,12 +17,22 @@ def tools_health() -> dict:
     return {"status": "ok", "tools": "placeholder"}
 
 
-@router.post("/draft")
-def draft(_: UserPublic = Depends(get_current_user)) -> Dict[str, Any]:
+@router.post("/draft", response_model=DraftResponse)
+def draft(
+    payload: DraftRequest,
+    user: UserPublic = Depends(get_current_user),
+) -> Dict[str, Any]:
+    """
+    Minimal drafting stub: accepts structured intake (doc_type, objective, context, facts, requirements).
+    """
     return {
-        "status": "placeholder",
-        "tool": "draft",
-        "message": "Drafting endpoint not implemented yet.",
+        "status": "pending",
+        "doc_type": payload.doc_type,
+        "draft": "Drafting en progreso; conecta con el agente de redacción.",
+        "sections": [],
+        "assumptions": payload.facts or [],
+        "open_questions": ["Completar implementación del agente de redacción."],
+        "risks": ["No implementado: no hay revisión automática aún."],
     }
 
 
