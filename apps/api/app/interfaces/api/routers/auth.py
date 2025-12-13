@@ -129,7 +129,7 @@ def register(payload: UserCreate, response: Response) -> TokenResponse:
 
 @router.post("/auth/login", response_model=TokenResponse)
 def login(payload: UserLogin, response: Response, request: Request) -> TokenResponse:
-    _enforce_rate_limit(request, bucket="login", limit=10, window_seconds=60)
+    _enforce_rate_limit(request, bucket="login", limit=5, window_seconds=60)
     db.init_pool()
     user = user_repository.get_user_by_email(payload.email)
     if not user or not security.verify_password(payload.password, user.password_hash):
@@ -146,7 +146,7 @@ def login(payload: UserLogin, response: Response, request: Request) -> TokenResp
     refresh_token, _ = security.create_refresh_token(user.user_id)
     _set_refresh_cookie(response, refresh_token)
     _set_csrf_cookie(response, secrets.token_urlsafe(24))
-    logger.info("Login success", extra={"user_id": user.user_id, "email": user.email})
+    logger.info("Login success", extra={"user_id": user.user_id, "email": user.email, "ip": request.client.host if request.client else "unknown"})
     return TokenResponse(
         access_token=access_token, refresh_token=None, token_type="bearer"
     )
@@ -210,7 +210,7 @@ def refresh_token(
     request: Request,
     refresh_token: Optional[str] = Body(default=None, embed=True),
 ) -> TokenResponse:
-    _enforce_rate_limit(request, bucket="refresh", limit=60, window_seconds=300)
+    _enforce_rate_limit(request, bucket="refresh", limit=30, window_seconds=300)
     _require_csrf(request, response)
     db.init_pool()
     refresh_token_repository.ensure_table()
@@ -248,6 +248,10 @@ def refresh_token(
     )
     _set_refresh_cookie(response, result["refresh_token"])
     _set_csrf_cookie(response, secrets.token_urlsafe(24))
+    logger.info(
+        "Refresh success",
+        extra={"user_id": user.user_id, "email": user.email, "ip": request.client.host if request.client else "unknown"},
+    )
     return TokenResponse(
         access_token=access_token, refresh_token=None, token_type="bearer"
     )
@@ -263,6 +267,16 @@ def logout(
     token_plain = _extract_refresh_token(request, refresh_token)
     if token_plain:
         security.revoke_refresh_token(token_plain)
+        token_id = token_plain.split(".", 1)[0]
+    else:
+        token_id = None
     _clear_refresh_cookie(response)
     _clear_csrf_cookie(response)
+    logger.info(
+        "Logout",
+        extra={
+            "token_id": token_id,
+            "ip": request.client.host if request.client else "unknown",
+        },
+    )
     return {"status": "ok"}
