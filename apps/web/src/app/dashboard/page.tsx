@@ -125,6 +125,7 @@ export default function DashboardPage() {
   const [researchResumeLoading, setResearchResumeLoading] = useState(false);
   const [researchPolling, setResearchPolling] = useState(false);
   const [researchEvents, setResearchEvents] = useState<ResearchEvent[]>([]);
+  const [researchStreamError, setResearchStreamError] = useState<string | null>(null);
   const [lastResearchMessageTrace, setLastResearchMessageTrace] = useState<string | null>(null);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const activeUploadJobId = useRef<string | null>(null);
@@ -184,6 +185,7 @@ export default function DashboardPage() {
       researchStreamCancelRef.current();
       researchStreamCancelRef.current = null;
     }
+    setResearchStreamError(null);
   };
 
   const resetResearchUI = () => {
@@ -196,6 +198,7 @@ export default function DashboardPage() {
 
   const handleResearchSnapshot = (res: ResearchRunResponse) => {
     setResearchResult(res);
+    setResearchStreamError(null);
     if (res.trace_id) {
       setResearchTraceInput(res.trace_id);
     }
@@ -239,6 +242,7 @@ export default function DashboardPage() {
       toast.error("No se pudo actualizar el progreso de investigación", {
         description: error instanceof Error ? error.message : "Error desconocido",
       });
+      setResearchStreamError(error instanceof Error ? error.message : "Error desconocido");
       stopResearchPolling();
     }
   };
@@ -255,6 +259,7 @@ export default function DashboardPage() {
   const runQAOrSearch = async (query: string) => {
     setActionLoading(true);
     stopResearchStream();
+    setResearchStreamError(null);
     const body =
       searchMode === "qa"
         ? {
@@ -313,6 +318,7 @@ export default function DashboardPage() {
   const runResearchFlow = async (query: string) => {
     setActionLoading(true);
     setResearchEvents([]);
+    setResearchStreamError(null);
     stopResearchStream();
     try {
       const traceToUse = researchTraceInput.trim() || researchResult?.trace_id;
@@ -339,7 +345,11 @@ export default function DashboardPage() {
           } else if (evt.type === "error") {
             toast.error("No se pudo completar la investigación", { description: evt.error });
             setActionLoading(false);
+            setResearchStreamError(evt.error);
           }
+        },
+        onError: (err) => {
+          setResearchStreamError(err.message);
         },
       });
       researchStreamCancelRef.current = () => streamer.cancel();
@@ -348,6 +358,7 @@ export default function DashboardPage() {
     } catch (error) {
       console.error("Error en investigación", error);
       const errMsg = error instanceof Error ? error.message : "Error desconocido";
+      setResearchStreamError(errMsg);
       // Fallback: si el endpoint de streaming no está disponible, usa ejecución sin streaming.
       try {
         const traceToUse = researchTraceInput.trim() || researchResult?.trace_id;
@@ -359,6 +370,7 @@ export default function DashboardPage() {
           description: fallbackErr instanceof Error ? fallbackErr.message : errMsg,
         });
       }
+      stopResearchStream();
     }
     setActionLoading(false);
   };
@@ -711,9 +723,20 @@ export default function DashboardPage() {
             <div>
               <p className="text-[11px] uppercase tracking-wide text-muted">Trace actual</p>
               <p className="font-mono text-sm text-foreground">{researchResult?.trace_id ?? "—"}</p>
-              <p className="text-[11px] text-muted">
-                {researchResult ? `Estado: ${researchResult.status}` : "Lanza o reanuda una investigación."}
-              </p>
+              <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted">
+                <span>{researchResult ? `Estado: ${researchResult.status}` : "Lanza o reanuda una investigación."}</span>
+                {researchPolling ? (
+                  <span className="flex items-center gap-1 rounded-full bg-background px-2 py-1 text-[11px] text-accent">
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                    Actualizando…
+                  </span>
+                ) : null}
+                {researchStreamError && (
+                  <span className="rounded-full bg-background px-2 py-1 text-[11px] text-danger">
+                    {researchStreamError}
+                  </span>
+                )}
+              </div>
             </div>
             <button
               type="button"
@@ -811,6 +834,11 @@ export default function DashboardPage() {
                     <History className="h-3 w-3 text-muted" />
                     Última actualización guardada
                   </>
+                )}
+                {researchStreamError && (
+                  <span className="rounded-full bg-background px-2 py-1 text-[11px] text-danger">
+                    {researchStreamError}
+                  </span>
                 )}
               </div>
 

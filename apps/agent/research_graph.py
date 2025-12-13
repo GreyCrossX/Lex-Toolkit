@@ -26,11 +26,61 @@ logger = logging.getLogger(__name__)
 class ResearchStatus:
     INTAKE = "intake"
     QUALIFIED = "qualified"
+    CONFLICT_CHECKED = "conflict_checked"
     CLASSIFIED = "classified"
     FACTS_STRUCTURED = "facts_structured"
     PLAN_BUILT = "plan_built"
     ANSWERED = "answered"
     ERROR = "error"
+
+
+# Node metadata to align tools to phases of the canonical workflow.
+NODE_METADATA: Dict[str, Dict[str, Any]] = {
+    "normalize_intake": {"phase": "intake", "role": "gatekeeper", "outputs": ["intake"]},
+    "classify_matter": {"phase": "diagnostics", "role": "gatekeeper", "outputs": ["qualification"]},
+    "jurisdiction_and_area_classifier": {"phase": "diagnostics", "role": "gatekeeper", "outputs": ["jurisdiction_hypotheses", "chosen_jurisdictions", "area_of_law"]},
+    "fact_extractor": {"phase": "facts", "role": "discovery", "outputs": ["facts", "parties"]},
+    "conflict_check": {"phase": "conflict_check", "role": "ethics", "outputs": ["conflict_check"]},
+    "issue_generator": {"phase": "issues", "role": "brain", "outputs": ["issues"]},
+    "research_plan_builder": {"phase": "plan", "role": "strategy", "outputs": ["research_plan"]},
+    "run_next_search_step": {"phase": "research", "role": "research", "outputs": ["queries", "research_plan"]},
+    "synthesize_briefing": {"phase": "briefing", "role": "analysis", "outputs": ["briefing"]},
+}
+
+# Tool-to-workflow map (intake -> process -> output) to keep tools aligned.
+WORKFLOW_BY_TOOL: Dict[str, List[str]] = {
+    "research": [
+        "normalize_intake",
+        "classify_matter",
+        "jurisdiction_and_area_classifier",
+        "fact_extractor",
+        "conflict_check",
+        "issue_generator",
+        "research_plan_builder",
+        "run_next_search_step",
+        "synthesize_briefing",
+    ],
+    "summary": [
+        "normalize_intake",
+        "classify_matter",
+        "fact_extractor",
+        "synthesize_briefing",
+    ],
+    "drafting": [
+        "normalize_intake",
+        "classify_matter",
+        "fact_extractor",
+        "issue_generator",
+        "synthesize_briefing",
+    ],
+    "review": [
+        "normalize_intake",
+        "classify_matter",
+        "fact_extractor",
+        "issue_generator",
+        "synthesize_briefing",
+    ],
+}
 
 
 # ---------- Typed state ----------
@@ -310,6 +360,26 @@ JURISDICTION_FEWSHOTS = [
         '{"jurisdiction_hypotheses":[{"level":"local","label":"cdmx","confidence":0.82}],"chosen_jurisdictions":["cdmx"],"area_of_law":{"primary":"laboral","secondary":[],"confidence":0.84,"rationale":"Despido en CDMX con patrón privado"}}',
     ),
 ]
+ISSUE_FEWSHOTS = [
+    (
+        "human",
+        "Área: laboral. Hechos: Cliente indica despido por embarazo, sin carta de despido, patrón privado en CDMX.",
+    ),
+    (
+        "ai",
+        '{"issues":[{"id":"I1","question":"¿Despido discriminatorio por embarazo?","priority":"high","area":"laboral","status":"pending"}]}',
+    ),
+]
+PLAN_FEWSHOTS = [
+    (
+        "human",
+        "Issues: [{\"id\":\"I1\",\"question\":\"¿Despido discriminatorio por embarazo?\",\"priority\":\"high\",\"area\":\"laboral\",\"status\":\"pending\"}]",
+    ),
+    (
+        "ai",
+        '{"research_plan":[{"id":"I1-law","issue_id":"I1","layer":"law","description":"Revisar LFT y tratados sobre discriminación por embarazo","status":"pending","query_ids":[],"top_k":5}]}',
+    ),
+]
 
 DEFAULT_MAX_SEARCH_STEPS = 4
 
@@ -350,6 +420,8 @@ def trace_node(
 ) -> Callable[
     [Callable[[ResearchState], ResearchState]], Callable[[ResearchState], ResearchState]
 ]:
+    meta = NODE_METADATA.get(name, {})
+
     def decorator(fn: Callable[[ResearchState], ResearchState]):
         def wrapped(state: ResearchState) -> ResearchState:
             _ensure_trace_id(state)
@@ -359,6 +431,9 @@ def trace_node(
                 status=state.get("status"),
                 issues=len(state.get("issues", []) or []),
                 queries=len(state.get("queries", []) or []),
+                phase=meta.get("phase"),
+                role=meta.get("role"),
+                outputs=",".join(meta.get("outputs", [])),
             ):
                 try:
                     result = fn(state)
@@ -516,6 +591,21 @@ def fact_extractor(state: ResearchState) -> ResearchState:
     }
 
 
+def conflict_check(state: ResearchState) -> ResearchState:
+    parties = state.get("parties", []) or []
+    opposing = [p for p in parties if (p.get("role") or "").lower() not in {"client", "self", "unknown"}]
+    opposing_names = [p.get("name") for p in opposing if p.get("name")]
+    has_conflict = False  # Placeholder: real conflict lookup would query firm DB/vector.
+    return {
+        "conflict_check": {
+            "opposing_parties": opposing_names,
+            "conflict_found": has_conflict,
+            "reason": "No conflict detected (placeholder check; firm DB lookup TBD).",
+        },
+        "status": ResearchStatus.CONFLICT_CHECKED,
+    }
+
+
 def issue_generator(state: ResearchState) -> ResearchState:
     facts = state.get("facts", {})
     area = state.get("area_of_law", {}).get("primary", "desconocido")
@@ -525,6 +615,7 @@ def issue_generator(state: ResearchState) -> ResearchState:
                 "system",
                 'Genera 1-4 cuestiones jurídicas priorizadas en español. Devuelve JSON issues [{id,question,priority (high|medium|low),area,status=\\"pending\\"}].',
             ),
+            *ISSUE_FEWSHOTS,
             ("user", "Área: {area}\nHechos: {facts}"),
         ]
     )
@@ -563,6 +654,7 @@ def research_plan_builder(state: ResearchState) -> ResearchState:
                 "Para cada issue genera pasos de investigación respetando jerarquía MX: constitution, treaties (human rights), laws/codes, reglamentos, "
                 'NOMs/administrative norms, jurisprudence, doctrine/custom. Devuelve research_plan [{id,issue_id,layer,description,status=\\"pending\\",query_ids:[],top_k?}].',
             ),
+            *PLAN_FEWSHOTS,
             ("user", "{issues}"),
         ]
     )
@@ -695,14 +787,20 @@ def run_next_search_step(state: ResearchState) -> ResearchState:
 def synthesize_briefing(state: ResearchState) -> ResearchState:
     issues = state.get("issues", [])
     queries = state.get("queries", [])
+    facts = state.get("facts", {})
+    conflict = state.get("conflict_check", {})
+    parties = state.get("parties", [])
     prompt = ChatPromptTemplate.from_messages(
         [
             (
                 "system",
-                "Redacta un briefing jurídico en español. Ordena citas por peso normativo (CPEUM/treaties > leyes/códigos > reglamentos > NOMs > jurisprudencia > doctrina/custom). "
-                "Devuelve JSON briefing: {overview, legal_characterization, recommended_strategy, issue_answers:[{issue_id, answer, citations:[{doc_id,citation,snippet,norm_layer}]}], open_questions}.",
+                "Redacta un briefing jurídico en español usando un formato organizado (fase/IRAC). "
+                "Incluye secciones: intake_summary (hechos clave + objetivo del cliente), conflict_check (conflict_found, opposing_parties, reason), "
+                "issues (lista), rule_findings (citas ordenadas por peso normativo CPEUM/treaties > leyes/códigos > reglamentos > NOMs > jurisprudencia > doctrina/custom), "
+                "analysis (cómo se aplican las reglas a los hechos), strategy (recomendaciones claras con riesgos/lagunas), next_steps (acciones concretas). "
+                "Devuelve JSON briefing: {overview, legal_characterization, recommended_strategy, issue_answers:[{issue_id, answer, citations:[{doc_id,citation,snippet,norm_layer}]}], open_questions, intake_summary, conflict_check, strategy, next_steps}.",
             ),
-            ("user", "Issues: {issues}\nQueries: {queries}"),
+            ("user", "Partes: {parties}\nHechos: {facts}\nConflictCheck: {conflict}\nIssues: {issues}\nQueries: {queries}"),
         ]
     )
 
@@ -716,12 +814,16 @@ def synthesize_briefing(state: ResearchState) -> ResearchState:
                 for issue in issues
             ],
             open_questions=["Confirme fechas y partes clave."],
+            intake_summary="Sinopsis no disponible (fallback).",
+            conflict_check={"conflict_found": False, "reason": f"Fallback: {exc}"},
+            strategy="No evaluado (fallback).",
+            next_steps=["Validar hechos clave con el cliente."],
         ).dict()
 
     data = _structured_call(
         prompt,
         BriefingModel,
-        {"issues": str(issues), "queries": str(queries)},
+        {"issues": str(issues), "queries": str(queries), "facts": str(facts), "conflict": str(conflict), "parties": str(parties)},
         _fallback,
         temperature=0.1,
         max_tokens=800,
@@ -741,6 +843,13 @@ def _should_continue_search(state: ResearchState) -> str:
     return "synthesize_briefing"
 
 
+def _conflict_resolution(state: ResearchState) -> str:
+    conflict = state.get("conflict_check", {}) or {}
+    if conflict.get("conflict_found"):
+        return "stop"
+    return "issue_generator"
+
+
 SYNTHETIC_EVAL_SCENARIOS = [
     {
         "prompt": "Cliente indica despido injustificado en CDMX sin pago de prestaciones.",
@@ -752,11 +861,46 @@ SYNTHETIC_EVAL_SCENARIOS = [
         "expect_jurisdiction": "federal",
         "expect_area_primary": "propiedad intelectual",
     },
+    {
+        "prompt": "Cliente cuenta que la contraparte incumplió contrato de arrendamiento en Guadalajara.",
+        "expect_jurisdiction": "local",
+        "expect_area_primary": "civil",
+    },
 ]
 
 
 def get_synthetic_eval_scenarios() -> List[Dict[str, str]]:
     return SYNTHETIC_EVAL_SCENARIOS.copy()
+
+
+def run_synthetic_eval(
+    runner: Callable[[str], Dict[str, Any]],
+    scenarios: Optional[List[Dict[str, str]]] = None,
+) -> List[Dict[str, Any]]:
+    """
+    Run lightweight synthetic evals. Caller must pass a runner that returns a ResearchState-like dict.
+    This harness is intentionally model-agnostic; in tests, stub runner to avoid network/tool calls.
+    """
+    results = []
+    for scenario in scenarios or SYNTHETIC_EVAL_SCENARIOS:
+        prompt = scenario["prompt"]
+        try:
+            state = runner(prompt) or {}
+            area = (state.get("area_of_law") or {}).get("primary")
+            jurisdictions = state.get("chosen_jurisdictions") or state.get("jurisdiction_hypotheses") or []
+            passed = True
+            if scenario.get("expect_area_primary") and area:
+                passed = passed and scenario["expect_area_primary"] in area.lower()
+            if scenario.get("expect_jurisdiction"):
+                expected = scenario["expect_jurisdiction"]
+                if isinstance(jurisdictions, list):
+                    passed = passed and any(expected in str(j).lower() for j in jurisdictions)
+                else:
+                    passed = passed and expected in str(jurisdictions).lower()
+            results.append({"prompt": prompt, "passed": bool(passed), "area": area, "jurisdictions": jurisdictions})
+        except Exception as exc:  # pragma: no cover - harness safety
+            results.append({"prompt": prompt, "passed": False, "error": str(exc)})
+    return results
 
 
 def build_research_graph() -> StateGraph:
@@ -772,6 +916,7 @@ def build_research_graph() -> StateGraph:
         ),
     )
     builder.add_node("fact_extractor", trace_node("fact_extractor")(fact_extractor))
+    builder.add_node("conflict_check", trace_node("conflict_check")(conflict_check))
     builder.add_node("issue_generator", trace_node("issue_generator")(issue_generator))
     builder.add_node(
         "research_plan_builder",
@@ -788,7 +933,12 @@ def build_research_graph() -> StateGraph:
     builder.add_edge("normalize_intake", "classify_matter")
     builder.add_edge("classify_matter", "jurisdiction_and_area_classifier")
     builder.add_edge("jurisdiction_and_area_classifier", "fact_extractor")
-    builder.add_edge("fact_extractor", "issue_generator")
+    builder.add_edge("fact_extractor", "conflict_check")
+    builder.add_conditional_edges(
+        "conflict_check",
+        _conflict_resolution,
+        {"issue_generator": "issue_generator", "stop": END},
+    )
     builder.add_edge("issue_generator", "research_plan_builder")
 
     builder.add_edge("research_plan_builder", "run_next_search_step")
@@ -812,6 +962,13 @@ def demo_research_run(prompt: str) -> ResearchState:
     }
     final_state = graph.invoke(initial_state)
     return final_state
+
+
+def get_workflow_nodes_for_tool(tool_id: str) -> List[str]:
+    """
+    Return the canonical node list for a given tool id based on the intake→process→output workflow.
+    """
+    return WORKFLOW_BY_TOOL.get(tool_id, WORKFLOW_BY_TOOL.get("research", []))
 
 
 def run_research(
