@@ -1508,6 +1508,17 @@ export default function DashboardPage() {
                     placeholder="Formal, directo, conciliador"
                   />
                 </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Idioma</span>
+                  <select
+                    value={draftingInput.language ?? "es"}
+                    onChange={(e) => setDraftingInput((p) => ({ ...p, language: e.target.value }))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                  >
+                    <option value="es">Español</option>
+                    <option value="en">English</option>
+                  </select>
+                </label>
                 <label className="flex flex-col gap-1 md:col-span-2">
                   <span className="text-xs text-muted">Contexto / Hechos clave</span>
                   <textarea
@@ -1555,6 +1566,16 @@ export default function DashboardPage() {
                     onChange={(e) => setDraftingInput((p) => ({ ...p, research_trace_id: e.target.value }))}
                     className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
                     placeholder="trace_id"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Resumen de investigación (opcional)</span>
+                  <textarea
+                    value={draftingInput.research_summary ?? ""}
+                    onChange={(e) => setDraftingInput((p) => ({ ...p, research_summary: e.target.value }))}
+                    rows={3}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Pega hallazgos/estrategia para guiar el draft."
                   />
                 </label>
               </div>

@@ -31,7 +31,7 @@ Next immediate actions (keep Local + Linear aligned):
 4) Drafting agent: ship MVP (intake → plan → draft → self-check) with schema-driven frontend/API.
 
 Drafting Agent MVP checklist (intake → process → output):
-- [ ] Intake schema enforced end-to-end: doc_type, objective, audience, tone, language, context, facts[], requirements[{label,value}], constraints[], research_trace_id?, research_summary? (validated in API, wired in UI form). API schema done; UI pending.
+- [x] Intake schema enforced end-to-end: doc_type, objective, audience, tone, language, context, facts[], requirements[{label,value}], constraints[], research_trace_id?, research_summary? (validated in API, wired in UI form).
 - [x] Conflict check runs before drafting; blocks on hits and surfaces conflict_check in response.
 - [x] Planning: template/section planner maps doc_type + requirements/constraints to sections/clauses; flags missing info/open questions.
 - [x] Drafting: section-by-section generation honoring tone/constraints; inserts TODOs instead of fabricating when facts missing; can ground on research_trace briefing when provided.
@@ -43,5 +43,5 @@ Drafting Agent MVP checklist (intake → process → output):
 Implementation route:
 - Extend API schemas (done) and add drafting graph with nodes: normalize_intake → classify_matter → fact_extractor → conflict_check → issue_generator (light) → template_selector → section_planner → draft_builder → draft_reviewer. ✅ graph stubbed.
 - Add `/draft/stream` (parallel to research stream) and persistence of drafts/runs; log with trace_id/user_id/firm_id. ✅ implemented.
-- Frontend: add Drafting form (doc_type selector, objective, audience, tone, constraints, facts list, requirements list, research_trace picker) and render plan/sections/risks in the dashboard. ⏳ pending.
+- Frontend: add Drafting form (doc_type selector, objective, audience, tone, constraints, facts list, requirements list, research_trace picker) and render plan/sections/risks in the dashboard. ✅ done.
 - Add docs entry in `docs/agent_workflow.md` and a smoke stub in `scripts/smoke_api.sh` for CI (offline-safe). ✅ done.
