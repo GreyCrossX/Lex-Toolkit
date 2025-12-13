@@ -20,3 +20,4 @@ Use this to update Linear issues without re-deriving the context.
 - Observability: trace/log each node/tool call (redacting PII); add metrics for LLM/tool latency.
 - Evaluation: add few-shot prompts + synthetic evals for structured outputs and citation quality; add more pytest coverage.
 - Frontend alignment: per-tool views and health badges (already discussed), plus streaming UX polish.
+- Auth/ops: RS256 key rotation + JWKS endpoint added; CSRF on refresh; tightened login/refresh rate limits; research run/stream now log duration/status.

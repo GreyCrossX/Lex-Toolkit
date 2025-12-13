@@ -59,7 +59,7 @@ export type ResearchRunResponse = {
 export type ResearchEvent =
   | { type: "start"; trace_id: string; status: string }
   | { type: "update"; trace_id: string; status?: string; data: Partial<ResearchRunResponse> }
-  | { type: "done"; trace_id: string } & ResearchRunResponse
+  | ({ type: "done"; trace_id: string } & ResearchRunResponse)
   | { type: "error"; trace_id: string; error: string; status?: string };
 
 export async function runResearch(
@@ -97,6 +97,7 @@ export function streamResearch(
     maxSteps?: number;
     traceId?: string;
     onEvent: (evt: ResearchEvent) => void;
+    onError?: (err: Error) => void;
     signal?: AbortSignal;
   }
 ) {
@@ -116,29 +117,37 @@ export function streamResearch(
     });
     if (!res.ok || !res.body) {
       const text = await res.text();
-      throw new Error(text || `Research stream failed with ${res.status}`);
+      const err = new Error(text || `Research stream failed with ${res.status}`);
+      opts.onError?.(err);
+      throw err;
     }
 
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
     let buffer = "";
 
-    while (true) {
-      const { value, done } = await reader.read();
-      if (done) break;
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split("\n");
-      buffer = lines.pop() ?? "";
-      for (const line of lines) {
-        const trimmed = line.trim();
-        if (!trimmed) continue;
-        try {
-          const evt = JSON.parse(trimmed) as ResearchEvent;
-          opts.onEvent(evt);
-        } catch (err) {
-          console.error("Failed to parse research stream event", err);
+    try {
+      while (true) {
+        const { value, done } = await reader.read();
+        if (done) break;
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split("\n");
+        buffer = lines.pop() ?? "";
+        for (const line of lines) {
+          const trimmed = line.trim();
+          if (!trimmed) continue;
+          try {
+            const evt = JSON.parse(trimmed) as ResearchEvent;
+            opts.onEvent(evt);
+          } catch (err) {
+            console.error("Failed to parse research stream event", err);
+            opts.onError?.(err as Error);
+          }
         }
       }
+    } catch (err) {
+      opts.onError?.(err as Error);
+      throw err;
     }
   };
 

@@ -1,6 +1,7 @@
 import json
 import logging
 import uuid
+from time import perf_counter
 from typing import Generator
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -63,6 +64,7 @@ def research_run(
         )
     max_steps = payload.max_search_steps
     existing_trace = payload.trace_id.strip() if payload.trace_id else None
+    started = perf_counter()
 
     try:
         result = run_research(
@@ -73,7 +75,10 @@ def research_run(
             trace_id=existing_trace,
         )
     except Exception as exc:  # pragma: no cover - runtime protection
-        logger.exception("research_run_error")
+        logger.exception(
+            "research_run_error",
+            extra={"user_id": user.user_id, "firm_id": user.firm_id, "trace_id": existing_trace},
+        )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
         ) from exc
@@ -89,6 +94,19 @@ def research_run(
         queries=result.get("queries", []) or [],
         briefing=result.get("briefing"),
         errors=[result.get("error")] if result.get("error") else None,
+    )
+    elapsed = perf_counter() - started
+    logger.info(
+        "research_run_completed",
+        extra={
+            "trace_id": trace_id,
+            "user_id": user.user_id,
+            "firm_id": user.firm_id,
+            "status": run_record["status"],
+            "elapsed_ms": round(elapsed * 1000, 2),
+            "issues": len(run_record["issues"] or []),
+            "queries": len(run_record["queries"] or []),
+        },
     )
 
     return ResearchRunResponse(
@@ -236,6 +254,7 @@ def research_run_stream(
         # Initial event so the client can show progress immediately.
         def dumps(obj: dict) -> str:
             return json.dumps(obj, default=str)
+        started = perf_counter()
         yield (
             dumps({"type": "start", "trace_id": trace_id, "status": "running"}) + "\n"
         ).encode("utf-8")
@@ -258,31 +277,48 @@ def research_run_stream(
                     "firm_id": user.firm_id,
                 },
             )
+            run_record = None
             for update in graph.stream(initial_state, stream_mode="updates"):
                 if not isinstance(update, dict):
                     continue
                 merge_update(update)
+                snapshot = snapshot_payload()
+                run_record = research_repository.upsert_run(
+                    trace_id=trace_id,
+                    firm_id=user.firm_id,
+                    user_id=user.user_id,
+                    status=snapshot["status"],
+                    issues=snapshot["issues"],
+                    research_plan=snapshot["research_plan"],
+                    queries=snapshot["queries"],
+                    briefing=snapshot["briefing"],
+                    errors=snapshot["errors"],
+                )
                 payload = {
                     "type": "update",
                     "trace_id": trace_id,
                     "data": update,
-                    "status": current_state["status"],
+                    "status": run_record["status"],
                 }
                 yield (dumps(payload) + "\n").encode("utf-8")
 
             snapshot = snapshot_payload()
-            run_record = research_repository.upsert_run(
-                trace_id=trace_id,
-                firm_id=user.firm_id,
-                user_id=user.user_id,
-                status=snapshot["status"],
-                issues=snapshot["issues"],
-                research_plan=snapshot["research_plan"],
-                queries=snapshot["queries"],
-                briefing=snapshot["briefing"],
-                errors=snapshot["errors"],
-            )
-            snapshot["status"] = run_record["status"]
+            if run_record:
+                snapshot["status"] = run_record["status"]
+            else:
+                run_record = research_repository.upsert_run(
+                    trace_id=trace_id,
+                    firm_id=user.firm_id,
+                    user_id=user.user_id,
+                    status=snapshot["status"],
+                    issues=snapshot["issues"],
+                    research_plan=snapshot["research_plan"],
+                    queries=snapshot["queries"],
+                    briefing=snapshot["briefing"],
+                    errors=snapshot["errors"],
+                )
+                snapshot["status"] = run_record["status"]
+            elapsed = perf_counter() - started
             logger.info(
                 "research_stream_done",
                 extra={
@@ -290,6 +326,9 @@ def research_run_stream(
                     "user_id": user.user_id,
                     "firm_id": user.firm_id,
                     "status": snapshot["status"],
+                    "issues": len(snapshot.get("issues") or []),
+                    "queries": len(snapshot.get("queries") or []),
+                    "elapsed_ms": round(elapsed * 1000, 2),
                 },
             )
             yield (dumps({"type": "done", **snapshot}) + "\n").encode("utf-8")
