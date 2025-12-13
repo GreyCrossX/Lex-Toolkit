@@ -28,13 +28,20 @@ Next immediate actions (keep Local + Linear aligned):
 1) Summarization: define templates + implement `/summary` (single/multi) so the dashboard UI can render real summaries/citations (GRE-31/32/33/53/34).
 2) Ingestion hardening: doc_type selectors + chunking/metadata/timeouts added; extend specialized parsers per `doc_type` (jurisprudence/contract/policy) and richer metadata; keep timeouts small. Extend dashboard upload UX as needed (GRE-30/52).
 3) Docs/QA/infra: finalize API docs + test plan + smoke test, and finish env/Docker coverage to match compose (GRE-48/49/50/44/45/46/47). Keep auth key-rotation/audit follow-ups tracked in Linear.
-4) Research agent: finish streaming resilience/resume + UI surfacing of conflicts in history; add synthetic-eval CI target and docs for workflow/intake→process→output mapping.
+4) Drafting agent: ship MVP (intake → plan → draft → self-check) with schema-driven frontend/API.
 
-Research Agent MVP checklist (intake → process → output):
-- [x] Conflict check uses firm-owned source (DB/vector matters/parties) and blocks on match; logs hit details; surfaced via API/stream/DB.
-- [x] Few-shots cover labor/civil-IP/admin and yield stable JSON for issues/plan/briefing; briefing includes intake summary, conflict, issues, rules, analysis, strategy, next steps.
-- [x] Streaming is reliable: `/research/run/stream` emits start/update/done/error; frontend renders progress/errors and falls back to non-stream run; trace_id resume works (start snapshot persisted, polling fallback wired).
-- [x] Traceability: per-node/tool logs with trace_id/user_id/firm_id + latency; runs/streams audited; errors surface trace_id (node spans carry user/firm).
-- [x] Auth/rate limits: research endpoints enforce auth; CSRF/RS256+JWKS kept; per-user rate limits active; UI handles 401/429.
-- [x] Eval harness: synthetic eval runner with ~5 scenarios; CI target runs it against stubbed runner (no network/tools). Added stubbed CLI in `scripts/smoke_api.sh`.
-- [x] Docs/DX: docs cover endpoints, workflow nodes per tool, how to run research, synthetic eval command, and conflict source config.
+Drafting Agent MVP checklist (intake → process → output):
+- [ ] Intake schema enforced end-to-end: doc_type, objective, audience, tone, language, context, facts[], requirements[{label,value}], constraints[], research_trace_id?, research_summary? (validated in API, wired in UI form). API schema done; UI pending.
+- [x] Conflict check runs before drafting; blocks on hits and surfaces conflict_check in response.
+- [x] Planning: template/section planner maps doc_type + requirements/constraints to sections/clauses; flags missing info/open questions.
+- [x] Drafting: section-by-section generation honoring tone/constraints; inserts TODOs instead of fabricating when facts missing; can ground on research_trace briefing when provided.
+- [x] Self-review: checklist for completeness (all planned sections), requirement coverage, risk flags, assumptions/open_questions surfaced; status/deliverables streamed to UI.
+- [x] Streaming & traceability: `/draft/run` and `/draft/run/stream` emit start/update/done/error; traces include trace_id/user_id/firm_id; errors surface trace_id.
+- [x] Frontend: drafting tool UI captures intake fields, shows plan/sections/risks/open questions, supports resume via trace_id.
+- [x] Docs/DX: workflow documented (intake → plan → draft → review), endpoint(s) documented, and smoke/eval stub for drafting added to scripts.
+
+Implementation route:
+- Extend API schemas (done) and add drafting graph with nodes: normalize_intake → classify_matter → fact_extractor → conflict_check → issue_generator (light) → template_selector → section_planner → draft_builder → draft_reviewer. ✅ graph stubbed.
+- Add `/draft/stream` (parallel to research stream) and persistence of drafts/runs; log with trace_id/user_id/firm_id. ✅ implemented.
+- Frontend: add Drafting form (doc_type selector, objective, audience, tone, constraints, facts list, requirements list, research_trace picker) and render plan/sections/risks in the dashboard. ⏳ pending.
+- Add docs entry in `docs/agent_workflow.md` and a smoke stub in `scripts/smoke_api.sh` for CI (offline-safe). ✅ done.

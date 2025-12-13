@@ -33,6 +33,7 @@ import { authFetch } from "@/lib/auth-fetch";
 import { apiLogout } from "@/lib/auth-client";
 import { TOOLS, type Tool } from "@/lib/tools";
 import { getResearchRun, runResearch, streamResearch, type ResearchEvent, type ResearchRunResponse } from "@/lib/research-client";
+import { getDraft, runDraft, type DraftRequest, type DraftResponse } from "@/lib/drafting-client";
 
 type ChatMessage = {
   id: string;
@@ -85,9 +86,20 @@ const formatCitationLabel = (citation: Citation) => {
 
 export const formatList = (value: string) =>
   value
-    .split(",")
+    .split(/[,\n]/)
     .map((v) => v.trim())
     .filter(Boolean);
+
+const parseRequirementsText = (value: string) =>
+  value
+    .split(/\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [label, ...rest] = line.split(":");
+      return { label: label?.trim(), value: rest.join(":").trim() };
+    })
+    .filter((r) => r.label && r.value);
 
 const docTypeLabel = (value: string) =>
   DOC_TYPE_OPTIONS.find((opt) => opt.value === value)?.label ?? value;
@@ -127,6 +139,21 @@ export default function DashboardPage() {
   const [researchPolling, setResearchPolling] = useState(false);
   const [researchEvents, setResearchEvents] = useState<ResearchEvent[]>([]);
   const [researchStreamError, setResearchStreamError] = useState<string | null>(null);
+  const [draftingInput, setDraftingInput] = useState<DraftRequest>({
+    doc_type: "carta",
+    language: "es",
+    tone: "formal",
+    facts: [],
+    requirements: [],
+    constraints: [],
+  });
+  const [draftingFactsText, setDraftingFactsText] = useState("");
+  const [draftingConstraintsText, setDraftingConstraintsText] = useState("");
+  const [draftingRequirementsText, setDraftingRequirementsText] = useState("");
+  const [draftingResult, setDraftingResult] = useState<DraftResponse | null>(null);
+  const [draftingTraceInput, setDraftingTraceInput] = useState("");
+  const [draftingLoading, setDraftingLoading] = useState(false);
+  const [draftingError, setDraftingError] = useState<string | null>(null);
   const lastResearchMessageTraceRef = useRef<string | null>(null);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const activeUploadJobId = useRef<string | null>(null);
@@ -327,6 +354,53 @@ export default function DashboardPage() {
     }
   };
 
+  const runDraftFlow = async () => {
+    setDraftingLoading(true);
+    setDraftingError(null);
+    try {
+      const facts = formatList(draftingFactsText);
+      const constraints = formatList(draftingConstraintsText);
+      const requirements = parseRequirementsText(draftingRequirementsText);
+      const payload: DraftRequest = {
+        ...draftingInput,
+        facts,
+        constraints,
+        requirements,
+      };
+      setDraftingInput(payload);
+      const res = await runDraft(payload);
+      setDraftingResult(res);
+      setDraftingTraceInput(res.trace_id);
+      toast.success("Redacción lista", { description: res.trace_id });
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Error desconocido";
+      setDraftingError(msg);
+      toast.error("No se pudo generar la redacción", { description: msg });
+    } finally {
+      setDraftingLoading(false);
+    }
+  };
+
+  const resumeDraftByTrace = async () => {
+    const traceId = draftingTraceInput.trim();
+    if (!traceId) {
+      toast.info("Ingresa un trace_id para recuperar un draft.");
+      return;
+    }
+    setDraftingLoading(true);
+    try {
+      const res = await getDraft(traceId);
+      setDraftingResult(res);
+      toast.success("Borrador recuperado", { description: traceId });
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Error desconocido";
+      setDraftingError(msg);
+      toast.error("No se pudo recuperar el borrador", { description: msg });
+    } finally {
+      setDraftingLoading(false);
+    }
+  };
+
   const runResearchFlow = async (query: string) => {
     setActionLoading(true);
     setResearchEvents([]);
@@ -521,6 +595,8 @@ export default function DashboardPage() {
       await runQAOrSearch(text);
     } else if (selectedTool.id === "summary") {
       toast.info("Usa el dropzone de resumen para cargar texto o .txt.");
+    } else if (selectedTool.id === "drafting") {
+      toast.info("Usa el formulario de redacción para capturar datos y generar el borrador.");
     } else {
       pushMessage({
         id: `assistant-${Date.now()}`,
@@ -1375,7 +1451,204 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          {selectedTool.id === "summary" ? (
+          {selectedTool.id === "drafting" ? (
+            <div className="sticky bottom-2 mt-3 rounded-2xl border border-border/60 bg-card/90 p-4 shadow-lg text-sm text-foreground">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] uppercase tracking-wide text-muted">Redacción</p>
+                  <p className="text-muted text-xs">Captura los campos clave y genera un borrador.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setDraftingResult(null);
+                    setDraftingTraceInput("");
+                    setDraftingError(null);
+                  }}
+                  className="text-xs text-muted underline"
+                >
+                  Limpiar
+                </button>
+              </div>
+
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Tipo de documento</span>
+                  <input
+                    value={draftingInput.doc_type}
+                    onChange={(e) => setDraftingInput((p) => ({ ...p, doc_type: e.target.value }))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="carta de demanda, contrato, memo"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Objetivo</span>
+                  <input
+                    value={draftingInput.objective ?? ""}
+                    onChange={(e) => setDraftingInput((p) => ({ ...p, objective: e.target.value }))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Exigir pago, resumir hallazgos, etc."
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Audiencia</span>
+                  <input
+                    value={draftingInput.audience ?? ""}
+                    onChange={(e) => setDraftingInput((p) => ({ ...p, audience: e.target.value }))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Cliente, contraparte, juez"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Tono</span>
+                  <input
+                    value={draftingInput.tone ?? ""}
+                    onChange={(e) => setDraftingInput((p) => ({ ...p, tone: e.target.value }))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Formal, directo, conciliador"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 md:col-span-2">
+                  <span className="text-xs text-muted">Contexto / Hechos clave</span>
+                  <textarea
+                    value={draftingInput.context ?? ""}
+                    onChange={(e) => setDraftingInput((p) => ({ ...p, context: e.target.value }))}
+                    rows={3}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Describe el asunto y datos relevantes."
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Hechos (coma o nueva línea)</span>
+                  <textarea
+                    value={draftingFactsText}
+                    onChange={(e) => setDraftingFactsText(e.target.value)}
+                    rows={3}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Hecho 1, Hecho 2"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Restricciones (coma o nueva línea)</span>
+                  <textarea
+                    value={draftingConstraintsText}
+                    onChange={(e) => setDraftingConstraintsText(e.target.value)}
+                    rows={3}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="No ceder indemnidad; Máx 2 páginas"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 md:col-span-2">
+                  <span className="text-xs text-muted">Requisitos (una línea por requisito, formato Etiqueta: Valor)</span>
+                  <textarea
+                    value={draftingRequirementsText}
+                    onChange={(e) => setDraftingRequirementsText(e.target.value)}
+                    rows={3}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Monto a reclamar: $50,000&#10;Plazo de respuesta: 5 días"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Trace de investigación (opcional)</span>
+                  <input
+                    value={draftingInput.research_trace_id ?? ""}
+                    onChange={(e) => setDraftingInput((p) => ({ ...p, research_trace_id: e.target.value }))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="trace_id"
+                  />
+                </label>
+              </div>
+
+              {draftingError && (
+                <p className="mt-2 text-xs text-danger">Error: {draftingError}</p>
+              )}
+
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={runDraftFlow}
+                  disabled={draftingLoading}
+                  className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-contrast transition hover:bg-accent-strong disabled:opacity-70"
+                >
+                  {draftingLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                  Generar borrador
+                </button>
+                <div className="flex items-center gap-2">
+                  <input
+                    value={draftingTraceInput}
+                    onChange={(e) => setDraftingTraceInput(e.target.value)}
+                    placeholder="trace_id para reanudar"
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                  />
+                  <button
+                    type="button"
+                    onClick={resumeDraftByTrace}
+                    disabled={draftingLoading}
+                    className="rounded-lg border border-border px-3 py-2 text-xs text-muted transition hover:border-accent hover:text-accent"
+                  >
+                    Recuperar
+                  </button>
+                </div>
+              </div>
+
+              {draftingResult && (
+                <div className="mt-4 space-y-3 rounded-2xl border border-border/60 bg-background/70 p-3 text-sm">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wide text-muted">Trace</p>
+                      <p className="font-mono text-xs text-foreground">{draftingResult.trace_id}</p>
+                    </div>
+                    <span className="rounded-full border border-border/60 bg-background/60 px-3 py-1 text-[11px] text-muted">
+                      {draftingResult.status}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-muted">Borrador</p>
+                    <p className="whitespace-pre-wrap text-sm text-foreground">{draftingResult.draft}</p>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-muted">Secciones ({draftingResult.sections.length})</p>
+                    <div className="mt-1 space-y-2">
+                      {draftingResult.sections.map((s) => (
+                        <div key={s.title} className="rounded-lg border border-border/60 bg-card/80 p-2">
+                          <p className="text-sm font-semibold text-foreground">{s.title}</p>
+                          <p className="text-sm text-muted">{s.content}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {(draftingResult.risks.length > 0 || draftingResult.open_questions.length > 0) && (
+                    <div className="grid gap-2 md:grid-cols-2">
+                      <div className="rounded-lg border border-border/60 bg-background/80 p-2">
+                        <p className="text-[11px] uppercase tracking-wide text-muted">Riesgos</p>
+                        {draftingResult.risks.length === 0 ? (
+                          <p className="text-sm text-muted">Sin riesgos reportados.</p>
+                        ) : (
+                          <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-foreground">
+                            {draftingResult.risks.map((r, idx) => (
+                              <li key={`risk-${idx}`}>{r}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      <div className="rounded-lg border border-border/60 bg-background/80 p-2">
+                        <p className="text-[11px] uppercase tracking-wide text-muted">Preguntas abiertas</p>
+                        {draftingResult.open_questions.length === 0 ? (
+                          <p className="text-sm text-muted">Sin preguntas abiertas.</p>
+                        ) : (
+                          <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-foreground">
+                            {draftingResult.open_questions.map((q, idx) => (
+                              <li key={`oq-${idx}`}>{q}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : selectedTool.id === "summary" ? (
             <div className="sticky bottom-2 mt-3 rounded-2xl border border-border/60 bg-card/90 p-4 shadow-lg">
               <textarea
                 value={summaryBuffer}

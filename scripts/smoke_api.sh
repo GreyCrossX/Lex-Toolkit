@@ -129,3 +129,18 @@ if not results or not any(r.get("passed") for r in results):
     sys.exit(1)
 print(json.dumps(results, indent=2, ensure_ascii=False))
 PY
+
+echo "9) drafting stub (offline-safe)"
+curl -fsS -X POST "${API_BASE}/draft/run" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "doc_type": "carta de demanda",
+    "objective": "Exigir cumplimiento de contrato",
+    "audience": "contraparte",
+    "tone": "formal",
+    "language": "es",
+    "context": "Cliente reclama incumplimiento de pago en contrato de servicios.",
+    "facts": ["Contrato firmado el 1 de enero de 2024", "Monto adeudado $50,000"],
+    "requirements": [{"label": "Monto a reclamar", "value": "$50,000"}],
+    "constraints": ["No ceder indemnidad total", "Incluir plazo de respuesta 5 días"]
+  }' | format_json

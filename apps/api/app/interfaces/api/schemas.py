@@ -273,6 +273,7 @@ class DraftSection(BaseModel):
 
 
 class DraftResponse(BaseModel):
+    trace_id: str
     status: str
     doc_type: str
     draft: str
