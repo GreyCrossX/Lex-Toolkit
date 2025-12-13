@@ -174,6 +174,16 @@ describe("DashboardPage research flow", () => {
     streamResearchMock.mockReset();
     getResearchRunMock.mockReset();
     runResearchMock.mockReset();
+    getResearchRunMock.mockResolvedValue({
+      trace_id: "t-1",
+      status: "running",
+      issues: [],
+      research_plan: [],
+      queries: [],
+      briefing: null,
+      conflict_check: null,
+      errors: null,
+    });
   });
 
   afterEach(() => {

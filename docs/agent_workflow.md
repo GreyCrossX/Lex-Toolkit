@@ -23,7 +23,7 @@ Source of truth for how agents should reason through a matter. Each tool should 
 ## Current implementation notes
 - Research graph nodes: intake → qualification → jurisdiction/area → facts → conflict check → issue spotting → research plan → search loop → briefing. Briefing is formatted by phase/IRAC with strategy and next steps.
 - Auth/guardrails: CSRF on refresh, RS256 + JWKS, login/refresh rate limits, research run/stream logging with trace/user/firm.
-- Gaps to fill later: real conflict lookup (firm DB/vector), richer few-shots, synthetic evals, and per-tool UI polish.
+- Gaps to fill next: stream resilience/resume + frontend surfacing of conflict hits, CI target for synthetic evals, and per-tool UI polish.
 
 ## Tool workflows (intake → process → output)
 - **Research**: normalize_intake → classify_matter → jurisdiction_and_area_classifier → fact_extractor → conflict_check → issue_generator → research_plan_builder → run_next_search_step (loop) → synthesize_briefing (IRAC/strategy/next_steps).
@@ -33,3 +33,8 @@ Source of truth for how agents should reason through a matter. Each tool should 
 
 ## Synthetic evals
 - Scenarios live in `apps/agent/research_graph.py` (`SYNTHETIC_EVAL_SCENARIOS`) with helper `run_synthetic_eval(runner)`; pass a stubbed runner in tests to avoid network/tool calls.
+- Conflict lookup: conflict_check now queries vector hits on opposing parties (distance threshold 0.3, top 3) and enriches with web lookup links.
+- Research run/stream responses persist and return a `conflict_check` block so the UI can surface conflicts and runs can be resumed/audited.
+- Streaming/resume: `/research/run/stream` emits start/update/done/error and persists snapshots on start and each update. Frontend falls back to polling and non-stream run on errors. Errors include `trace_id` for support.
+- Smoke/eval: `scripts/smoke_api.sh` now runs an offline-safe synthetic eval stub; useful for CI without network or tools.
+- Keepalive: streaming emits periodic `keepalive` events to keep proxies from timing out during long searches.

@@ -21,10 +21,20 @@ Statuses shown as Local / Linear.
 - Marketing shell (landing + pricing + login) — Local: Done (App Router, shared header, Spanish copy) / Linear: n/a.
 - GRE-45/46/47 (Dockerize backend/frontend, dev DB), GRE-44 env vars — Local: Partially covered by root compose and `.env.example`, but not fully per issue scope / Linear: Backlog/Todo.
 - GRE-50 End-to-end smoke test, GRE-49 test plan, GRE-48 API docs — Local: Not started / Linear: Backlog.
-- Auth hardening & frontend cookie flow — Local: Done (login/register/refresh/logout/me wired with HttpOnly refresh cookies + CSRF double-submit token on refresh, dashboard middleware guard, authFetch 401 retry) with follow-up backlog for key rotation (RS256+KID), stricter rate limits, and audit logging / Linear: Move to In Progress (or mark Done when backlog split).
+- Auth hardening & frontend cookie flow — Local: Done (login/register/refresh/logout/me wired with HttpOnly refresh cookies + CSRF double-submit token on refresh, dashboard middleware guard, authFetch 401 retry) with follow-up backlog for key rotation (RS256+KID), stricter rate limits, and audit logging / Linear: In Progress (RS256/JWKS + audit still pending).
 - Dashboard UX: create per-tool views (chat input variations + tailored UI states) so each tool has a dedicated interaction model.
 
 Next immediate actions (keep Local + Linear aligned):
 1) Summarization: define templates + implement `/summary` (single/multi) so the dashboard UI can render real summaries/citations (GRE-31/32/33/53/34).
 2) Ingestion hardening: doc_type selectors + chunking/metadata/timeouts added; extend specialized parsers per `doc_type` (jurisprudence/contract/policy) and richer metadata; keep timeouts small. Extend dashboard upload UX as needed (GRE-30/52).
-3) Docs/QA/infra: finalize API docs + test plan + smoke test, and finish env/Docker coverage to match compose (GRE-48/49/50/44/45/46/47). Add auth CSRF/key-rotation/tests tasks to Linear.
+3) Docs/QA/infra: finalize API docs + test plan + smoke test, and finish env/Docker coverage to match compose (GRE-48/49/50/44/45/46/47). Keep auth key-rotation/audit follow-ups tracked in Linear.
+4) Research agent: finish streaming resilience/resume + UI surfacing of conflicts in history; add synthetic-eval CI target and docs for workflow/intake→process→output mapping.
+
+Research Agent MVP checklist (intake → process → output):
+- [x] Conflict check uses firm-owned source (DB/vector matters/parties) and blocks on match; logs hit details; surfaced via API/stream/DB.
+- [x] Few-shots cover labor/civil-IP/admin and yield stable JSON for issues/plan/briefing; briefing includes intake summary, conflict, issues, rules, analysis, strategy, next steps.
+- [x] Streaming is reliable: `/research/run/stream` emits start/update/done/error; frontend renders progress/errors and falls back to non-stream run; trace_id resume works (start snapshot persisted, polling fallback wired).
+- [x] Traceability: per-node/tool logs with trace_id/user_id/firm_id + latency; runs/streams audited; errors surface trace_id (node spans carry user/firm).
+- [x] Auth/rate limits: research endpoints enforce auth; CSRF/RS256+JWKS kept; per-user rate limits active; UI handles 401/429.
+- [x] Eval harness: synthetic eval runner with ~5 scenarios; CI target runs it against stubbed runner (no network/tools). Added stubbed CLI in `scripts/smoke_api.sh`.
+- [x] Docs/DX: docs cover endpoints, workflow nodes per tool, how to run research, synthetic eval command, and conflict source config.

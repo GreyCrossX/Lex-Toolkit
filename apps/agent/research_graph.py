@@ -14,7 +14,7 @@ from langgraph.graph.message import add_messages
 from pydantic import BaseModel, ConfigDict, Field
 
 from .llm import get_llm
-from .tools import get_tools, pgvector_inspector_tool
+from .tools import get_tools, pgvector_inspector_tool, web_browser_tool
 
 
 logger = logging.getLogger(__name__)
@@ -180,6 +180,7 @@ class ResearchState(TypedDict, total=False):
 
     status: str
     error: Optional[str]
+    conflict_check: Dict[str, Any]
 
 
 # ---------- Structured output models ----------
@@ -340,6 +341,8 @@ def _build_query_text(step: ResearchStep, state: ResearchState) -> str:
 
 # Shared toolset for the research agent.
 RESEARCH_TOOLS = get_tools(["pgvector_inspector", "web_browser"])
+CONFLICT_DISTANCE_THRESHOLD = 0.3
+CONFLICT_RESULTS_LIMIT = 5
 QUALIFICATION_FEWSHOTS = [
     (
         "human",
@@ -359,6 +362,14 @@ JURISDICTION_FEWSHOTS = [
         "ai",
         '{"jurisdiction_hypotheses":[{"level":"local","label":"cdmx","confidence":0.82}],"chosen_jurisdictions":["cdmx"],"area_of_law":{"primary":"laboral","secondary":[],"confidence":0.84,"rationale":"Despido en CDMX con patrón privado"}}',
     ),
+    (
+        "human",
+        "Consulta: 'Quiero registrar mi marca en EUA y México, soy una startup en Monterrey.'",
+    ),
+    (
+        "ai",
+        '{"jurisdiction_hypotheses":[{"level":"federal","label":"mx","confidence":0.66},{"level":"federal","label":"us","confidence":0.42}],"chosen_jurisdictions":["federal","mx"],"area_of_law":{"primary":"propiedad intelectual","secondary":["marcas"],"confidence":0.73,"rationale":"Registro de marca en MX/US"}}',
+    ),
 ]
 ISSUE_FEWSHOTS = [
     (
@@ -369,6 +380,14 @@ ISSUE_FEWSHOTS = [
         "ai",
         '{"issues":[{"id":"I1","question":"¿Despido discriminatorio por embarazo?","priority":"high","area":"laboral","status":"pending"}]}',
     ),
+    (
+        "human",
+        "Área: propiedad intelectual. Hechos: Startup en Monterrey quiere registrar marca en MX y EUA.",
+    ),
+    (
+        "ai",
+        '{"issues":[{"id":"I2","question":"¿Procede registro de marca en MX y EUA?","priority":"medium","area":"propiedad intelectual","status":"pending"}]}',
+    ),
 ]
 PLAN_FEWSHOTS = [
     (
@@ -378,6 +397,14 @@ PLAN_FEWSHOTS = [
     (
         "ai",
         '{"research_plan":[{"id":"I1-law","issue_id":"I1","layer":"law","description":"Revisar LFT y tratados sobre discriminación por embarazo","status":"pending","query_ids":[],"top_k":5}]}',
+    ),
+    (
+        "human",
+        "Issues: [{\"id\":\"I2\",\"question\":\"¿Procede registro de marca en MX y EUA?\",\"priority\":\"medium\",\"area\":\"propiedad intelectual\",\"status\":\"pending\"}]",
+    ),
+    (
+        "ai",
+        '{"research_plan":[{"id":"I2-law","issue_id":"I2","layer":"law","description":"Analizar LPI mexicana y tratados relevantes para marcas; buscar guías USPTO para marca en EUA","status":"pending","query_ids":[],"top_k":5}]}',
     ),
 ]
 
@@ -401,9 +428,15 @@ def _ensure_trace_id(state: ResearchState) -> str:
 
 @contextmanager
 def trace_span(name: str, **attrs):
-    trace_id = _ensure_trace_id(attrs.get("state", {}) if "state" in attrs else {})
+    state = attrs.get("state", {}) if "state" in attrs else {}
+    trace_id = _ensure_trace_id(state if isinstance(state, dict) else {})
     start = time.time()
     base = {"trace_id": trace_id, "span": name}
+    if isinstance(state, dict):
+        if state.get("user_id"):
+            base["user_id"] = state["user_id"]
+        if state.get("firm_id"):
+            base["firm_id"] = state["firm_id"]
     base.update({k: v for k, v in attrs.items() if k != "state"})
     logger.info("trace.start", extra=base)
     try:
@@ -427,6 +460,7 @@ def trace_node(
             _ensure_trace_id(state)
             with trace_span(
                 f"node.{name}",
+                state=state,
                 node=name,
                 status=state.get("status"),
                 issues=len(state.get("issues", []) or []),
@@ -595,12 +629,61 @@ def conflict_check(state: ResearchState) -> ResearchState:
     parties = state.get("parties", []) or []
     opposing = [p for p in parties if (p.get("role") or "").lower() not in {"client", "self", "unknown"}]
     opposing_names = [p.get("name") for p in opposing if p.get("name")]
-    has_conflict = False  # Placeholder: real conflict lookup would query firm DB/vector.
+    has_conflict = False
+    conflict_hits: List[Dict[str, Any]] = []
+
+    def _search_vector(name: str) -> bool:
+        payload = pgvector_inspector_tool.invoke(
+            {"query": name, "top_k": CONFLICT_RESULTS_LIMIT, "jurisdictions": None, "firm_id": state.get("firm_id")}
+        )
+        results = payload.get("results", []) if isinstance(payload, dict) else []
+        for hit in results:
+            distance = float(hit.get("distance", 1.0))
+            conflict_hits.append(
+                {
+                    "name": name,
+                    "distance": distance,
+                    "doc_id": hit.get("doc_id"),
+                    "chunk_id": hit.get("chunk_id"),
+                }
+            )
+            if distance <= CONFLICT_DISTANCE_THRESHOLD:
+                return True
+        return False
+
+    def _search_web(name: str) -> None:
+        payload = web_browser_tool.invoke({"query": name, "max_results": 1})
+        if isinstance(payload, dict) and payload.get("links"):
+            conflict_hits.append({"name": name, "source": "web", "links": payload.get("links")})
+
+    for name in opposing_names:
+        try:
+            vector_hit = _search_vector(name)
+            if vector_hit:
+                has_conflict = True
+            _search_web(name)
+        except Exception as exc:  # pragma: no cover - best-effort lookup
+            logger.warning("conflict_check_lookup_failed", extra={"name": name, "error": str(exc)})
+
+    logger.info(
+        "conflict_check.results",
+        extra={
+            "trace_id": state.get("trace_id"),
+            "firm_id": state.get("firm_id"),
+            "user_id": state.get("user_id"),
+            "opposing_parties": opposing_names,
+            "conflict_found": has_conflict,
+            "hit_count": len(conflict_hits),
+            "hits": conflict_hits,
+        },
+    )
+
     return {
         "conflict_check": {
             "opposing_parties": opposing_names,
             "conflict_found": has_conflict,
-            "reason": "No conflict detected (placeholder check; firm DB lookup TBD).",
+            "reason": "Conflict hit on opposing party" if has_conflict else "No conflict detected",
+            "hits": conflict_hits,
         },
         "status": ResearchStatus.CONFLICT_CHECKED,
     }
@@ -863,6 +946,11 @@ SYNTHETIC_EVAL_SCENARIOS = [
     },
     {
         "prompt": "Cliente cuenta que la contraparte incumplió contrato de arrendamiento en Guadalajara.",
+        "expect_jurisdiction": "local",
+        "expect_area_primary": "civil",
+    },
+    {
+        "prompt": "Persona reporta accidente de tránsito en Monterrey contra empresa de transporte.",
         "expect_jurisdiction": "local",
         "expect_area_primary": "civil",
     },

@@ -103,3 +103,29 @@ if [[ -f "./sample.pdf" ]]; then
 else
   echo "sample.pdf not found; skipping upload test."
 fi
+
+echo "8) synthetic eval (stubbed runner, offline-safe)"
+python3 - <<'PY'
+import json
+import sys
+
+from apps.agent.research_graph import get_synthetic_eval_scenarios, run_synthetic_eval
+
+
+def runner(prompt: str):
+    low = prompt.lower()
+    area = "laboral" if "despido" in low else ("civil" if "accidente" in low or "contrato" in low else "administrativo")
+    jurisdiction = "cdmx" if "cdmx" in low else ("local" if "monterrey" in low or "guadalajara" in low else "federal")
+    return {
+        "area_of_law": {"primary": area},
+        "chosen_jurisdictions": [jurisdiction],
+    }
+
+
+scenarios = get_synthetic_eval_scenarios()
+results = run_synthetic_eval(runner, scenarios)
+if not results or not any(r.get("passed") for r in results):
+    print("Synthetic eval stub failed", file=sys.stderr)
+    sys.exit(1)
+print(json.dumps(results, indent=2, ensure_ascii=False))
+PY

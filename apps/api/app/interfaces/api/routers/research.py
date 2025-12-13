@@ -64,6 +64,15 @@ def research_run(
         )
     max_steps = payload.max_search_steps
     existing_trace = payload.trace_id.strip() if payload.trace_id else None
+    logger.info(
+        "research_run_start",
+        extra={
+            "trace_id": existing_trace,
+            "user_id": user.user_id,
+            "firm_id": user.firm_id,
+            "max_steps": max_steps,
+        },
+    )
     started = perf_counter()
 
     try:
@@ -77,10 +86,15 @@ def research_run(
     except Exception as exc:  # pragma: no cover - runtime protection
         logger.exception(
             "research_run_error",
-            extra={"user_id": user.user_id, "firm_id": user.firm_id, "trace_id": existing_trace},
+            extra={
+                "user_id": user.user_id,
+                "firm_id": user.firm_id,
+                "trace_id": existing_trace,
+            },
         )
         raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"{exc} (trace_id={existing_trace or 'unassigned'})",
         ) from exc
 
     trace_id = result.get("trace_id", existing_trace or "")
@@ -93,6 +107,7 @@ def research_run(
         research_plan=result.get("research_plan", []) or [],
         queries=result.get("queries", []) or [],
         briefing=result.get("briefing"),
+        conflict_check=result.get("conflict_check"),
         errors=[result.get("error")] if result.get("error") else None,
     )
     elapsed = perf_counter() - started
@@ -116,6 +131,7 @@ def research_run(
         research_plan=run_record["research_plan"] or [],
         queries=run_record["queries"] or [],
         briefing=run_record["briefing"],
+        conflict_check=run_record.get("conflict_check"),
         errors=run_record["errors"],
     )
 
@@ -138,6 +154,7 @@ def research_get(
         research_plan=record["research_plan"] or [],
         queries=record["queries"] or [],
         briefing=record["briefing"],
+        conflict_check=record.get("conflict_check"),
         errors=record["errors"],
     )
 
@@ -178,6 +195,7 @@ def research_run_stream(
             "research_plan": [],
             "queries": [],
             "briefing": None,
+            "conflict_check": None,
             "errors": None,
         }
 
@@ -190,6 +208,7 @@ def research_run_stream(
                 "research_plan",
                 "queries",
                 "briefing",
+                "conflict_check",
                 "errors",
                 "status",
             ):
@@ -230,6 +249,20 @@ def research_run_stream(
                 mapped["status"] = update["synthesize_briefing"].get(
                     "status", mapped.get("status")
                 )
+            if "conflict_check" in update and isinstance(
+                update["conflict_check"], dict
+            ):
+                mapped["conflict_check"] = update["conflict_check"]
+                if update["conflict_check"].get("conflict_found"):
+                    logger.info(
+                        "conflict_found_stream",
+                        extra={
+                            "trace_id": trace_id,
+                            "user_id": user.user_id,
+                            "firm_id": user.firm_id,
+                            "opposing": update["conflict_check"].get("opposing_parties"),
+                        },
+                    )
 
             # Apply mapped top-level values first.
             for key, val in mapped.items():
@@ -248,16 +281,24 @@ def research_run_stream(
                 "research_plan": current_state.get("research_plan") or [],
                 "queries": current_state.get("queries") or [],
                 "briefing": current_state.get("briefing"),
+                "conflict_check": current_state.get("conflict_check"),
                 "errors": current_state.get("errors"),
             }
 
         # Initial event so the client can show progress immediately.
         def dumps(obj: dict) -> str:
             return json.dumps(obj, default=str)
+
+        HEARTBEAT_SECONDS = 15
+        last_emit = perf_counter()
+
+        def emit(payload: dict) -> bytes:
+            nonlocal last_emit
+            last_emit = perf_counter()
+            return (dumps(payload) + "\n").encode("utf-8")
+
         started = perf_counter()
-        yield (
-            dumps({"type": "start", "trace_id": trace_id, "status": "running"}) + "\n"
-        ).encode("utf-8")
+        yield emit({"type": "start", "trace_id": trace_id, "status": "running"})
         try:
             initial_state = {
                 "messages": [HumanMessage(content=prompt)],
@@ -277,10 +318,31 @@ def research_run_stream(
                     "firm_id": user.firm_id,
                 },
             )
-            run_record = None
+            run_record = research_repository.upsert_run(
+                trace_id=trace_id,
+                firm_id=user.firm_id,
+                user_id=user.user_id,
+                status=current_state["status"],
+                issues=current_state["issues"],
+                research_plan=current_state["research_plan"],
+                queries=current_state["queries"],
+                briefing=current_state["briefing"],
+                conflict_check=current_state["conflict_check"],
+                errors=current_state["errors"],
+            )
             for update in graph.stream(initial_state, stream_mode="updates"):
                 if not isinstance(update, dict):
                     continue
+                # Heartbeat to keep connections alive if upstream pauses.
+                now = perf_counter()
+                if now - last_emit > HEARTBEAT_SECONDS:
+                    yield emit(
+                        {
+                            "type": "keepalive",
+                            "trace_id": trace_id,
+                            "status": current_state.get("status", "running"),
+                        }
+                    )
                 merge_update(update)
                 snapshot = snapshot_payload()
                 run_record = research_repository.upsert_run(
@@ -292,6 +354,7 @@ def research_run_stream(
                     research_plan=snapshot["research_plan"],
                     queries=snapshot["queries"],
                     briefing=snapshot["briefing"],
+                    conflict_check=snapshot.get("conflict_check"),
                     errors=snapshot["errors"],
                 )
                 payload = {
@@ -300,7 +363,7 @@ def research_run_stream(
                     "data": update,
                     "status": run_record["status"],
                 }
-                yield (dumps(payload) + "\n").encode("utf-8")
+                yield emit(payload)
 
             snapshot = snapshot_payload()
             if run_record:
@@ -315,6 +378,7 @@ def research_run_stream(
                     research_plan=snapshot["research_plan"],
                     queries=snapshot["queries"],
                     briefing=snapshot["briefing"],
+                    conflict_check=snapshot.get("conflict_check"),
                     errors=snapshot["errors"],
                 )
                 snapshot["status"] = run_record["status"]
@@ -331,9 +395,16 @@ def research_run_stream(
                     "elapsed_ms": round(elapsed * 1000, 2),
                 },
             )
-            yield (dumps({"type": "done", **snapshot}) + "\n").encode("utf-8")
+            yield emit({"type": "done", **snapshot})
         except Exception as exc:  # pragma: no cover - runtime protection
-            logger.exception("research_run_stream_error")
+            logger.exception(
+                "research_run_stream_error",
+                extra={
+                    "trace_id": trace_id,
+                    "user_id": user.user_id,
+                    "firm_id": user.firm_id,
+                },
+            )
             research_repository.upsert_run(
                 trace_id=trace_id,
                 firm_id=user.firm_id,
@@ -343,10 +414,9 @@ def research_run_stream(
                 research_plan=current_state.get("research_plan") or [],
                 queries=current_state.get("queries") or [],
                 briefing=current_state.get("briefing"),
+                conflict_check=current_state.get("conflict_check"),
                 errors=[str(exc)],
             )
-            yield (
-                dumps({"type": "error", "trace_id": trace_id, "error": str(exc)}) + "\n"
-            ).encode("utf-8")
+            yield emit({"type": "error", "trace_id": trace_id, "error": str(exc)})
 
     return StreamingResponse(event_stream(), media_type="application/x-ndjson")

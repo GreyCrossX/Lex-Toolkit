@@ -5,6 +5,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import {
   ArrowLeftRight,
+  AlertTriangle,
   CheckCircle2,
   ChevronDown,
   ChevronUp,
@@ -126,7 +127,7 @@ export default function DashboardPage() {
   const [researchPolling, setResearchPolling] = useState(false);
   const [researchEvents, setResearchEvents] = useState<ResearchEvent[]>([]);
   const [researchStreamError, setResearchStreamError] = useState<string | null>(null);
-  const [lastResearchMessageTrace, setLastResearchMessageTrace] = useState<string | null>(null);
+  const lastResearchMessageTraceRef = useRef<string | null>(null);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const activeUploadJobId = useRef<string | null>(null);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
@@ -194,6 +195,7 @@ export default function DashboardPage() {
     setResearchEvents([]);
     stopResearchPolling();
     stopResearchStream();
+    lastResearchMessageTraceRef.current = null;
   };
 
   const handleResearchSnapshot = (res: ResearchRunResponse) => {
@@ -202,15 +204,24 @@ export default function DashboardPage() {
     if (res.trace_id) {
       setResearchTraceInput(res.trace_id);
     }
-    if (res.trace_id && res.trace_id !== lastResearchMessageTrace) {
+    const conflict = res.conflict_check;
+    const alreadyNotified = res.trace_id && lastResearchMessageTraceRef.current === res.trace_id;
+    if (res.trace_id && !alreadyNotified) {
       const briefing = res.briefing;
       const issues = res.issues || [];
       const plan = res.research_plan || [];
       const queries = res.queries || [];
+      const conflictLine =
+        conflict && typeof conflict.conflict_found === "boolean"
+          ? conflict.conflict_found
+            ? "Conflicto detectado: detén la investigación."
+            : "Sin conflicto encontrado."
+          : null;
       const summaryLines = [
         `Investigación completa (trace: ${res.trace_id})`,
         briefing?.overview ? `Resumen: ${briefing.overview}` : null,
         briefing?.recommended_strategy ? `Estrategia: ${briefing.recommended_strategy}` : null,
+        conflictLine,
         issues.length ? `Issues (${issues.length}): ${issues.map((i) => i.question).join(" · ")}` : null,
         plan.length ? `Pasos de plan: ${plan.length}` : null,
         queries.length ? `Consultas ejecutadas: ${queries.length}` : null,
@@ -224,7 +235,7 @@ export default function DashboardPage() {
         content: summaryLines || `Investigación lista (trace: ${res.trace_id})`,
         meta: { tool: "research" },
       });
-      setLastResearchMessageTrace(res.trace_id);
+      lastResearchMessageTraceRef.current = res.trace_id;
     }
     if (res.status === "answered" || res.status === "error") {
       stopResearchPolling();
@@ -235,6 +246,7 @@ export default function DashboardPage() {
   const pollResearchRun = async (traceId: string) => {
     try {
       const res = await getResearchRun(traceId);
+      if (!res) return;
       handleResearchSnapshot(res);
       syncSessionToken();
     } catch (error) {
@@ -329,7 +341,7 @@ export default function DashboardPage() {
           setResearchEvents((prev) => [...prev, evt]);
           if (evt.type === "start") {
             setResearchTraceInput(evt.trace_id);
-            setResearchPolling(true);
+            startResearchPolling(evt.trace_id);
           } else if (evt.type === "update") {
             if (evt.data) {
               setResearchResult((prev) => ({
@@ -346,10 +358,15 @@ export default function DashboardPage() {
             toast.error("No se pudo completar la investigación", { description: evt.error });
             setActionLoading(false);
             setResearchStreamError(evt.error);
+            if (evt.trace_id) {
+              startResearchPolling(evt.trace_id);
+            }
           }
         },
         onError: (err) => {
           setResearchStreamError(err.message);
+          const traceToUse = researchTraceInput.trim() || researchResult?.trace_id;
+          if (traceToUse) startResearchPolling(traceToUse);
         },
       });
       researchStreamCancelRef.current = () => streamer.cancel();
@@ -714,6 +731,10 @@ export default function DashboardPage() {
     const plan = researchResult?.research_plan ?? [];
     const queries = researchResult?.queries ?? [];
     const briefing = researchResult?.briefing;
+    const conflict = researchResult?.conflict_check;
+    const conflictHits = conflict?.hits ?? [];
+    const opposingParties = conflict?.opposing_parties ?? [];
+    const conflictFound = conflict?.conflict_found ?? false;
     const events = researchEvents;
 
     return (
@@ -791,6 +812,37 @@ export default function DashboardPage() {
               <p className="text-[11px] uppercase tracking-wide text-muted">Consultas</p>
               <p className="text-sm font-semibold text-foreground">{queries.length}</p>
             </div>
+          </div>
+
+          <div className="mt-3 rounded-lg border border-border/60 bg-background/70 p-2 text-xs">
+            <div className="flex items-center gap-2 text-[11px] uppercase tracking-wide text-muted">
+              <AlertTriangle className={`h-4 w-4 ${conflictFound ? "text-danger" : "text-foreground/60"}`} />
+              Conflictos
+            </div>
+            <p className={`mt-1 text-sm ${conflictFound ? "text-danger" : "text-foreground"}`}>
+              {conflict
+                ? conflictFound
+                  ? conflict.reason || "Conflicto detectado con la contraparte."
+                  : conflict.reason || "Sin conflicto detectado."
+                : "Aún sin revisar conflicto."}
+            </p>
+            {opposingParties.length > 0 && (
+              <p className="text-[11px] text-muted">Contrapartes: {opposingParties.join(", ")}</p>
+            )}
+            {conflictHits.length > 0 && (
+              <ul className="mt-1 space-y-1">
+                {conflictHits.slice(0, 3).map((hit, idx) => (
+                  <li key={`conflict-${idx}`} className="rounded border border-border/50 bg-background/80 p-1 text-[11px]">
+                    {hit.doc_id ? `Matter ${hit.doc_id}` : hit.name || "Match"} ·{" "}
+                    {typeof hit.distance === "number"
+                      ? `dist ${hit.distance.toFixed(2)}`
+                      : hit.distance
+                        ? `dist ${hit.distance}`
+                        : "fuente"}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {researchResult?.errors && researchResult.errors.length > 0 && (

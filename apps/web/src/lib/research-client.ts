@@ -46,6 +46,22 @@ export type ResearchBriefing = {
   open_questions?: string[];
 };
 
+export type ConflictHit = {
+  name?: string;
+  doc_id?: string;
+  chunk_id?: string;
+  distance?: number | string;
+  source?: string;
+  links?: unknown;
+};
+
+export type ConflictCheck = {
+  opposing_parties?: string[];
+  conflict_found?: boolean;
+  reason?: string;
+  hits?: ConflictHit[];
+};
+
 export type ResearchRunResponse = {
   trace_id: string;
   status: string;
@@ -53,6 +69,7 @@ export type ResearchRunResponse = {
   research_plan: ResearchStep[];
   queries: ResearchQuery[];
   briefing?: ResearchBriefing | null;
+  conflict_check?: ConflictCheck | null;
   errors?: string[] | null;
 };
 
@@ -60,6 +77,7 @@ export type ResearchEvent =
   | { type: "start"; trace_id: string; status: string }
   | { type: "update"; trace_id: string; status?: string; data: Partial<ResearchRunResponse> }
   | ({ type: "done"; trace_id: string } & ResearchRunResponse)
+  | { type: "keepalive"; trace_id: string; status?: string }
   | { type: "error"; trace_id: string; error: string; status?: string };
 
 export async function runResearch(

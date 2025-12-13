@@ -241,6 +241,7 @@ class ResearchRunResponse(BaseModel):
     research_plan: List[ResearchStep] = Field(default_factory=list)
     queries: List[ResearchQuery] = Field(default_factory=list)
     briefing: Optional[ResearchBriefing] = None
+    conflict_check: Optional[Dict[str, Any]] = None
     errors: Optional[List[str]] = None
 
 

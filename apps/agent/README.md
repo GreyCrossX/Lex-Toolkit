@@ -17,6 +17,11 @@ print(demo_research_run("Cliente indica despido injustificado en CDMX"))
 tools = get_research_tools()  # pgvector_inspector, web_browser
 ```
 
+Synthetic eval (offline stub-friendly):
+```bash
+uv run python -m apps.agent.main --synthetic-eval
+```
+
 ## Tools
 
 Reusable tools sit in `apps/agent/tools` and are exported via `TOOL_REGISTRY`:

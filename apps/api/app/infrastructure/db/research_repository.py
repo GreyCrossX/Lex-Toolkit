@@ -15,11 +15,13 @@ CREATE TABLE IF NOT EXISTS research_runs (
     research_plan JSONB,
     queries JSONB,
     briefing JSONB,
+    conflict_check JSONB,
     errors JSONB,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 CREATE INDEX IF NOT EXISTS idx_research_runs_firm ON research_runs(firm_id);
+ALTER TABLE research_runs ADD COLUMN IF NOT EXISTS conflict_check JSONB;
 """
 
 
@@ -40,6 +42,7 @@ def upsert_run(
     research_plan: Any,
     queries: Any,
     briefing: Any,
+    conflict_check: Any,
     errors: Any,
 ) -> Dict[str, Any]:
     ensure_table()
@@ -55,13 +58,14 @@ def upsert_run(
         else None,
         "queries": json.dumps(queries) if queries is not None else None,
         "briefing": json.dumps(briefing) if briefing is not None else None,
+        "conflict_check": json.dumps(conflict_check) if conflict_check is not None else None,
         "errors": json.dumps(errors) if errors is not None else None,
     }
     with pool.connection() as conn, conn.cursor() as cur:
         cur.execute(
             """
-            INSERT INTO research_runs (trace_id, firm_id, user_id, status, issues, research_plan, queries, briefing, errors)
-            VALUES (%(trace_id)s, %(firm_id)s, %(user_id)s, %(status)s, %(issues)s, %(research_plan)s, %(queries)s, %(briefing)s, %(errors)s)
+            INSERT INTO research_runs (trace_id, firm_id, user_id, status, issues, research_plan, queries, briefing, conflict_check, errors)
+            VALUES (%(trace_id)s, %(firm_id)s, %(user_id)s, %(status)s, %(issues)s, %(research_plan)s, %(queries)s, %(briefing)s, %(conflict_check)s, %(errors)s)
             ON CONFLICT (trace_id) DO UPDATE SET
                 firm_id = EXCLUDED.firm_id,
                 user_id = EXCLUDED.user_id,
@@ -70,9 +74,10 @@ def upsert_run(
                 research_plan = EXCLUDED.research_plan,
                 queries = EXCLUDED.queries,
                 briefing = EXCLUDED.briefing,
+                conflict_check = EXCLUDED.conflict_check,
                 errors = EXCLUDED.errors,
                 updated_at = now()
-            RETURNING trace_id, firm_id, user_id, status, issues, research_plan, queries, briefing, errors, created_at, updated_at
+            RETURNING trace_id, firm_id, user_id, status, issues, research_plan, queries, briefing, conflict_check, errors, created_at, updated_at
             """,
             payload,
         )
@@ -93,6 +98,7 @@ def upsert_run(
         "research_plan": _parse(row["research_plan"]),
         "queries": _parse(row["queries"]),
         "briefing": _parse(row["briefing"]),
+        "conflict_check": _parse(row["conflict_check"]),
         "errors": _parse(row["errors"]),
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],
@@ -111,7 +117,7 @@ def get_run(trace_id: str, firm_id: Optional[str] = None) -> Optional[Dict[str, 
     with pool.connection() as conn, conn.cursor() as cur:
         cur.execute(
             f"""
-            SELECT trace_id, firm_id, user_id, status, issues, research_plan, queries, briefing, errors, created_at, updated_at
+            SELECT trace_id, firm_id, user_id, status, issues, research_plan, queries, briefing, conflict_check, errors, created_at, updated_at
             FROM research_runs
             WHERE {where}
             """,
@@ -136,6 +142,7 @@ def get_run(trace_id: str, firm_id: Optional[str] = None) -> Optional[Dict[str, 
         "research_plan": _parse(row["research_plan"]),
         "queries": _parse(row["queries"]),
         "briefing": _parse(row["briefing"]),
+        "conflict_check": _parse(row["conflict_check"]),
         "errors": _parse(row["errors"]),
         "created_at": row["created_at"],
         "updated_at": row["updated_at"],

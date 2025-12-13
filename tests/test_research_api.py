@@ -47,6 +47,7 @@ def make_client(monkeypatch):
             "research_plan": [],
             "queries": [],
             "briefing": {"overview": "ok"},
+            "conflict_check": {"conflict_found": False, "opposing_parties": []},
         }
         store[tid] = data
         return data
@@ -59,6 +60,7 @@ def make_client(monkeypatch):
             "research_plan": kwargs.get("research_plan"),
             "queries": kwargs.get("queries"),
             "briefing": kwargs.get("briefing"),
+            "conflict_check": kwargs.get("conflict_check"),
             "errors": kwargs.get("errors"),
             "firm_id": kwargs.get("firm_id"),
             "user_id": kwargs.get("user_id"),
@@ -94,6 +96,7 @@ def test_research_run_and_get(monkeypatch):
     assert data["trace_id"]
     assert data["status"] == "answered"
     assert data["issues"][0]["question"]
+    assert data["conflict_check"] is not None
 
     trace_id = data["trace_id"]
     assert trace_id in store
@@ -103,6 +106,7 @@ def test_research_run_and_get(monkeypatch):
     fetched = resp_get.json()
     assert fetched["trace_id"] == trace_id
     assert fetched["issues"]
+    assert fetched["conflict_check"] is not None
 
 
 def test_research_run_rate_limited(monkeypatch):
@@ -130,6 +134,7 @@ def test_research_run_stream(monkeypatch):
 
         def stream(self, initial_state, stream_mode="updates"):
             yield {"issues": [{"id": "I1", "question": "streamed"}]}
+            yield {"conflict_check": {"conflict_found": False, "opposing_parties": []}}
             yield {
                 "research_plan": [{"id": "P1", "issue_id": "I1", "description": "plan"}]
             }
@@ -150,3 +155,4 @@ def test_research_run_stream(monkeypatch):
     assert done_evt["type"] == "done"
     trace_id = done_evt["trace_id"]
     assert trace_id in store
+    assert "conflict_check" in store[trace_id]
