@@ -11,7 +11,9 @@ def test_build_where_clauses_with_filters_and_distance():
         sections=["intro"],
         max_distance=0.9,
     )
-    clauses, params = _build_where_clauses(req, {"embedding": "[0.1]"}, "embedding <-> %(embedding)s::vector")
+    clauses, params = _build_where_clauses(
+        req, {"embedding": "[0.1]"}, "embedding <-> %(embedding)s::vector"
+    )
 
     assert clauses == [
         "embedding IS NOT NULL",
@@ -28,7 +30,9 @@ def test_build_where_clauses_with_filters_and_distance():
 
 def test_build_where_clauses_defaults_to_embedding_present():
     req = SearchRequest(query=None, embedding=[0.2])
-    clauses, params = _build_where_clauses(req, {"embedding": "[0.2]"}, "d <-> %(embedding)s")
+    clauses, params = _build_where_clauses(
+        req, {"embedding": "[0.2]"}, "d <-> %(embedding)s"
+    )
 
     assert clauses == ["embedding IS NOT NULL"]
     assert params["embedding"] == "[0.2]"

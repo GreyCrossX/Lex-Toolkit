@@ -14,7 +14,7 @@ from langgraph.graph.message import add_messages
 from pydantic import BaseModel, ConfigDict, Field
 
 from .llm import get_llm
-from .tools import get_tools, pgvector_inspector_tool, web_browser_tool
+from .tools import get_tools, pgvector_inspector_tool
 
 
 logger = logging.getLogger(__name__)
@@ -256,7 +256,9 @@ def _structured_call(
 ):
     with trace_span("structured_call", model=model_cls.__name__):
         try:
-            llm = get_llm(temperature=temperature, max_tokens=max_tokens).with_structured_output(model_cls)
+            llm = get_llm(
+                temperature=temperature, max_tokens=max_tokens
+            ).with_structured_output(model_cls)
             resp = llm.invoke(prompt.format_prompt(**fmt).to_messages())
             if isinstance(resp, BaseModel):
                 payload = resp.model_dump()
@@ -274,9 +276,15 @@ def _build_query_text(step: ResearchStep, state: ResearchState) -> str:
     issues = state.get("issues", []) or []
     issue = next((i for i in issues if i.get("id") == step.get("issue_id")), None)
     facts = state.get("facts", {})
-    relevant = facts.get("relevant_facts") or facts.get("facts", {}).get("relevant_facts") or []
+    relevant = (
+        facts.get("relevant_facts")
+        or facts.get("facts", {}).get("relevant_facts")
+        or []
+    )
     fact_bits = "; ".join((f.get("text") or "")[:160] for f in relevant[:3])
-    base = issue.get("question") if issue else step.get("description") or "consulta legal"
+    base = (
+        issue.get("question") if issue else step.get("description") or "consulta legal"
+    )
     return f"{base} | capa: {step.get('layer')} | hechos: {fact_bits}".strip()
 
 
@@ -293,8 +301,14 @@ QUALIFICATION_FEWSHOTS = [
     ),
 ]
 JURISDICTION_FEWSHOTS = [
-    ("human", "El cliente describe: 'Demanda por despido injustificado en un despacho en CDMX, patrón privado.'"),
-    ("ai", '{"jurisdiction_hypotheses":[{"level":"local","label":"cdmx","confidence":0.82}],"chosen_jurisdictions":["cdmx"],"area_of_law":{"primary":"laboral","secondary":[],"confidence":0.84,"rationale":"Despido en CDMX con patrón privado"}}'),
+    (
+        "human",
+        "El cliente describe: 'Demanda por despido injustificado en un despacho en CDMX, patrón privado.'",
+    ),
+    (
+        "ai",
+        '{"jurisdiction_hypotheses":[{"level":"local","label":"cdmx","confidence":0.82}],"chosen_jurisdictions":["cdmx"],"area_of_law":{"primary":"laboral","secondary":[],"confidence":0.84,"rationale":"Despido en CDMX con patrón privado"}}',
+    ),
 ]
 
 DEFAULT_MAX_SEARCH_STEPS = 4
@@ -331,7 +345,11 @@ def trace_span(name: str, **attrs):
         raise
 
 
-def trace_node(name: str) -> Callable[[Callable[[ResearchState], ResearchState]], Callable[[ResearchState], ResearchState]]:
+def trace_node(
+    name: str,
+) -> Callable[
+    [Callable[[ResearchState], ResearchState]], Callable[[ResearchState], ResearchState]
+]:
     def decorator(fn: Callable[[ResearchState], ResearchState]):
         def wrapped(state: ResearchState) -> ResearchState:
             _ensure_trace_id(state)
@@ -388,19 +406,27 @@ def classify_matter(state: ResearchState) -> ResearchState:
             ("user", "{text}"),
         ]
     )
-    fallback = lambda exc: QualificationModel(
-        is_legal_matter=True,
-        confidence=0.5,
-        recommended_path="legal_action",
-        rationale=f"fallback: {exc}",
-    ).dict()
-    data = _structured_call(prompt, QualificationModel, {"text": text}, fallback, temperature=0.0, max_tokens=200)
+    def fallback(exc: Exception) -> Dict[str, Any]:
+        return QualificationModel(
+            is_legal_matter=True,
+            confidence=0.5,
+            recommended_path="legal_action",
+            rationale=f"fallback: {exc}",
+        ).dict()
+    data = _structured_call(
+        prompt,
+        QualificationModel,
+        {"text": text},
+        fallback,
+        temperature=0.0,
+        max_tokens=200,
+    )
     return {
         "qualification": data,
         "status": ResearchStatus.QUALIFIED,
         "messages": [
             AIMessage(
-                content=f"Clasificación preliminar: {data.get('recommended_path','legal_action')} (confianza {data.get('confidence',0):.2f})."
+                content=f"Clasificación preliminar: {data.get('recommended_path', 'legal_action')} (confianza {data.get('confidence', 0):.2f})."
             )
         ],
     }
@@ -422,12 +448,26 @@ def jurisdiction_and_area_classifier(state: ResearchState) -> ResearchState:
             ("user", "{text}"),
         ]
     )
-    fallback = lambda exc: JurisdictionAreaModel(
-        jurisdiction_hypotheses=[JurisdictionHypothesisModel(level="federal", label="federal - MX", confidence=0.5, basis=str(exc))],
-        chosen_jurisdictions=["federal"],
-        area_of_law=AreaOfLawModel(primary="desconocido", secondary=[], confidence=0.5, rationale="fallback"),
-    ).dict()
-    data = _structured_call(prompt, JurisdictionAreaModel, {"text": text}, fallback, temperature=0.0, max_tokens=300)
+    def fallback(exc: Exception) -> Dict[str, Any]:
+        return JurisdictionAreaModel(
+            jurisdiction_hypotheses=[
+                JurisdictionHypothesisModel(
+                    level="federal", label="federal - MX", confidence=0.5, basis=str(exc)
+                )
+            ],
+            chosen_jurisdictions=["federal"],
+            area_of_law=AreaOfLawModel(
+                primary="desconocido", secondary=[], confidence=0.5, rationale="fallback"
+            ),
+        ).dict()
+    data = _structured_call(
+        prompt,
+        JurisdictionAreaModel,
+        {"text": text},
+        fallback,
+        temperature=0.0,
+        max_tokens=300,
+    )
     return {**data, "status": ResearchStatus.CLASSIFIED}
 
 
@@ -444,6 +484,7 @@ def fact_extractor(state: ResearchState) -> ResearchState:
             ("user", "{text}"),
         ]
     )
+
     def _fallback(exc: Exception) -> Dict[str, Any]:
         return FactExtractionModel(
             parties=[PartyModel(id="P1", role="client", name="Cliente")],
@@ -460,7 +501,14 @@ def fact_extractor(state: ResearchState) -> ResearchState:
             ),
         ).dict()
 
-    data = _structured_call(prompt, FactExtractionModel, {"text": text}, _fallback, temperature=0.0, max_tokens=500)
+    data = _structured_call(
+        prompt,
+        FactExtractionModel,
+        {"text": text},
+        _fallback,
+        temperature=0.0,
+        max_tokens=500,
+    )
     return {
         "parties": data.get("parties", []),
         "facts": data.get("facts", {}),
@@ -475,11 +523,12 @@ def issue_generator(state: ResearchState) -> ResearchState:
         [
             (
                 "system",
-                "Genera 1-4 cuestiones jurídicas priorizadas en español. Devuelve JSON issues [{id,question,priority (high|medium|low),area,status=\\\"pending\\\"}].",
+                'Genera 1-4 cuestiones jurídicas priorizadas en español. Devuelve JSON issues [{id,question,priority (high|medium|low),area,status=\\"pending\\"}].',
             ),
             ("user", "Área: {area}\nHechos: {facts}"),
         ]
     )
+
     def _fallback(exc: Exception) -> Dict[str, Any]:
         return IssuesModel(
             issues=[
@@ -512,7 +561,7 @@ def research_plan_builder(state: ResearchState) -> ResearchState:
             (
                 "system",
                 "Para cada issue genera pasos de investigación respetando jerarquía MX: constitution, treaties (human rights), laws/codes, reglamentos, "
-                "NOMs/administrative norms, jurisprudence, doctrine/custom. Devuelve research_plan [{id,issue_id,layer,description,status=\\\"pending\\\",query_ids:[],top_k?}].",
+                'NOMs/administrative norms, jurisprudence, doctrine/custom. Devuelve research_plan [{id,issue_id,layer,description,status=\\"pending\\",query_ids:[],top_k?}].',
             ),
             ("user", "{issues}"),
         ]
@@ -523,7 +572,7 @@ def research_plan_builder(state: ResearchState) -> ResearchState:
         for issue in issues:
             plan.append(
                 {
-                    "id": f"{issue.get('id','I')}-law",
+                    "id": f"{issue.get('id', 'I')}-law",
                     "issue_id": issue.get("id"),
                     "layer": "law",
                     "description": "Revisar leyes/códigos aplicables (fallback).",
@@ -551,7 +600,9 @@ def research_plan_builder(state: ResearchState) -> ResearchState:
 def run_next_search_step(state: ResearchState) -> ResearchState:
     plan = state.get("research_plan", []) or []
     queries = state.get("queries", []) or []
-    pending_idx = next((i for i, s in enumerate(plan) if s.get("status") == "pending"), None)
+    pending_idx = next(
+        (i for i, s in enumerate(plan) if s.get("status") == "pending"), None
+    )
     if pending_idx is None:
         return {}
 
@@ -569,7 +620,9 @@ def run_next_search_step(state: ResearchState) -> ResearchState:
             "tool.pgvector_inspector",
             query_preview=query_text[:120],
             top_k=top_k,
-            jurisdictions=",".join(chosen_jurisdictions) if chosen_jurisdictions else "",
+            jurisdictions=",".join(chosen_jurisdictions)
+            if chosen_jurisdictions
+            else "",
             firm_id=firm_id,
         ):
             tool_payload = pgvector_inspector_tool.invoke(
@@ -580,14 +633,20 @@ def run_next_search_step(state: ResearchState) -> ResearchState:
                     "firm_id": firm_id,
                 }
             )
-            tool_rows = tool_payload.get("results", []) if isinstance(tool_payload, dict) else []
+            tool_rows = (
+                tool_payload.get("results", [])
+                if isinstance(tool_payload, dict)
+                else []
+            )
             for row in tool_rows:
                 metadata = row.get("metadata") or {}
                 results.append(
                     {
                         "doc_id": row.get("doc_id"),
                         "title": metadata.get("title") or "",
-                        "citation": metadata.get("citation") or metadata.get("chunk_id") or row.get("chunk_id", ""),
+                        "citation": metadata.get("citation")
+                        or metadata.get("chunk_id")
+                        or row.get("chunk_id", ""),
                         "snippet": (row.get("content") or "")[:400],
                         "score": float(row.get("distance", 0.0)),
                         "norm_layer": step.get("layer", ""),
@@ -652,7 +711,10 @@ def synthesize_briefing(state: ResearchState) -> ResearchState:
             overview="Resumen breve del asunto (fallback).",
             legal_characterization="Caracterización legal fallback.",
             recommended_strategy="Estrategia preliminar fallback.",
-            issue_answers=[IssueAnswerModel(issue_id=issue.get("id"), answer="Respuesta fallback.") for issue in issues],
+            issue_answers=[
+                IssueAnswerModel(issue_id=issue.get("id"), answer="Respuesta fallback.")
+                for issue in issues
+            ],
             open_questions=["Confirme fechas y partes clave."],
         ).dict()
 
@@ -699,14 +761,28 @@ def get_synthetic_eval_scenarios() -> List[Dict[str, str]]:
 
 def build_research_graph() -> StateGraph:
     builder = StateGraph(ResearchState)
-    builder.add_node("normalize_intake", trace_node("normalize_intake")(normalize_intake))
+    builder.add_node(
+        "normalize_intake", trace_node("normalize_intake")(normalize_intake)
+    )
     builder.add_node("classify_matter", trace_node("classify_matter")(classify_matter))
-    builder.add_node("jurisdiction_and_area_classifier", trace_node("jurisdiction_and_area_classifier")(jurisdiction_and_area_classifier))
+    builder.add_node(
+        "jurisdiction_and_area_classifier",
+        trace_node("jurisdiction_and_area_classifier")(
+            jurisdiction_and_area_classifier
+        ),
+    )
     builder.add_node("fact_extractor", trace_node("fact_extractor")(fact_extractor))
     builder.add_node("issue_generator", trace_node("issue_generator")(issue_generator))
-    builder.add_node("research_plan_builder", trace_node("research_plan_builder")(research_plan_builder))
-    builder.add_node("run_next_search_step", trace_node("run_next_search_step")(run_next_search_step))
-    builder.add_node("synthesize_briefing", trace_node("synthesize_briefing")(synthesize_briefing))
+    builder.add_node(
+        "research_plan_builder",
+        trace_node("research_plan_builder")(research_plan_builder),
+    )
+    builder.add_node(
+        "run_next_search_step", trace_node("run_next_search_step")(run_next_search_step)
+    )
+    builder.add_node(
+        "synthesize_briefing", trace_node("synthesize_briefing")(synthesize_briefing)
+    )
 
     builder.add_edge(START, "normalize_intake")
     builder.add_edge("normalize_intake", "classify_matter")
@@ -730,7 +806,10 @@ def build_research_graph() -> StateGraph:
 
 def demo_research_run(prompt: str) -> ResearchState:
     graph = build_research_graph().compile()
-    initial_state: ResearchState = {"messages": [HumanMessage(content=prompt)], "trace_id": uuid.uuid4().hex}
+    initial_state: ResearchState = {
+        "messages": [HumanMessage(content=prompt)],
+        "trace_id": uuid.uuid4().hex,
+    }
     final_state = graph.invoke(initial_state)
     return final_state
 

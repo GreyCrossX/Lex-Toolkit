@@ -22,7 +22,9 @@ def make_client(monkeypatch):
     monkeypatch.setattr(app_module.db, "init_pool", lambda: None)
     monkeypatch.setattr(app_module.ingestion_repository, "ensure_table", lambda: None)
     monkeypatch.setattr(app_module.user_repository, "ensure_table", lambda: None)
-    monkeypatch.setattr(app_module.refresh_token_repository, "ensure_table", lambda: None)
+    monkeypatch.setattr(
+        app_module.refresh_token_repository, "ensure_table", lambda: None
+    )
     monkeypatch.setattr(app_module.research_repository, "ensure_table", lambda: None)
 
     # Dummy auth.
@@ -34,7 +36,9 @@ def make_client(monkeypatch):
     # In-memory store.
     store = {}
 
-    def fake_run(prompt, firm_id=None, user_id=None, max_search_steps=None, trace_id=None):
+    def fake_run(
+        prompt, firm_id=None, user_id=None, max_search_steps=None, trace_id=None
+    ):
         tid = trace_id or "trace-1"
         data = {
             "trace_id": tid,
@@ -68,17 +72,23 @@ def make_client(monkeypatch):
     monkeypatch.setattr(research_router, "run_research", fake_run)
     monkeypatch.setattr(research_router.research_repository, "upsert_run", fake_upsert)
     monkeypatch.setattr(research_router.research_repository, "get_run", fake_get)
-    monkeypatch.setattr(research_router.rate_limit, "enforce", lambda *args, **kwargs: None)
+    monkeypatch.setattr(
+        research_router.rate_limit, "enforce", lambda *args, **kwargs: None
+    )
 
     client = TestClient(app_module.app)
-    client.app.dependency_overrides[research_router.get_current_user] = lambda: DummyUser()
+    client.app.dependency_overrides[research_router.get_current_user] = (
+        lambda: DummyUser()
+    )
     return client, store
 
 
 def test_research_run_and_get(monkeypatch):
     client, store = make_client(monkeypatch)
 
-    resp = client.post("/research/run", json={"prompt": "Investigar despido injustificado"})
+    resp = client.post(
+        "/research/run", json={"prompt": "Investigar despido injustificado"}
+    )
     assert resp.status_code == 200
     data = resp.json()
     assert data["trace_id"]
@@ -120,12 +130,16 @@ def test_research_run_stream(monkeypatch):
 
         def stream(self, initial_state, stream_mode="updates"):
             yield {"issues": [{"id": "I1", "question": "streamed"}]}
-            yield {"research_plan": [{"id": "P1", "issue_id": "I1", "description": "plan"}]}
+            yield {
+                "research_plan": [{"id": "P1", "issue_id": "I1", "description": "plan"}]
+            }
             yield {"status": "answered", "briefing": {"overview": "done"}}
 
     monkeypatch.setattr(research_router, "build_research_graph", lambda: FakeGraph())
 
-    with client.stream("POST", "/research/run/stream", json={"prompt": "streaming test"}) as resp:
+    with client.stream(
+        "POST", "/research/run/stream", json={"prompt": "streaming test"}
+    ) as resp:
         assert resp.status_code == 200
         lines = list(resp.iter_lines())
 

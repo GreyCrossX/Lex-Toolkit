@@ -7,6 +7,7 @@ Requires:
 
 These tests do not mutate data; they only read and assert ordering/limits.
 """
+
 import importlib
 import os
 
@@ -16,10 +17,14 @@ RUN_PGVECTOR = os.environ.get("RUN_PGVECTOR_TESTS") == "1"
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
 if not RUN_PGVECTOR:
-    pytest.skip("Set RUN_PGVECTOR_TESTS=1 to run live pgvector tests", allow_module_level=True)
+    pytest.skip(
+        "Set RUN_PGVECTOR_TESTS=1 to run live pgvector tests", allow_module_level=True
+    )
 
 if not DATABASE_URL:
-    pytest.skip("DATABASE_URL is required for live pgvector tests", allow_module_level=True)
+    pytest.skip(
+        "DATABASE_URL is required for live pgvector tests", allow_module_level=True
+    )
 
 fastapi = pytest.importorskip("fastapi")
 TestClient = pytest.importorskip("fastapi.testclient").TestClient
@@ -44,7 +49,9 @@ def get_vector_dims(pool):
         cur.execute("SELECT vector_dims(embedding) AS dims FROM legal_chunks LIMIT 1")
         row = cur.fetchone()
         if not row or not row["dims"]:
-            pytest.skip("legal_chunks is empty; seed data required for live pgvector tests")
+            pytest.skip(
+                "legal_chunks is empty; seed data required for live pgvector tests"
+            )
         return int(row["dims"])
 
 

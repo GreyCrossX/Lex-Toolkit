@@ -28,6 +28,8 @@ Requires-Dist: langchain-openai
 Requires-Dist: pytest
 Requires-Dist: passlib[bcrypt]
 Requires-Dist: python-jose
+Requires-Dist: langgraph==0.2.45
+Requires-Dist: ruff>=0.14.9
 
 # Legal Scraper Monorepo
 
@@ -42,7 +44,7 @@ This repository is structured as a monorepo so we can add a Next.js frontend, Fa
 
 - `apps/web` – Next.js frontend (landing, dashboard tools, Vitest setup).
 - `apps/api` – FastAPI backend (health, search, QA; pgvector).
-- `apps/agent` – reserved for LangGraph agent flows and tooling.
+- `apps/agent` – LangGraph agent flows and shared tools (pgvector_inspector, web_browser, research graph).
 - `services/data_pipeline` – ingestion, normalization, and chunk/embedding code plus its Pipenv environment and configs.
 - `data` – shared datasets (raw, normalized, chunks, etc.).
 - `infra/docker` – Docker/infra manifests.

@@ -37,7 +37,11 @@ def save_upload(job_id: str, upload: UploadFile) -> Path:
     return dest_path
 
 
-async def process_job(job_id: str, file_path: Path, ingest_callback: Optional[Callable[[Path], object]] = None) -> None:
+async def process_job(
+    job_id: str,
+    file_path: Path,
+    ingest_callback: Optional[Callable[[Path], object]] = None,
+) -> None:
     ingest_repo.update_job(
         job_id,
         status="processing",
@@ -49,11 +53,15 @@ async def process_job(job_id: str, file_path: Path, ingest_callback: Optional[Ca
         pool = db.get_pool()
 
         if ingest_callback:
-            ingest_repo.update_job(job_id, message="Ejecutando pipeline de ingesta...", progress=50)
+            ingest_repo.update_job(
+                job_id, message="Ejecutando pipeline de ingesta...", progress=50
+            )
             await ingest_callback(file_path)
             doc_ids = [file_path.stem]
         else:
-            ingest_repo.update_job(job_id, message="Extrayendo y embebiendo texto...", progress=55)
+            ingest_repo.update_job(
+                job_id, message="Extrayendo y embebiendo texto...", progress=55
+            )
             doc_id, chunk_count = await asyncio.wait_for(
                 asyncio.to_thread(ingest_pdf, pool, file_path, file_path.stem),
                 timeout=20,

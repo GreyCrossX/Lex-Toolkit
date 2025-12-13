@@ -7,7 +7,7 @@ cd ..
 docker compose up -d pgvector
 ```
 
-The init SQL in this directory enables pgvector and creates indexed `legal_chunks` sized for 1536-dim embeddings (text-embedding-3-small), using HNSW. Adjust the dimension in `init/001_enable_pgvector.sql` if needed and recreate the volume.
+The init SQL in this directory enables pgvector and creates indexed `legal_chunks` sized for 1536-dim embeddings (text-embedding-3-small) using HNSW. Adjust the dimension in `init/001_enable_pgvector.sql` if needed and recreate the volume.
 
 ## Quick start
 1) Copy env defaults and edit secrets if needed:
@@ -19,7 +19,7 @@ cp .env.example .env  # edit POSTGRES_PASSWORD if desired
 ```bash
 docker compose up -d
 ```
-The `init/001_enable_pgvector.sql` script enables the extension, creates a `legal_chunks` table sized for `text-embedding-3-large` (3072 dims), and builds btree/GIN/IVFFlat indexes. Adjust the `dim` in that file if you use a different embedding model.
+The `init/001_enable_pgvector.sql` script enables the extension, creates a `legal_chunks` table sized for 1536-dim embeddings (text-embedding-3-small), and builds btree/GIN/HNSW indexes. If you prefer 3072-dim embeddings (text-embedding-3-large), change the `dim` constant in that file before first run (or recreate the volume) so the vector column and HNSW index match your model size.
 
 ## Sanity query
 Once running, connect and run a vector search (replace the sample vector with one from your export):

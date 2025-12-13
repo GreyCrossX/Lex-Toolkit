@@ -55,6 +55,7 @@ class LawSource:
 # HTTP
 # -----------------
 
+
 def fetch_url(url: str, *, max_retries: int = 3, timeout: int = 20) -> str:
     headers = {"User-Agent": USER_AGENT}
     last_exc: Exception | None = None
@@ -68,9 +69,11 @@ def fetch_url(url: str, *, max_retries: int = 3, timeout: int = 20) -> str:
             last_exc = exc
             print(f"[WARNING] Fetch attempt {attempt} failed for {url}: {exc}")
             if attempt < max_retries:
-                time.sleep(2 ** attempt)
+                time.sleep(2**attempt)
 
-    raise RuntimeError(f"Failed to fetch {url} after {max_retries} attempts") from last_exc
+    raise RuntimeError(
+        f"Failed to fetch {url} after {max_retries} attempts"
+    ) from last_exc
 
 
 # -----------------
@@ -193,6 +196,7 @@ def extract_dates_from_meta(meta_text: str) -> Tuple[Optional[str], Optional[str
 # Misc helpers
 # -----------------
 
+
 def slug_from_url(url: str) -> str:
     path = urlparse(url).path
     basename = os.path.basename(path)
@@ -229,6 +233,7 @@ def guess_type_from_title(title: str, default_type: str) -> str:
 # -----------------
 # Page parsing
 # -----------------
+
 
 def parse_constitucion_page(
     soup: BeautifulSoup, page_url: str, default_type: str
@@ -331,10 +336,9 @@ def parse_slider_layout(
 
     for container in slider_containers:
         # Title: from slider header
-        header_span = (
-            container.select_one("div.nn_sliders_slider span span")
-            or container.select_one("div.nn_sliders_slider span a span")
-        )
+        header_span = container.select_one(
+            "div.nn_sliders_slider span span"
+        ) or container.select_one("div.nn_sliders_slider span a span")
         title = header_span.get_text(" ", strip=True) if header_span else None
 
         if not title:
@@ -416,6 +420,7 @@ def parse_law_page(
 # -----------------
 # Save / main
 # -----------------
+
 
 def save_law_sources(laws: List[LawSource], path: Path) -> None:
     data: List[Dict[str, object]] = [

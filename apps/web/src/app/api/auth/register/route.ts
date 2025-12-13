@@ -7,6 +7,7 @@ import {
   readJsonSafe,
   setAccessCookie,
   setRefreshCookieFromBackend,
+  setCsrfCookieFromBackend,
 } from "../utils";
 
 export const runtime = "nodejs";
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
     response.cookies.delete(ACCESS_COOKIE_NAME);
   }
   setRefreshCookieFromBackend(backendRes, response);
+  setCsrfCookieFromBackend(backendRes, response);
 
   return response;
 }

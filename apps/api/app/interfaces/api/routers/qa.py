@@ -7,7 +7,13 @@ from app.application.search_service import run_search
 from app.infrastructure.db import connection as db
 from app.infrastructure.llm import openai_client as llm
 from app.interfaces.api.routers.auth import get_current_user
-from app.interfaces.api.schemas import QARequest, QAResponse, QACitation, SearchRequest, UserPublic
+from app.interfaces.api.schemas import (
+    QARequest,
+    QAResponse,
+    QACitation,
+    SearchRequest,
+    UserPublic,
+)
 
 router = APIRouter()
 
@@ -71,7 +77,9 @@ def qa(
         )
 
     try:
-        answer = llm.generate_answer(req.query, context_chunks, max_tokens=req.max_tokens)
+        answer = llm.generate_answer(
+            req.query, context_chunks, max_tokens=req.max_tokens
+        )
     except Exception as exc:  # pragma: no cover - runtime protection
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,

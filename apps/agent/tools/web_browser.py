@@ -18,8 +18,12 @@ ENV_ALLOWLIST = os.environ.get("BROWSER_ALLOWED_DOMAINS")
 
 class WebBrowserArgs(BaseModel):
     url: str = Field(..., description="URL to fetch (http/https)")
-    allowed_domains: Optional[List[str]] = Field(None, description="Optional allowlist of hostnames")
-    max_bytes: int = Field(MAX_BYTES_DEFAULT, ge=10_000, le=1_000_000, description="Max bytes to read")
+    allowed_domains: Optional[List[str]] = Field(
+        None, description="Optional allowlist of hostnames"
+    )
+    max_bytes: int = Field(
+        MAX_BYTES_DEFAULT, ge=10_000, le=1_000_000, description="Max bytes to read"
+    )
 
     @field_validator("url")
     def _validate_scheme(cls, v: str) -> str:
@@ -35,21 +39,43 @@ class WebBrowserArgs(BaseModel):
         return [d.lower() for d in v]
 
 
-def _run_web_browser(url: str, allowed_domains: Optional[List[str]] = None, max_bytes: int = MAX_BYTES_DEFAULT) -> Dict[str, Any]:
+def _run_web_browser(
+    url: str,
+    allowed_domains: Optional[List[str]] = None,
+    max_bytes: int = MAX_BYTES_DEFAULT,
+) -> Dict[str, Any]:
     parsed = urlparse(url)
-    env_allow = [d.strip().lower() for d in ENV_ALLOWLIST.split(",") if d.strip()] if ENV_ALLOWLIST else []
+    env_allow = (
+        [d.strip().lower() for d in ENV_ALLOWLIST.split(",") if d.strip()]
+        if ENV_ALLOWLIST
+        else []
+    )
     allowlist = allowed_domains or env_allow
     if allowlist and parsed.hostname and parsed.hostname.lower() not in allowlist:
-        return {"url": url, "status": "blocked", "reason": "Host not in allowlist", "links": [], "text": ""}
+        return {
+            "url": url,
+            "status": "blocked",
+            "reason": "Host not in allowlist",
+            "links": [],
+            "text": "",
+        }
 
     headers = {"User-Agent": USER_AGENT}
     try:
-        with httpx.Client(follow_redirects=True, headers=headers, timeout=DEFAULT_TIMEOUT) as client:
+        with httpx.Client(
+            follow_redirects=True, headers=headers, timeout=DEFAULT_TIMEOUT
+        ) as client:
             resp = client.get(url)
             status = resp.status_code
             content = resp.content[:max_bytes]
     except Exception as exc:  # pragma: no cover - network safety
-        return {"url": url, "status": "error", "reason": str(exc), "links": [], "text": ""}
+        return {
+            "url": url,
+            "status": "error",
+            "reason": str(exc),
+            "links": [],
+            "text": "",
+        }
 
     soup = BeautifulSoup(content, "html.parser")
     title = soup.title.string.strip() if soup.title and soup.title.string else ""

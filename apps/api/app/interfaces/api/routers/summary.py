@@ -36,7 +36,9 @@ def summarize_document(
 ):
     if req.stream:
         events = summary_service.stream_summary_document(pool, req)
-        return StreamingResponse(_ndjson_stream(events), media_type="application/x-ndjson")
+        return StreamingResponse(
+            _ndjson_stream(events), media_type="application/x-ndjson"
+        )
     try:
         return summary_service.summarize_document(pool, req)
     except Exception as exc:  # pragma: no cover - runtime protection
@@ -54,7 +56,9 @@ def summarize_multi(
 ):
     if req.stream:
         events = summary_service.stream_summary_multi(pool, req)
-        return StreamingResponse(_ndjson_stream(events), media_type="application/x-ndjson")
+        return StreamingResponse(
+            _ndjson_stream(events), media_type="application/x-ndjson"
+        )
     try:
         return summary_service.summarize_multi(pool, req)
     except Exception as exc:  # pragma: no cover - runtime protection

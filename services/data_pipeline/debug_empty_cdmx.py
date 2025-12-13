@@ -36,9 +36,7 @@ PARAGRAPH_GAP_MIN = 8.0
 TRANSITORIOS_ROOT_PATTERN = re.compile(
     r"(?mi)^\s*art[ií]culos\s+transitorios\s*[:\-.]?\s*$"
 )
-TRANSITORIOS_ALT_PATTERN = re.compile(
-    r"(?mi)^\s*transitorios\s*[:\-.]?\s*$"
-)
+TRANSITORIOS_ALT_PATTERN = re.compile(r"(?mi)^\s*transitorios\s*[:\-.]?\s*$")
 
 TRANSITORY_ITEM_PATTERN = re.compile(
     r"(?mi)^\s*(?:art[ií]culo\s+|transitorio\s+)?"
@@ -68,6 +66,7 @@ class SourceEntry:
 # -----------------
 # Core PDF text extraction (same as scraper)
 # -----------------
+
 
 def _normalize_word_text(text: str) -> str:
     text = text.replace(SOFT_HYPHEN, "").strip()
@@ -217,9 +216,7 @@ def _page_to_text(page: pdfplumber.page.Page) -> str:
 def extract_plain_text_from_pdf(data: bytes) -> str:
     with pdfplumber.open(BytesIO(data)) as pdf:
         page_texts = [
-            page_text
-            for page in pdf.pages
-            if (page_text := _page_to_text(page))
+            page_text for page in pdf.pages if (page_text := _page_to_text(page))
         ]
     return "\n".join(page_texts).strip()
 
@@ -227,6 +224,7 @@ def extract_plain_text_from_pdf(data: bytes) -> str:
 # -----------------
 # Article / transitory detection (same logic as scraper)
 # -----------------
+
 
 def find_article_positions_sequential(
     plain_text: str,
@@ -237,9 +235,7 @@ def find_article_positions_sequential(
     i = 1
 
     while i <= max_articles:
-        pattern = re.compile(
-            rf"(?mi)^\s*art[ií]culo\s+{i}(?:o|º)?\b"
-        )
+        pattern = re.compile(rf"(?mi)^\s*art[ií]culo\s+{i}(?:o|º)?\b")
         m = pattern.search(plain_text, start_pos)
         if not m:
             break
@@ -349,7 +345,7 @@ def split_transitory_region(text: str) -> Tuple[List[Dict[str, str]], str]:
             body_text = ""
         else:
             header_line = chunk[:newline_pos]
-            body_text = chunk[newline_pos + 1:].strip()
+            body_text = chunk[newline_pos + 1 :].strip()
 
         transitory_items.append(
             {
@@ -358,7 +354,11 @@ def split_transitory_region(text: str) -> Tuple[List[Dict[str, str]], str]:
             }
         )
 
-    full_preamble = (heading_text + "\n" + transitory_preamble).strip() if transitory_preamble else heading_text
+    full_preamble = (
+        (heading_text + "\n" + transitory_preamble).strip()
+        if transitory_preamble
+        else heading_text
+    )
 
     return transitory_items, full_preamble
 
@@ -374,6 +374,7 @@ def split_articles_and_transitory(
 # -----------------
 # Loading normalized docs & sources
 # -----------------
+
 
 def find_empty_doc_ids(normalized_dir: Path) -> List[str]:
     ids: List[str] = []
@@ -438,6 +439,7 @@ def write_missing_sources(
 # Fetch with logging
 # -----------------
 
+
 def fetch_pdf(url: str, *, max_retries: int = 3, timeout: int = 20) -> bytes:
     headers = {"User-Agent": USER_AGENT}
     last_exc: Optional[Exception] = None
@@ -452,14 +454,17 @@ def fetch_pdf(url: str, *, max_retries: int = 3, timeout: int = 20) -> bytes:
             last_exc = exc
             print(f"    [HTTP-WARN] attempt {attempt} failed: {exc}")
             if attempt < max_retries:
-                time.sleep(2 ** attempt)
+                time.sleep(2**attempt)
 
-    raise RuntimeError(f"Failed to fetch {url} after {max_retries} attempts") from last_exc
+    raise RuntimeError(
+        f"Failed to fetch {url} after {max_retries} attempts"
+    ) from last_exc
 
 
 # -----------------
 # Debug routine for a single entry
 # -----------------
+
 
 def debug_entry(entry: SourceEntry) -> None:
     print("=" * 80)
@@ -495,12 +500,14 @@ def debug_entry(entry: SourceEntry) -> None:
     # Show first few article contexts
     MAX_ART_CONTEXT = 5
     for idx, (num, pos) in enumerate(positions[:MAX_ART_CONTEXT]):
-        ctx = text[pos:pos + 300].replace("\n", " ")
+        ctx = text[pos : pos + 300].replace("\n", " ")
         print(f"  [ART {num}] at index {pos}: {ctx}")
 
     if not positions:
         # Maybe it uses PRIMERO/SEGUNDO pattern without 'Artículo'
-        print("\n[CHECK] Looking for 'PRIMERO/SEGUNDO/TERCERO' lines without 'ARTÍCULO':")
+        print(
+            "\n[CHECK] Looking for 'PRIMERO/SEGUNDO/TERCERO' lines without 'ARTÍCULO':"
+        )
         for i, line in enumerate(lines[:200], start=1):
             up = line.upper()
             if (
@@ -513,14 +520,14 @@ def debug_entry(entry: SourceEntry) -> None:
     # Transitorios
     trans_pos = find_transitorios_heading(text)
     if trans_pos is not None:
-        trans_ctx = text[trans_pos:trans_pos + 200].replace("\n", " ")
+        trans_ctx = text[trans_pos : trans_pos + 200].replace("\n", " ")
         print(f"\n[INFO] TRANSITORIOS heading at index {trans_pos}: {trans_ctx}")
     else:
         print("\n[INFO] No TRANSITORIOS heading detected.")
 
     # Run full splitter to see what it *would* produce
-    articles, transitory_items, preamble, trans_preamble = split_articles_and_transitory(
-        text
+    articles, transitory_items, preamble, trans_preamble = (
+        split_articles_and_transitory(text)
     )
     print("\n[SUMMARY] Splitter results:")
     print(f"  Articles:   {len(articles)}")
@@ -548,6 +555,7 @@ def debug_entry(entry: SourceEntry) -> None:
 # Main orchestration
 # -----------------
 
+
 def main() -> None:
     base_dir = Path("data")
     normalized_dir = base_dir / "normalized" / "cdmx"
@@ -566,7 +574,7 @@ def main() -> None:
     print(f"[INFO] Loading sources from {sources_path}")
     sources = load_sources(sources_path)
 
-    print(f"[INFO] Writing missing_cdmx.json")
+    print("[INFO] Writing missing_cdmx.json")
     write_missing_sources(sources, empty_ids, missing_out)
 
     # Build dict for quick lookup

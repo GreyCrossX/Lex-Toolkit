@@ -4,11 +4,13 @@ import {
   API_BASE,
   ACCESS_COOKIE_NAME,
   REFRESH_COOKIE_NAME,
+  CSRF_COOKIE_NAME,
   buildBackendHeaders,
   clearAuthCookies,
   readJsonSafe,
   setAccessCookie,
   setRefreshCookieFromBackend,
+  setCsrfCookieFromBackend,
 } from "../utils";
 
 export const runtime = "nodejs";
@@ -23,7 +25,10 @@ export async function POST(req: NextRequest) {
 
   const backendRes = await fetch(`${API_BASE}/auth/refresh`, {
     method: "POST",
-    headers: buildBackendHeaders(req),
+    headers: {
+      ...buildBackendHeaders(req),
+      "x-csrf-token": req.cookies.get(CSRF_COOKIE_NAME)?.value ?? "",
+    },
     body: JSON.stringify({ refresh_token: refreshToken }),
   });
 
@@ -36,6 +41,7 @@ export async function POST(req: NextRequest) {
     response.cookies.delete(ACCESS_COOKIE_NAME);
   }
   setRefreshCookieFromBackend(backendRes, response);
+  setCsrfCookieFromBackend(backendRes, response);
 
   if (!backendRes.ok) {
     // If refresh failed, clear both cookies to force re-auth.

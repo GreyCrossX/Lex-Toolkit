@@ -7,7 +7,11 @@ import redis
 
 logger = logging.getLogger("rate_limit")
 
-REDIS_URL = os.environ.get("RATE_LIMIT_REDIS_URL") or os.environ.get("CELERY_BROKER_URL") or "redis://redis:6379/0"
+REDIS_URL = (
+    os.environ.get("RATE_LIMIT_REDIS_URL")
+    or os.environ.get("CELERY_BROKER_URL")
+    or "redis://redis:6379/0"
+)
 _client: redis.Redis | None = None
 _fallback_buckets: Dict[str, List[float]] = {}
 

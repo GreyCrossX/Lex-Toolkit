@@ -26,7 +26,13 @@ def ensure_table() -> None:
         conn.commit()
 
 
-def create_user(email: str, password_hash: str, full_name: Optional[str], role: str = "user", firm_id: Optional[str] = None) -> str:
+def create_user(
+    email: str,
+    password_hash: str,
+    full_name: Optional[str],
+    role: str = "user",
+    firm_id: Optional[str] = None,
+) -> str:
     ensure_table()
     pool = db.get_pool()
     user_id = str(uuid.uuid4())

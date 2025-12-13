@@ -70,7 +70,9 @@ def _lines_from_words(words: List[Dict[str, float | str]]) -> List[str]:
         return []
 
     heights = [float(line["bottom"]) - float(line["top"]) for line in line_blocks]
-    gap_threshold = max(PARAGRAPH_GAP_MIN, median(heights) * 1.35) if heights else PARAGRAPH_GAP_MIN
+    gap_threshold = (
+        max(PARAGRAPH_GAP_MIN, median(heights) * 1.35) if heights else PARAGRAPH_GAP_MIN
+    )
 
     lines: List[str] = []
     prev_bottom: Optional[float] = None
@@ -164,10 +166,6 @@ def extract_plain_text_from_pdf(
     """
     with pdfplumber.open(BytesIO(data)) as pdf:
         pages = pdf.pages[:max_pages] if max_pages else pdf.pages
-        page_texts = [
-            page_text
-            for page in pages
-            if (page_text := _page_to_text(page))
-        ]
+        page_texts = [page_text for page in pages if (page_text := _page_to_text(page))]
 
     return "\n".join(page_texts).strip()

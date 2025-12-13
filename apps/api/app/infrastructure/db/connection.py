@@ -1,5 +1,5 @@
 import os
-from typing import Callable, Optional
+from typing import Optional
 
 from pgvector.psycopg import register_vector
 from psycopg.rows import dict_row

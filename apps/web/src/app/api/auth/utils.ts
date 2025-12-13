@@ -10,17 +10,18 @@ const isProd = process.env.NODE_ENV === "production";
 
 export const ACCESS_COOKIE_NAME = "access_token";
 export const REFRESH_COOKIE_NAME = "refresh_token";
+export const CSRF_COOKIE_NAME = "csrf_token";
 const REFRESH_MAX_AGE_SECONDS = 60 * 60 * 24 * 7; // 7 days; mirrors backend default
 
-type ParsedRefresh = { token: string | null; maxAge?: number };
+type ParsedCookie = { token: string | null; maxAge?: number };
 
-function parseRefreshCookie(setCookieHeader: string[] | undefined): ParsedRefresh {
+function parseCookie(setCookieHeader: string[] | undefined, name: string): ParsedCookie {
   if (!setCookieHeader) {
     return { token: null };
   }
 
   for (const raw of setCookieHeader) {
-    const match = raw.match(/refresh_token=([^;]+)/);
+    const match = raw.match(new RegExp(`${name}=([^;]+)`));
     if (!match) continue;
     const maxAgeMatch = raw.match(/Max-Age=([^;]+)/i);
     const maxAge = maxAgeMatch ? Number.parseInt(maxAgeMatch[1], 10) : undefined;
@@ -50,7 +51,7 @@ export function setRefreshCookieFromBackend(backendRes: Response, response: Next
     backendRes.headers.raw?.()["set-cookie"] ||
     undefined;
 
-  const { token, maxAge } = parseRefreshCookie(setCookieHeader);
+  const { token, maxAge } = parseCookie(setCookieHeader, REFRESH_COOKIE_NAME);
   if (!token) return;
 
   response.cookies.set({
@@ -60,6 +61,27 @@ export function setRefreshCookieFromBackend(backendRes: Response, response: Next
     secure: isProd,
     sameSite: "lax",
     path: "/api/auth/refresh",
+    maxAge: maxAge ?? REFRESH_MAX_AGE_SECONDS,
+  });
+}
+
+export function setCsrfCookieFromBackend(backendRes: Response, response: NextResponse) {
+  const setCookieHeader =
+    (backendRes.headers as unknown as { getSetCookie?: () => string[] }).getSetCookie?.() ||
+    // @ts-expect-error - raw() exists in node fetch
+    backendRes.headers.raw?.()["set-cookie"] ||
+    undefined;
+
+  const { token, maxAge } = parseCookie(setCookieHeader, CSRF_COOKIE_NAME);
+  if (!token) return;
+
+  response.cookies.set({
+    name: CSRF_COOKIE_NAME,
+    value: token,
+    httpOnly: false,
+    secure: isProd,
+    sameSite: "lax",
+    path: "/",
     maxAge: maxAge ?? REFRESH_MAX_AGE_SECONDS,
   });
 }
@@ -75,6 +97,12 @@ export function clearAuthCookies(response: NextResponse) {
     name: REFRESH_COOKIE_NAME,
     value: "",
     path: "/api/auth/refresh",
+    maxAge: 0,
+  });
+  response.cookies.set({
+    name: CSRF_COOKIE_NAME,
+    value: "",
+    path: "/",
     maxAge: 0,
   });
 }

@@ -56,7 +56,9 @@ def normalize_metadata(raw: Optional[Dict]) -> Dict[str, str]:
     return normalized
 
 
-def load_doc(path: Path) -> tuple[SimpleLegalDoc, List[SimpleLegalArt], List[SimpleLegalTransient]]:
+def load_doc(
+    path: Path,
+) -> tuple[SimpleLegalDoc, List[SimpleLegalArt], List[SimpleLegalTransient]]:
     with path.open("r", encoding="utf-8") as f:
         data = json.load(f)
 
@@ -115,9 +117,7 @@ def iter_doc_paths(
     normalized_root: Path,
     jurisdictions: Optional[Sequence[str]] = None,
 ) -> Iterable[Path]:
-    jurisdiction_set = (
-        {j.lower() for j in jurisdictions} if jurisdictions else None
-    )
+    jurisdiction_set = {j.lower() for j in jurisdictions} if jurisdictions else None
 
     for path in sorted(normalized_root.rglob("*.json")):
         # Skip directories like .jsonl etc.
@@ -309,8 +309,7 @@ def main() -> None:
         total_chunks += len(payloads)
         doc_id_filter.discard(doc.id)
         print(
-            f"[OK] {doc.id}: {len(payloads)} chunks "
-            f"(jurisdiction={doc.jurisdiction})"
+            f"[OK] {doc.id}: {len(payloads)} chunks (jurisdiction={doc.jurisdiction})"
         )
 
     if doc_id_filter:

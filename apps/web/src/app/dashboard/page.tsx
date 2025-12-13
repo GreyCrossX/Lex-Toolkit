@@ -52,7 +52,7 @@ type Citation = {
 };
 type SummaryResponse = { summary?: string; citations?: Citation[] };
 type UploadJobStatus = "queued" | "uploading" | "processing" | "completed" | "failed";
-type UploadResponsePayload = { job_id: string; status: UploadJobStatus; message?: string };
+type UploadResponsePayload = { job_id: string; status: UploadJobStatus; message?: string; doc_type?: string };
 type UploadStatusPayload = {
   job_id: string;
   filename: string;
@@ -61,17 +61,35 @@ type UploadStatusPayload = {
   message?: string;
   error?: string;
   doc_ids?: string[];
+  doc_type?: string;
 };
 
 const SEARCH_PLACEHOLDER = "Ej. requisitos para licitaciones en CDMX";
 const SUMMARY_PLACEHOLDER = "Pega texto a resumir...";
 const RESEARCH_POLL_INTERVAL = 1500;
+const DOC_TYPE_OPTIONS = [
+  { value: "statute", label: "Ley/Reglamento", hint: "Default" },
+  { value: "jurisprudence", label: "Jurisprudencia", hint: "Tesis/precedentes" },
+  { value: "contract", label: "Contrato", hint: "Arrendamiento/NDA/etc." },
+  { value: "policy", label: "Política", hint: "Manual/compliance" },
+];
+
+const formatCitationLabel = (citation: Citation) => {
+  const title = citation.metadata?.title as string | undefined;
+  const section = citation.section || "";
+  const doc = citation.doc_id || "";
+  const parts = [title || doc, section].filter(Boolean);
+  return parts.join(" · ");
+};
 
 export const formatList = (value: string) =>
   value
     .split(",")
     .map((v) => v.trim())
     .filter(Boolean);
+
+const docTypeLabel = (value: string) =>
+  DOC_TYPE_OPTIONS.find((opt) => opt.value === value)?.label ?? value;
 
 export default function DashboardPage() {
   const health = useBackendHealth();
@@ -98,6 +116,8 @@ export default function DashboardPage() {
   const [uploadProgress, setUploadProgress] = useState<number>(0);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const [uploadDocIds, setUploadDocIds] = useState<string[]>([]);
+  const [uploadDocType, setUploadDocType] = useState<string>(DOC_TYPE_OPTIONS[0].value);
+  const [activeUploadDocType, setActiveUploadDocType] = useState<string>(DOC_TYPE_OPTIONS[0].value);
   const [uploading, setUploading] = useState(false);
   const [citationSortDesc, setCitationSortDesc] = useState(false);
   const [researchResult, setResearchResult] = useState<ResearchRunResponse | null>(null);
@@ -105,6 +125,7 @@ export default function DashboardPage() {
   const [researchResumeLoading, setResearchResumeLoading] = useState(false);
   const [researchPolling, setResearchPolling] = useState(false);
   const [researchEvents, setResearchEvents] = useState<ResearchEvent[]>([]);
+  const [lastResearchMessageTrace, setLastResearchMessageTrace] = useState<string | null>(null);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const activeUploadJobId = useRef<string | null>(null);
   const chatBottomRef = useRef<HTMLDivElement | null>(null);
@@ -112,6 +133,7 @@ export default function DashboardPage() {
   const [uploadDragActive, setUploadDragActive] = useState(false);
   const researchPollTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const researchStreamCancelRef = useRef<null | (() => void)>(null);
+  const [selectedCitation, setSelectedCitation] = useState<Citation | null>(null);
 
   const readyTools = useMemo(() => TOOLS.filter((t) => t.status === "ready"), []);
   const syncSessionToken = () => setSessionToken(getAccessToken());
@@ -176,6 +198,30 @@ export default function DashboardPage() {
     setResearchResult(res);
     if (res.trace_id) {
       setResearchTraceInput(res.trace_id);
+    }
+    if (res.trace_id && res.trace_id !== lastResearchMessageTrace) {
+      const briefing = res.briefing;
+      const issues = res.issues || [];
+      const plan = res.research_plan || [];
+      const queries = res.queries || [];
+      const summaryLines = [
+        `Investigación completa (trace: ${res.trace_id})`,
+        briefing?.overview ? `Resumen: ${briefing.overview}` : null,
+        briefing?.recommended_strategy ? `Estrategia: ${briefing.recommended_strategy}` : null,
+        issues.length ? `Issues (${issues.length}): ${issues.map((i) => i.question).join(" · ")}` : null,
+        plan.length ? `Pasos de plan: ${plan.length}` : null,
+        queries.length ? `Consultas ejecutadas: ${queries.length}` : null,
+      ]
+        .filter((line): line is string => Boolean(line))
+        .join("\n");
+
+      pushMessage({
+        id: `assistant-research-${res.trace_id}`,
+        role: "assistant",
+        content: summaryLines || `Investigación lista (trace: ${res.trace_id})`,
+        meta: { tool: "research" },
+      });
+      setLastResearchMessageTrace(res.trace_id);
     }
     if (res.status === "answered" || res.status === "error") {
       stopResearchPolling();
@@ -301,9 +347,18 @@ export default function DashboardPage() {
       syncSessionToken();
     } catch (error) {
       console.error("Error en investigación", error);
-      toast.error("No se pudo completar la investigación", {
-        description: error instanceof Error ? error.message : "Error desconocido",
-      });
+      const errMsg = error instanceof Error ? error.message : "Error desconocido";
+      // Fallback: si el endpoint de streaming no está disponible, usa ejecución sin streaming.
+      try {
+        const traceToUse = researchTraceInput.trim() || researchResult?.trace_id;
+        const res = await runResearch(query, { maxSteps: 4, traceId: traceToUse });
+        handleResearchSnapshot(res);
+        toast.info("Streaming no disponible, se usó ejecución directa", { description: res.trace_id });
+      } catch (fallbackErr) {
+        toast.error("No se pudo completar la investigación", {
+          description: fallbackErr instanceof Error ? fallbackErr.message : errMsg,
+        });
+      }
     }
     setActionLoading(false);
   };
@@ -453,6 +508,7 @@ export default function DashboardPage() {
     setUploadDocIds([]);
     setUploadError(null);
     setUploading(false);
+    setActiveUploadDocType(uploadDocType);
     activeUploadJobId.current = null;
   };
 
@@ -462,7 +518,12 @@ export default function DashboardPage() {
       const res = await authFetch(`${API_BASE_URL}/upload/${jobId}`);
       if (!res.ok) throw new Error(`Respuesta ${res.status}`);
       const data = (await res.json()) as UploadStatusPayload;
-      setUploadStatus(data.message ?? `Estado: ${data.status}`);
+      const statusDocType = data.doc_type || activeUploadDocType;
+      if (data.doc_type) {
+        setActiveUploadDocType(data.doc_type);
+      }
+      const statusMessage = data.message ?? `Estado: ${data.status}`;
+      setUploadStatus(`${statusMessage}${statusDocType ? ` · ${docTypeLabel(statusDocType)}` : ""}`);
       setUploadProgress(data.progress ?? 0);
       setUploadDocIds(data.doc_ids ?? []);
       syncSessionToken();
@@ -518,17 +579,20 @@ export default function DashboardPage() {
     setUploadProgress(0);
     setUploadDocIds([]);
     setUploadStatus("Preparando archivo para ingesta...");
+    const docType = uploadDocType;
+    setActiveUploadDocType(docType);
     activeUploadJobId.current = null;
 
     try {
       const formData = new FormData();
       formData.append("file", file);
-      const res = await authFetch(`${API_BASE_URL}/upload`, { method: "POST", body: formData });
+      const res = await authFetch(`${API_BASE_URL}/ingestion/${docType}`, { method: "POST", body: formData });
       if (!res.ok) throw new Error(`Respuesta ${res.status}`);
       const data = (await res.json()) as UploadResponsePayload;
       if (!data.job_id) throw new Error("Respuesta de ingesta inválida (sin job_id).");
       activeUploadJobId.current = data.job_id;
-      setUploadStatus(data.message ?? "Trabajo en cola.");
+      const message = data.message ?? "Trabajo en cola.";
+      setUploadStatus(`${message} · ${docTypeLabel(data.doc_type ?? docType)}`);
       setUploadProgress(5);
       syncSessionToken();
       toast.success("Documento enviado", { description: "Seguimiento de ingesta en progreso." });
@@ -545,17 +609,7 @@ export default function DashboardPage() {
   };
 
   const renderMessage = (msg: ChatMessage) => {
-    const citations = msg.citations
-      ? citationSortDesc
-        ? [...msg.citations].reverse()
-        : msg.citations
-      : null;
-    const results = msg.results
-      ? citationSortDesc
-        ? [...msg.results].reverse()
-        : msg.results
-      : null;
-
+    const isSearchResults = msg.meta?.mode === "search" && msg.results && msg.results.length > 0;
     return (
       <div
         key={msg.id}
@@ -567,35 +621,23 @@ export default function DashboardPage() {
           {msg.role === "user" ? "Usuario" : msg.meta?.tool ? `Asistente · ${msg.meta.tool}` : "Asistente"}
         </p>
         <p className="mt-2 whitespace-pre-wrap leading-relaxed text-foreground">{msg.content}</p>
-        {citations && citations.length > 0 && (
-          <div className="mt-3 space-y-2">
-            <p className="text-[11px] uppercase tracking-wide text-muted">Citas</p>
-            <ul className="space-y-2">
-              {citations.map((c) => (
-                <li key={c.chunk_id} className="rounded-lg border border-border/60 bg-background/60 p-2">
-                  <p className="text-[12px] text-muted">
-                    <span className="font-semibold">{c.doc_id}</span> • {c.section ?? "sección"} •{" "}
-                    {c.jurisdiction ?? "jurisdicción"} •{" "}
-                    {c.distance !== undefined ? c.distance.toFixed(3) : "—"}
-                  </p>
-                  <p className="text-foreground">{c.content}</p>
-                </li>
-              ))}
-            </ul>
-          </div>
+        {msg.citations && msg.citations.length > 0 && msg.role === "assistant" && (
+          <p className="mt-2 text-[12px] text-muted">
+            Citas disponibles en la barra derecha. Se ocultaron refs internas (chunk_id) para legibilidad.
+          </p>
         )}
-        {results && results.length > 0 && (
-          <div className="mt-3">
+        {isSearchResults && (
+          <div className="mt-3 space-y-2">
             <p className="text-[11px] uppercase tracking-wide text-muted">Resultados</p>
-            <ul className="mt-1 space-y-2 text-muted">
-              {results.map((r) => (
+            <ul className="space-y-2">
+              {msg.results!.map((r) => (
                 <li key={r.chunk_id} className="rounded-lg border border-border/60 bg-background/60 p-2">
                   <p className="text-[12px] text-muted">
                     <span className="font-semibold">{r.doc_id}</span> • {r.section ?? "sección"} •{" "}
                     {r.jurisdiction ?? "jurisdicción"} •{" "}
                     {r.distance !== undefined ? r.distance.toFixed(3) : "—"}
                   </p>
-                  <p className="text-foreground">{r.content}</p>
+                  <p className="text-foreground line-clamp-2">{r.content}</p>
                 </li>
               ))}
             </ul>
@@ -604,6 +646,31 @@ export default function DashboardPage() {
       </div>
     );
   };
+
+  const renderDocTypeSelector = () => (
+    <div className="space-y-1 text-xs">
+      <div className="flex flex-wrap gap-2">
+        {DOC_TYPE_OPTIONS.map((opt) => {
+          const isActive = uploadDocType === opt.value;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => setUploadDocType(opt.value)}
+              className={`rounded-full border px-3 py-1 transition ${
+                isActive ? "border-accent text-accent" : "border-border/70 text-muted hover:border-accent"
+              }`}
+            >
+              {opt.label}
+            </button>
+          );
+        })}
+      </div>
+      <p className="text-[11px] text-muted">
+        Se enviará como {docTypeLabel(uploadDocType)} (`{uploadDocType}`) vía /ingestion/{uploadDocType}.
+      </p>
+    </div>
+  );
 
   const StatusBadge = ({ status }: { status: "online" | "offline" | "checking" }) => {
     if (status === "checking") {
@@ -866,6 +933,22 @@ export default function DashboardPage() {
     );
   };
 
+  const citationsSidebar = useMemo(() => {
+    const all: Citation[] = [];
+    messages.forEach((m) => {
+      if (m.citations && m.citations.length > 0) all.push(...m.citations);
+    });
+    const unique = new Map<string, Citation>();
+    all.forEach((c) => {
+      if (!unique.has(c.chunk_id)) unique.set(c.chunk_id, c);
+    });
+    return Array.from(unique.values()).sort((a, b) => {
+      const ad = a.distance ?? Number.POSITIVE_INFINITY;
+      const bd = b.distance ?? Number.POSITIVE_INFINITY;
+      return ad - bd;
+    });
+  }, [messages]);
+
   return (
     <div className="min-h-screen bg-background">
       <header className="sticky top-0 z-40 flex items-center justify-between border-b border-border/50 bg-surface/80 px-4 py-3 backdrop-blur">
@@ -1054,6 +1137,7 @@ export default function DashboardPage() {
               <Upload className="h-4 w-4" />
               <span>Subir documento</span>
             </div>
+            {renderDocTypeSelector()}
             <div
               className={`flex cursor-pointer flex-col gap-2 rounded-xl border border-dashed p-3 text-xs transition ${
                 uploadDragActive ? "border-accent bg-accent/5" : "border-border/60 bg-background/60"
@@ -1139,27 +1223,76 @@ export default function DashboardPage() {
           {renderResearchPanels()}
 
           <div className="flex flex-1 flex-col gap-3 overflow-y-auto rounded-2xl border border-border/60 bg-surface/80 p-4">
-            {messages.length === 0 ? (
-              <div className="rounded-xl border border-border/60 bg-card/80 p-4 text-sm text-muted">
-                Aún no hay mensajes. Escribe tu petición para {selectedTool.name}. Usa filtros a la izquierda para
-                acotar doc_ids, jurisdicciones y secciones.
-                {selectedTool.id === "research" && researchResult?.trace_id && (
-                  <p className="mt-2 text-xs text-muted">
-                    Último trace: <span className="font-mono text-foreground">{researchResult.trace_id}</span> (
-                    {researchResult.status})
-                  </p>
+            <div className="grid grid-cols-1 gap-4 xl:grid-cols-[2fr_320px]">
+              <div className="flex flex-col gap-3">
+                {messages.length === 0 ? (
+                  <div className="rounded-xl border border-border/60 bg-card/80 p-4 text-sm text-muted">
+                    Aún no hay mensajes. Escribe tu petición para {selectedTool.name}. Usa filtros a la izquierda para
+                    acotar doc_ids, jurisdicciones y secciones.
+                    {selectedTool.id === "research" && researchResult?.trace_id && (
+                      <p className="mt-2 text-xs text-muted">
+                        Último trace: <span className="font-mono text-foreground">{researchResult.trace_id}</span> (
+                        {researchResult.status})
+                      </p>
+                    )}
+                  </div>
+                ) : (
+                  messages.map(renderMessage)
                 )}
+                {actionLoading && (
+                  <div className="flex items-center gap-2 text-sm text-muted">
+                    <Loader2 className="h-4 w-4 animate-spin text-accent" />
+                    Procesando...
+                  </div>
+                )}
+                <div ref={chatBottomRef} />
               </div>
-            ) : (
-              messages.map(renderMessage)
-            )}
-            {actionLoading && (
-              <div className="flex items-center gap-2 text-sm text-muted">
-                <Loader2 className="h-4 w-4 animate-spin text-accent" />
-                Procesando...
-              </div>
-            )}
-            <div ref={chatBottomRef} />
+
+              <aside className="hidden h-full xl:block">
+                <div className="sticky top-24 flex h-full flex-col gap-3 rounded-2xl border border-border/60 bg-card/80 p-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wide text-muted">Citas relevantes</p>
+                      <p className="text-sm text-foreground">{citationsSidebar.length} artículos</p>
+                    </div>
+                    <button
+                      type="button"
+                      className="text-[11px] text-muted underline"
+                      onClick={() => setSelectedCitation(null)}
+                    >
+                      Limpiar
+                    </button>
+                  </div>
+                  <div className="h-full space-y-2 overflow-y-auto pr-1">
+                    {citationsSidebar.length === 0 ? (
+                      <p className="text-xs text-muted">No hay citas aún.</p>
+                    ) : (
+                      citationsSidebar.map((c) => (
+                        <button
+                          key={c.chunk_id}
+                          onClick={() => setSelectedCitation(c)}
+                          className={`w-full rounded-lg border px-3 py-2 text-left text-sm transition ${
+                            selectedCitation?.chunk_id === c.chunk_id
+                              ? "border-accent bg-accent/10 text-foreground"
+                              : "border-border/60 bg-background/60 text-foreground hover:border-accent"
+                          }`}
+                        >
+                          <p className="text-[11px] font-semibold text-muted">{formatCitationLabel(c)}</p>
+                          <p className="line-clamp-3 text-sm">{c.content}</p>
+                        </button>
+                      ))
+                    )}
+                  </div>
+                  {selectedCitation && (
+                    <div className="rounded-xl border border-border/60 bg-background/70 p-3 text-sm text-foreground">
+                      <p className="text-[11px] uppercase tracking-wide text-muted">Detalle</p>
+                      <p className="mt-1 font-semibold">{formatCitationLabel(selectedCitation)}</p>
+                      <p className="mt-2 whitespace-pre-wrap text-sm">{selectedCitation.content}</p>
+                    </div>
+                  )}
+                </div>
+              </aside>
+            </div>
           </div>
 
           {selectedTool.id === "summary" ? (
@@ -1244,6 +1377,7 @@ export default function DashboardPage() {
                 <Upload className="h-4 w-4" />
                 <span>Subir documento</span>
               </div>
+              <div className="mt-2">{renderDocTypeSelector()}</div>
               <div
                 className={`mt-2 flex cursor-pointer flex-col gap-2 rounded-xl border border-dashed p-3 text-xs transition ${
                   uploadDragActive ? "border-accent bg-accent/5" : "border-border/60 bg-background/60"

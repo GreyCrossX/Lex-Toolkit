@@ -1,8 +1,9 @@
+import hashlib
+import json
 import os
 import secrets
-import hashlib
 from datetime import datetime, timedelta, timezone
-from typing import Optional, Tuple
+from typing import Dict, Optional, Tuple
 
 from jose import JWTError, jwt
 from passlib.context import CryptContext
@@ -10,17 +11,33 @@ from passlib.context import CryptContext
 from app.infrastructure.db import refresh_token_repository
 
 JWT_SECRET = os.environ.get("JWT_SECRET")
-if not JWT_SECRET:
-    raise RuntimeError("JWT_SECRET env var is required for signing tokens.")
-if len(JWT_SECRET) < 32:
-    raise RuntimeError("JWT_SECRET must be at least 32 characters for HS256.")
+JWT_PRIVATE_KEY = os.environ.get("JWT_PRIVATE_KEY")
+JWT_PRIVATE_KEY_ID = os.environ.get("JWT_PRIVATE_KEY_ID", "current")
+JWT_PUBLIC_KEYS_RAW = os.environ.get("JWT_PUBLIC_KEYS")
 
-JWT_ALGORITHM = "HS256"
+JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM") or ("RS256" if JWT_PRIVATE_KEY else "HS256")
 JWT_ISSUER = os.environ.get("JWT_ISSUER", "legalscraper-api")
 JWT_AUDIENCE = os.environ.get("JWT_AUDIENCE", "lex-web")
 JWT_EXPIRE_MINUTES = int(os.environ.get("JWT_EXPIRE_MINUTES", "15"))
 REFRESH_EXPIRE_DAYS = int(os.environ.get("JWT_REFRESH_EXPIRE_DAYS", "7"))
 JWT_LEEWAY_SECONDS = int(os.environ.get("JWT_LEEWAY_SECONDS", "30"))
+
+if JWT_PRIVATE_KEY:
+    _PUBLIC_KEYS: Dict[str, str] = {}
+    if JWT_PUBLIC_KEYS_RAW:
+        try:
+            parsed = json.loads(JWT_PUBLIC_KEYS_RAW)
+            if not isinstance(parsed, dict):
+                raise ValueError("JWT_PUBLIC_KEYS must be a JSON object mapping kid to public key PEM.")
+            _PUBLIC_KEYS = {str(k): v for k, v in parsed.items()}
+        except Exception as exc:  # pragma: no cover - parse guard
+            raise RuntimeError(f"Failed to parse JWT_PUBLIC_KEYS: {exc}") from exc
+else:
+    _PUBLIC_KEYS = {}
+    if not JWT_SECRET:
+        raise RuntimeError("JWT_SECRET env var is required for HS256 or provide JWT_PRIVATE_KEY for RS256.")
+    if len(JWT_SECRET) < 32:
+        raise RuntimeError("JWT_SECRET must be at least 32 characters for HS256.")
 
 # Use pbkdf2_sha256 to sidestep bcrypt backend issues in slim images.
 pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
@@ -38,7 +55,9 @@ def verify_password(password: str, password_hash: str) -> bool:
     return pwd_context.verify(password, password_hash)
 
 
-def create_access_token(user_id: str, email: str, role: str, expires_minutes: Optional[int] = None) -> str:
+def create_access_token(
+    user_id: str, email: str, role: str, expires_minutes: Optional[int] = None
+) -> str:
     exp_minutes = expires_minutes or JWT_EXPIRE_MINUTES
     now = _utcnow()
     expire = now + timedelta(minutes=exp_minutes)
@@ -53,14 +72,24 @@ def create_access_token(user_id: str, email: str, role: str, expires_minutes: Op
         "jti": secrets.token_hex(16),
         "token_type": "access",
     }
-    return jwt.encode(to_encode, JWT_SECRET, algorithm=JWT_ALGORITHM)
+    headers = {}
+    key = JWT_SECRET
+    if JWT_ALGORITHM.startswith("RS"):
+        if not JWT_PRIVATE_KEY:
+            raise RuntimeError("JWT_PRIVATE_KEY is required for RS256 signing.")
+        headers["kid"] = JWT_PRIVATE_KEY_ID
+        key = JWT_PRIVATE_KEY
+    return jwt.encode(to_encode, key, algorithm=JWT_ALGORITHM, headers=headers)
 
 
 def decode_token(token: str, expected_type: str = "access") -> Optional[dict]:
     try:
+        key = _resolve_decode_key(token)
+        if key is None:
+            return None
         payload = jwt.decode(
             token,
-            JWT_SECRET,
+            key,
             algorithms=[JWT_ALGORITHM],
             audience=JWT_AUDIENCE,
             issuer=JWT_ISSUER,
@@ -77,7 +106,9 @@ def _hash_refresh_secret(secret: str) -> str:
     return hashlib.sha256(secret.encode("utf-8")).hexdigest()
 
 
-def create_refresh_token(user_id: str, parent_id: Optional[str] = None) -> Tuple[str, str]:
+def create_refresh_token(
+    user_id: str, parent_id: Optional[str] = None
+) -> Tuple[str, str]:
     """
     Returns (refresh_token_plain, token_id).
     Plain token shape: <token_id>.<secret>
@@ -107,16 +138,22 @@ def verify_and_rotate_refresh_token(token_plain: str) -> Optional[dict]:
 
     # If token was already revoked, treat as reuse and revoke the whole chain.
     if record.revoked:
-        refresh_token_repository.revoke_chain_from(record.token_id, reason="reuse-detected", mark_reused=True)
+        refresh_token_repository.revoke_chain_from(
+            record.token_id, reason="reuse-detected", mark_reused=True
+        )
         return None
 
     if _hash_refresh_secret(secret) != record.secret_hash:
-        refresh_token_repository.revoke_chain_from(record.token_id, reason="secret-mismatch", mark_reused=True)
+        refresh_token_repository.revoke_chain_from(
+            record.token_id, reason="secret-mismatch", mark_reused=True
+        )
         return None
 
     refresh_token_repository.touch_token(record.token_id)
     # Rotate: revoke current and create a new one.
-    new_token_plain, new_token_id = create_refresh_token(record.user_id, parent_id=record.token_id)
+    new_token_plain, new_token_id = create_refresh_token(
+        record.user_id, parent_id=record.token_id
+    )
     refresh_token_repository.revoke_token(
         record.token_id, replaced_by=new_token_id, reason="rotated", mark_reused=False
     )
@@ -128,3 +165,18 @@ def revoke_refresh_token(token_plain: str) -> None:
         return
     token_id, _ = token_plain.split(".", 1)
     refresh_token_repository.revoke_token(token_id)
+
+
+def _resolve_decode_key(token: str) -> Optional[str]:
+    if JWT_ALGORITHM.startswith("RS"):
+        try:
+            header = jwt.get_unverified_header(token)
+        except JWTError:
+            return None
+        kid = header.get("kid")
+        if kid and kid in _PUBLIC_KEYS:
+            return _PUBLIC_KEYS[kid]
+        if JWT_PRIVATE_KEY and (kid is None or kid == JWT_PRIVATE_KEY_ID):
+            return JWT_PRIVATE_KEY
+        return None
+    return JWT_SECRET

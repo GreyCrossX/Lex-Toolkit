@@ -29,6 +29,8 @@ dependencies = [
     "pytest",
     "passlib[bcrypt]",
     "python-jose",
+    "langgraph==0.2.45",
+    "ruff>=0.14.9",
 ]
 
 [build-system]

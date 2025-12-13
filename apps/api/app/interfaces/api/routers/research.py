@@ -1,13 +1,17 @@
 import json
 import logging
 import uuid
-from typing import Generator, Optional
+from typing import Generator
 
 from fastapi import APIRouter, Depends, HTTPException, status
 
 from app.infrastructure.security import rate_limit
 from app.interfaces.api.routers.auth import get_current_user
-from app.interfaces.api.schemas import ResearchRunRequest, ResearchRunResponse, UserPublic
+from app.interfaces.api.schemas import (
+    ResearchRunRequest,
+    ResearchRunResponse,
+    UserPublic,
+)
 from app.infrastructure.db import research_repository
 from fastapi.responses import StreamingResponse
 from langchain_core.messages import HumanMessage
@@ -27,7 +31,9 @@ router = APIRouter()
 
 def _research_rate_limit(identifier: str, bucket: str = "research_run") -> None:
     try:
-        rate_limit.enforce(bucket=bucket, identifier=identifier, limit=5, window_seconds=60)
+        rate_limit.enforce(
+            bucket=bucket, identifier=identifier, limit=5, window_seconds=60
+        )
     except rate_limit.RateLimitExceeded:
         raise HTTPException(
             status_code=status.HTTP_429_TOO_MANY_REQUESTS,
@@ -52,7 +58,9 @@ def research_run(
 
     prompt = payload.prompt.strip()
     if len(prompt) < 4:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Prompt too short")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Prompt too short"
+        )
     max_steps = payload.max_search_steps
     existing_trace = payload.trace_id.strip() if payload.trace_id else None
 
@@ -66,7 +74,9 @@ def research_run(
         )
     except Exception as exc:  # pragma: no cover - runtime protection
         logger.exception("research_run_error")
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)) from exc
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(exc)
+        ) from exc
 
     trace_id = result.get("trace_id", existing_trace or "")
     run_record = research_repository.upsert_run(
@@ -99,7 +109,9 @@ def research_get(
 ) -> ResearchRunResponse:
     record = research_repository.get_run(trace_id, firm_id=user.firm_id)
     if not record:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Trace not found")
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND, detail="Trace not found"
+        )
 
     return ResearchRunResponse(
         trace_id=record["trace_id"],
@@ -131,7 +143,9 @@ def research_run_stream(
 
     prompt = payload.prompt.strip()
     if len(prompt) < 4:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Prompt too short")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail="Prompt too short"
+        )
     max_steps = payload.max_search_steps
     existing_trace = payload.trace_id.strip() if payload.trace_id else None
     trace_id = existing_trace or uuid.uuid4().hex
@@ -150,6 +164,61 @@ def research_run_stream(
         }
 
         def merge_update(update: dict) -> None:
+            mapped: dict = {}
+
+            # Pull top-level fields if present directly.
+            for field in (
+                "issues",
+                "research_plan",
+                "queries",
+                "briefing",
+                "errors",
+                "status",
+            ):
+                if field in update:
+                    mapped[field] = update[field]
+
+            # Map nested nodes from the research graph into the top-level snapshot.
+            if "issue_generator" in update and isinstance(
+                update["issue_generator"], dict
+            ):
+                mapped["issues"] = update["issue_generator"].get(
+                    "issues", mapped.get("issues")
+                )
+            if "research_plan_builder" in update and isinstance(
+                update["research_plan_builder"], dict
+            ):
+                mapped["research_plan"] = update["research_plan_builder"].get(
+                    "research_plan", mapped.get("research_plan")
+                )
+                mapped["status"] = update["research_plan_builder"].get(
+                    "status", mapped.get("status")
+                )
+            if "run_next_search_step" in update and isinstance(
+                update["run_next_search_step"], dict
+            ):
+                rns = update["run_next_search_step"]
+                mapped["research_plan"] = rns.get(
+                    "research_plan", mapped.get("research_plan")
+                )
+                mapped["queries"] = rns.get("queries", mapped.get("queries"))
+                mapped["status"] = rns.get("status", mapped.get("status"))
+            if "synthesize_briefing" in update and isinstance(
+                update["synthesize_briefing"], dict
+            ):
+                mapped["briefing"] = update["synthesize_briefing"].get(
+                    "briefing", mapped.get("briefing")
+                )
+                mapped["status"] = update["synthesize_briefing"].get(
+                    "status", mapped.get("status")
+                )
+
+            # Apply mapped top-level values first.
+            for key, val in mapped.items():
+                if val is not None:
+                    current_state[key] = val
+
+            # Then store the raw update payload for completeness.
             for key, val in update.items():
                 current_state[key] = val
 
@@ -165,7 +234,11 @@ def research_run_stream(
             }
 
         # Initial event so the client can show progress immediately.
-        yield (json.dumps({"type": "start", "trace_id": trace_id, "status": "running"}) + "\n").encode("utf-8")
+        def dumps(obj: dict) -> str:
+            return json.dumps(obj, default=str)
+        yield (
+            dumps({"type": "start", "trace_id": trace_id, "status": "running"}) + "\n"
+        ).encode("utf-8")
         try:
             initial_state = {
                 "messages": [HumanMessage(content=prompt)],
@@ -179,16 +252,23 @@ def research_run_stream(
 
             logger.info(
                 "research_stream_start",
-                extra={"trace_id": trace_id, "user_id": user.user_id, "firm_id": user.firm_id},
+                extra={
+                    "trace_id": trace_id,
+                    "user_id": user.user_id,
+                    "firm_id": user.firm_id,
+                },
             )
             for update in graph.stream(initial_state, stream_mode="updates"):
                 if not isinstance(update, dict):
                     continue
                 merge_update(update)
-                yield (
-                    json.dumps({"type": "update", "trace_id": trace_id, "data": update, "status": current_state["status"]})
-                    + "\n"
-                ).encode("utf-8")
+                payload = {
+                    "type": "update",
+                    "trace_id": trace_id,
+                    "data": update,
+                    "status": current_state["status"],
+                }
+                yield (dumps(payload) + "\n").encode("utf-8")
 
             snapshot = snapshot_payload()
             run_record = research_repository.upsert_run(
@@ -212,7 +292,7 @@ def research_run_stream(
                     "status": snapshot["status"],
                 },
             )
-            yield (json.dumps({"type": "done", **snapshot}) + "\n").encode("utf-8")
+            yield (dumps({"type": "done", **snapshot}) + "\n").encode("utf-8")
         except Exception as exc:  # pragma: no cover - runtime protection
             logger.exception("research_run_stream_error")
             research_repository.upsert_run(
@@ -226,6 +306,8 @@ def research_run_stream(
                 briefing=current_state.get("briefing"),
                 errors=[str(exc)],
             )
-            yield (json.dumps({"type": "error", "trace_id": trace_id, "error": str(exc)}) + "\n").encode("utf-8")
+            yield (
+                dumps({"type": "error", "trace_id": trace_id, "error": str(exc)}) + "\n"
+            ).encode("utf-8")
 
     return StreamingResponse(event_stream(), media_type="application/x-ndjson")

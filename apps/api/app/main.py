@@ -5,8 +5,21 @@ from fastapi.middleware.cors import CORSMiddleware
 import os
 
 from app.infrastructure.db import connection as db
-from app.infrastructure.db import ingestion_repository, user_repository, refresh_token_repository, research_repository
-from app.interfaces.api.routers import auth, qa, research, search, upload, summary, tools
+from app.infrastructure.db import (
+    ingestion_repository,
+    user_repository,
+    refresh_token_repository,
+    research_repository,
+)
+from app.interfaces.api.routers import (
+    auth,
+    qa,
+    research,
+    search,
+    upload,
+    summary,
+    tools,
+)
 
 
 @asynccontextmanager

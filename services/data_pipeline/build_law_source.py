@@ -47,6 +47,7 @@ class LawSource:
 # Helpers
 # -----------------
 
+
 def fetch_url(url: str, *, max_retries: int = 3, timeout: int = 20) -> str:
     headers = {"User-Agent": USER_AGENT}
     last_exc: Exception | None = None
@@ -64,9 +65,11 @@ def fetch_url(url: str, *, max_retries: int = 3, timeout: int = 20) -> str:
             last_exc = exc
             print(f"[WARNING] Index fetch attempt {attempt} failed: {exc}")
             if attempt < max_retries:
-                time.sleep(2 ** attempt)
+                time.sleep(2**attempt)
 
-    raise RuntimeError(f"Failed to fetch index {url} after {max_retries} attempts") from last_exc
+    raise RuntimeError(
+        f"Failed to fetch index {url} after {max_retries} attempts"
+    ) from last_exc
 
 
 def normalize_date(raw: str) -> Optional[str]:

@@ -3,7 +3,12 @@ from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
 from app.application import ingestion_service
 from app.infrastructure.db import ingestion_repository
 from app.interfaces.api.routers.auth import get_current_user
-from app.interfaces.api.schemas import UploadResponse, UploadStatus, UploadStatusResponse, UserPublic
+from app.interfaces.api.schemas import (
+    UploadResponse,
+    UploadStatus,
+    UploadStatusResponse,
+    UserPublic,
+)
 from app.interfaces.worker.tasks import ingest_upload
 
 router = APIRouter()
@@ -24,8 +29,14 @@ async def _handle_upload(doc_type: str, file: UploadFile) -> UploadResponse:
             detail="Solo se permiten archivos PDF.",
         )
 
-    job = ingestion_repository.create_job(filename=file.filename or "document.pdf", content_type=file.content_type or "", doc_type=doc_type)
-    ingestion_repository.update_job(job.job_id, status="uploading", message="Recibiendo archivo...", progress=5)
+    job = ingestion_repository.create_job(
+        filename=file.filename or "document.pdf",
+        content_type=file.content_type or "",
+        doc_type=doc_type,
+    )
+    ingestion_repository.update_job(
+        job.job_id, status="uploading", message="Recibiendo archivo...", progress=5
+    )
 
     try:
         saved_path = ingestion_service.save_upload(job.job_id, file)
@@ -84,7 +95,9 @@ async def _handle_upload(doc_type: str, file: UploadFile) -> UploadResponse:
     )
 
 
-@router.post("/upload", response_model=UploadResponse, status_code=status.HTTP_202_ACCEPTED)
+@router.post(
+    "/upload", response_model=UploadResponse, status_code=status.HTTP_202_ACCEPTED
+)
 async def upload_file(
     file: UploadFile = File(...),
     current_user: UserPublic = Depends(get_current_user),
@@ -93,7 +106,11 @@ async def upload_file(
     return await _handle_upload("statute", file)
 
 
-@router.post("/ingestion/{doc_type}", response_model=UploadResponse, status_code=status.HTTP_202_ACCEPTED)
+@router.post(
+    "/ingestion/{doc_type}",
+    response_model=UploadResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+)
 async def upload_with_doc_type(
     doc_type: str,
     file: UploadFile = File(...),
@@ -103,7 +120,9 @@ async def upload_with_doc_type(
 
 
 @router.get("/upload/{job_id}", response_model=UploadStatusResponse)
-def upload_status(job_id: str, current_user: UserPublic = Depends(get_current_user)) -> UploadStatusResponse:
+def upload_status(
+    job_id: str, current_user: UserPublic = Depends(get_current_user)
+) -> UploadStatusResponse:
     job = ingestion_repository.get_job(job_id)
     if job is None:
         raise HTTPException(
@@ -124,5 +143,7 @@ def upload_status(job_id: str, current_user: UserPublic = Depends(get_current_us
 
 
 @router.get("/ingestion/{job_id}", response_model=UploadStatusResponse)
-def ingestion_status(job_id: str, current_user: UserPublic = Depends(get_current_user)) -> UploadStatusResponse:
+def ingestion_status(
+    job_id: str, current_user: UserPublic = Depends(get_current_user)
+) -> UploadStatusResponse:
     return upload_status(job_id, current_user)

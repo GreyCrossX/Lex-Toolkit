@@ -265,7 +265,9 @@ def build_chunks_from_units(
             )
             dup_count = seen_ids.get(base_chunk_id, 0)
             seen_ids[base_chunk_id] = dup_count + 1
-            chunk_id = base_chunk_id if dup_count == 0 else f"{base_chunk_id}:v{dup_count}"
+            chunk_id = (
+                base_chunk_id if dup_count == 0 else f"{base_chunk_id}:v{dup_count}"
+            )
             chunks.append(
                 LegalChunk(
                     chunk_id=chunk_id,

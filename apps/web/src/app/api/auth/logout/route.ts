@@ -4,6 +4,7 @@ import {
   API_BASE,
   ACCESS_COOKIE_NAME,
   REFRESH_COOKIE_NAME,
+  CSRF_COOKIE_NAME,
   buildBackendHeaders,
   clearAuthCookies,
   readJsonSafe,
@@ -24,6 +25,7 @@ export async function POST(req: NextRequest) {
 
   clearAuthCookies(response);
   response.cookies.delete(ACCESS_COOKIE_NAME);
+  response.cookies.delete(CSRF_COOKIE_NAME);
 
   return response;
 }

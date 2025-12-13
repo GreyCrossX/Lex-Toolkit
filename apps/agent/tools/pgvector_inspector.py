@@ -53,11 +53,17 @@ class PGVectorInspectorArgs(BaseModel):
     query: str = Field(..., description="Text to embed and search over legal_chunks")
     top_k: int = Field(5, ge=1, le=50, description="Number of rows to return (1-50)")
     doc_ids: Optional[List[str]] = Field(None, description="Filter by doc_id list")
-    jurisdictions: Optional[List[str]] = Field(None, description="Filter by jurisdiction list (lowercased)")
+    jurisdictions: Optional[List[str]] = Field(
+        None, description="Filter by jurisdiction list (lowercased)"
+    )
     sections: Optional[List[str]] = Field(None, description="Filter by section list")
     max_distance: Optional[float] = Field(None, description="Optional distance cap")
-    embedding: Optional[List[float]] = Field(None, description="Precomputed embedding; skips embed step if set")
-    firm_id: Optional[str] = Field(None, description="Optional tenant/firm filter (matches metadata->>'firm_id')")
+    embedding: Optional[List[float]] = Field(
+        None, description="Precomputed embedding; skips embed step if set"
+    )
+    firm_id: Optional[str] = Field(
+        None, description="Optional tenant/firm filter (matches metadata->>'firm_id')"
+    )
 
     @field_validator("jurisdictions", mode="before")
     def _lower_juris(cls, v: Optional[List[str]]) -> Optional[List[str]]:
@@ -172,7 +178,9 @@ def _run_pgvector_inspector(
                 "chunk_id": getter("chunk_id") if "chunk_id" in row else row[0],
                 "doc_id": getter("doc_id") if "doc_id" in row else row[1],
                 "section": getter("section") if "section" in row else row[2],
-                "jurisdiction": getter("jurisdiction") if "jurisdiction" in row else row[3],
+                "jurisdiction": getter("jurisdiction")
+                if "jurisdiction" in row
+                else row[3],
                 "metadata": getter("metadata") if "metadata" in row else row[4],
                 "content": getter("content") if "content" in row else row[5],
                 "distance": float(getter("distance") if "distance" in row else row[6]),

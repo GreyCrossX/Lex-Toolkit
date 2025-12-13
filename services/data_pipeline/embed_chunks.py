@@ -7,7 +7,7 @@ import math
 import sqlite3
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Callable, Dict, Iterable, Iterator, List, Optional, Sequence, Tuple
+from typing import Callable, Dict, Iterator, List, Optional, Sequence, Tuple
 
 
 ChunkRecord = Dict[str, object]
@@ -410,16 +410,17 @@ def main() -> None:
     exported = 0
     batch: List[ChunkRecord] = []
     export_fh = (
-        args.export_jsonl.open("w", encoding="utf-8")
-        if args.export_jsonl
-        else None
+        args.export_jsonl.open("w", encoding="utf-8") if args.export_jsonl else None
     )
 
     for chunk_file in iter_chunk_files(
         chunks_dir, jurisdictions=args.jurisdiction, doc_ids=args.doc_id
     ):
         for record in iter_chunk_records(chunk_file.path):
-            if args.max_chunks is not None and processed + len(batch) >= args.max_chunks:
+            if (
+                args.max_chunks is not None
+                and processed + len(batch) >= args.max_chunks
+            ):
                 break
 
             batch.append(record)

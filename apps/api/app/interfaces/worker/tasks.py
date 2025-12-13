@@ -20,7 +20,9 @@ def _ensure_db() -> None:
 
 
 @celery_app.task(name="app.interfaces.worker.ingest_upload")
-def ingest_upload(job_id: str, file_path: str, doc_type: str = "statute") -> Tuple[str, int]:
+def ingest_upload(
+    job_id: str, file_path: str, doc_type: str = "statute"
+) -> Tuple[str, int]:
     """
     Celery task to ingest an uploaded document.
     """
@@ -46,7 +48,7 @@ def ingest_upload(job_id: str, file_path: str, doc_type: str = "statute") -> Tup
         )
         logger.info("Ingest job %s completed (%s chunks)", job_id, chunk_count)
         return doc_id, chunk_count
-    except SoftTimeLimitExceeded as exc:
+    except SoftTimeLimitExceeded:
         ingestion_repository.update_job(
             job_id,
             status="failed",

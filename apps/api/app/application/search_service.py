@@ -75,7 +75,9 @@ def run_search(
                 chunk_id=getter("chunk_id") if "chunk_id" in row else row[0],
                 doc_id=getter("doc_id") if "doc_id" in row else row[1],
                 section=getter("section") if "section" in row else row[2],
-                jurisdiction=getter("jurisdiction") if "jurisdiction" in row else row[3],
+                jurisdiction=getter("jurisdiction")
+                if "jurisdiction" in row
+                else row[3],
                 metadata=(getter("metadata") if "metadata" in row else row[4]) or {},
                 content=getter("content") if "content" in row else row[5],
                 distance=float(getter("distance") if "distance" in row else row[6]),

@@ -1,5 +1,4 @@
-import hashlib
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional
 
 from app.core.domain.auth import RefreshToken
@@ -109,7 +108,12 @@ def get_token(token_id: str) -> Optional[RefreshToken]:
     return _row_to_token(row) if row else None
 
 
-def revoke_token(token_id: str, replaced_by: Optional[str] = None, reason: Optional[str] = None, mark_reused: bool = False) -> Optional[RefreshToken]:
+def revoke_token(
+    token_id: str,
+    replaced_by: Optional[str] = None,
+    reason: Optional[str] = None,
+    mark_reused: bool = False,
+) -> Optional[RefreshToken]:
     pool = db.get_pool()
     with pool.connection() as conn, conn.cursor() as cur:
         cur.execute(
@@ -122,7 +126,12 @@ def revoke_token(token_id: str, replaced_by: Optional[str] = None, reason: Optio
             WHERE token_id = %(token_id)s
             RETURNING token_id, user_id, secret_hash, revoked, replaced_by, parent_id, reused, revoked_reason, last_used_at, expires_at, created_at
             """,
-            {"token_id": token_id, "replaced_by": replaced_by, "reason": reason, "mark_reused": mark_reused},
+            {
+                "token_id": token_id,
+                "replaced_by": replaced_by,
+                "reason": reason,
+                "mark_reused": mark_reused,
+            },
         )
         row = cur.fetchone()
         conn.commit()
@@ -143,7 +152,9 @@ def touch_token(token_id: str) -> None:
         conn.commit()
 
 
-def revoke_chain_from(token_id: str, reason: str = "reuse-detected", mark_reused: bool = False) -> None:
+def revoke_chain_from(
+    token_id: str, reason: str = "reuse-detected", mark_reused: bool = False
+) -> None:
     """
     Revoke a token and its descendants (following replaced_by chain) to mitigate token reuse.
     """
@@ -154,5 +165,10 @@ def revoke_chain_from(token_id: str, reason: str = "reuse-detected", mark_reused
         record = get_token(current)
         if record is None:
             break
-        revoke_token(record.token_id, replaced_by=record.replaced_by, reason=reason, mark_reused=mark_reused)
+        revoke_token(
+            record.token_id,
+            replaced_by=record.replaced_by,
+            reason=reason,
+            mark_reused=mark_reused,
+        )
         current = record.replaced_by

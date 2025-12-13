@@ -3,7 +3,6 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import re
 import time
 from dataclasses import dataclass, asdict, field
@@ -23,6 +22,7 @@ from services.data_pipeline.paths import DEFAULT_CDMX_LAW_SOURCE
 # --------------
 # Data Models
 # --------------
+
 
 @dataclass
 class LegalArt:
@@ -58,6 +58,7 @@ class LegalDoc:
 # Config
 # -----------
 
+
 def load_law_sources(path: str | Path) -> List[Dict[str, str]]:
     path = Path(path)
     if not path.exists():
@@ -77,9 +78,7 @@ USER_AGENT = (
 TRANSITORIOS_ROOT_PATTERN = re.compile(
     r"(?mi)^\s*art[ií]culos\s+transitorios\s*[:\-.]?\s*$"
 )
-TRANSITORIOS_ALT_PATTERN = re.compile(
-    r"(?mi)^\s*transitorios\s*[:\-.]?\s*$"
-)
+TRANSITORIOS_ALT_PATTERN = re.compile(r"(?mi)^\s*transitorios\s*[:\-.]?\s*$")
 
 TRANSITORY_ITEM_PATTERN = re.compile(
     r"(?mi)^\s*(?:art[ií]culo\s+|transitorio\s+)?"
@@ -96,16 +95,30 @@ ARTICLE_INLINE_PATTERN = re.compile(
 # ---- Relaxed article header detection (method 2) ----
 
 ORDINAL_WORDS_MAP = {
-    "primero": 1, "primera": 1,
-    "segundo": 2, "segunda": 2,
-    "tercero": 3, "tercera": 3,
-    "cuarto": 4, "cuarta": 4,
-    "quinto": 5, "quinta": 5,
-    "sexto": 6, "sexta": 6,
-    "septimo": 7, "séptimo": 7, "septima": 7, "séptima": 7,
-    "octavo": 8, "octava": 8,
-    "noveno": 9, "novena": 9,
-    "decimo": 10, "décimo": 10, "decima": 10, "décima": 10,
+    "primero": 1,
+    "primera": 1,
+    "segundo": 2,
+    "segunda": 2,
+    "tercero": 3,
+    "tercera": 3,
+    "cuarto": 4,
+    "cuarta": 4,
+    "quinto": 5,
+    "quinta": 5,
+    "sexto": 6,
+    "sexta": 6,
+    "septimo": 7,
+    "séptimo": 7,
+    "septima": 7,
+    "séptima": 7,
+    "octavo": 8,
+    "octava": 8,
+    "noveno": 9,
+    "novena": 9,
+    "decimo": 10,
+    "décimo": 10,
+    "decima": 10,
+    "décima": 10,
 }
 
 ORDINAL_WORDS_PATTERN = (
@@ -129,7 +142,10 @@ ARTICLE_HEADER_PATTERN = re.compile(
 # HTTP Fetch
 # -----------------
 
-def fetch_content(url: str, *, max_retries: int = 3, timeout: int = 20) -> Tuple[str | bytes, str]:
+
+def fetch_content(
+    url: str, *, max_retries: int = 3, timeout: int = 20
+) -> Tuple[str | bytes, str]:
     """
     Fetch URL with basic retry logic and return (content, kind),
     where kind is 'html' or 'pdf'.
@@ -155,14 +171,17 @@ def fetch_content(url: str, *, max_retries: int = 3, timeout: int = 20) -> Tuple
             last_exc = exc
             print(f"[WARNING] Fetch attempt {attempt} failed for {url}: {exc}")
             if attempt < max_retries:
-                time.sleep(2 ** attempt)
+                time.sleep(2**attempt)
 
-    raise RuntimeError(f"Failed to fetch {url} after {max_retries} attempts") from last_exc
+    raise RuntimeError(
+        f"Failed to fetch {url} after {max_retries} attempts"
+    ) from last_exc
 
 
 # -----------------
 # HTML / PDF -> plain text
 # -----------------
+
 
 def extract_plain_text(html: str) -> str:
     """Extract plain text from HTML, stripping scripts/styles."""
@@ -334,9 +353,7 @@ def extract_plain_text_from_pdf(data: bytes) -> str:
     """
     with pdfplumber.open(BytesIO(data)) as pdf:
         page_texts = [
-            page_text
-            for page in pdf.pages
-            if (page_text := _page_to_text(page))
+            page_text for page in pdf.pages if (page_text := _page_to_text(page))
         ]
 
     return "\n".join(page_texts).strip()
@@ -345,6 +362,7 @@ def extract_plain_text_from_pdf(data: bytes) -> str:
 # -----------------
 # Article detection
 # -----------------
+
 
 def find_article_positions_sequential(
     plain_text: str,
@@ -358,9 +376,7 @@ def find_article_positions_sequential(
     i = 1
 
     while i <= max_articles:
-        pattern = re.compile(
-            rf"(?mi)^\s*art[ií]culo\s+{i}(?:o|º)?\b"
-        )
+        pattern = re.compile(rf"(?mi)^\s*art[ií]culo\s+{i}(?:o|º)?\b")
         m = pattern.search(plain_text, start_pos)
         if not m:
             break
@@ -439,12 +455,10 @@ def split_articles_and_tail(
 
     # Method 1
     positions = find_article_positions_sequential(plain_text)
-    method_used = "sequential"
 
     # If no luck, try relaxed method 2
     if not positions:
         positions = find_article_positions_relaxed(plain_text)
-        method_used = "relaxed" if positions else "none"
 
     if not positions:
         # No article headers found at all
@@ -508,6 +522,7 @@ def split_articles_and_tail(
 # Transitory parsing
 # -----------------
 
+
 def split_transitory_region(text: str) -> Tuple[List[LegalTransient], str]:
     text = text.strip()
     if not text:
@@ -547,7 +562,7 @@ def split_transitory_region(text: str) -> Tuple[List[LegalTransient], str]:
             body_text = ""
         else:
             header_line = chunk[:newline_pos]
-            body_text = chunk[newline_pos + 1:].strip()
+            body_text = chunk[newline_pos + 1 :].strip()
 
         transitory_items.append(
             LegalTransient(
@@ -556,7 +571,11 @@ def split_transitory_region(text: str) -> Tuple[List[LegalTransient], str]:
             )
         )
 
-    full_preamble = (heading_text + "\n" + transitory_preamble).strip() if transitory_preamble else heading_text
+    full_preamble = (
+        (heading_text + "\n" + transitory_preamble).strip()
+        if transitory_preamble
+        else heading_text
+    )
 
     return transitory_items, full_preamble
 
@@ -580,6 +599,7 @@ def split_articles_and_transitory(
 # Document pipeline
 # -----------------
 
+
 def build_document(entry: Dict[str, str], plain_text: str) -> LegalDoc:
     """
     Convert a LAW_SOURCES entry + plain_text into a LegalDoc with structured articles/transitories.
@@ -587,8 +607,8 @@ def build_document(entry: Dict[str, str], plain_text: str) -> LegalDoc:
       - empty PDF text, or
       - text but no article headers detected (OCR-pending / weird structure).
     """
-    articles, transitory_items, preamble, trans_preamble, parse_issue = split_articles_and_transitory(
-        plain_text
+    articles, transitory_items, preamble, trans_preamble, parse_issue = (
+        split_articles_and_transitory(plain_text)
     )
 
     # Refine parse_issue for truly empty text
@@ -643,7 +663,9 @@ def save_document(doc: LegalDoc, out_dir: Path) -> None:
     )
 
     print(f"[OK] Saved document {doc.id} -> {base_path}.json / .txt")
-    print(f"     Articles: {len(doc.articles or [])}, Transitory: {len(doc.transitory or [])}")
+    print(
+        f"     Articles: {len(doc.articles or [])}, Transitory: {len(doc.transitory or [])}"
+    )
 
 
 def save_raw_html(entry: Dict[str, str], html: str, out_dir: Path) -> None:
@@ -671,6 +693,7 @@ def save_raw_pdf(entry: Dict[str, str], data: bytes, out_dir: Path) -> None:
 # -----------------
 # CLI
 # -----------------
+
 
 def run(out_dir: Path, sources_path: Path, max_docs: Optional[int] = None) -> None:
     """Main processing loop."""
@@ -717,6 +740,7 @@ def run(out_dir: Path, sources_path: Path, max_docs: Optional[int] = None) -> No
         except Exception as e:
             print(f"[ERROR] Failed to process {entry['id']}: {e}")
             import traceback
+
             traceback.print_exc()
             continue
 
@@ -733,7 +757,9 @@ def run(out_dir: Path, sources_path: Path, max_docs: Optional[int] = None) -> No
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="CDMX legal document scraper (GOCDMX PDFs)")
+    parser = argparse.ArgumentParser(
+        description="CDMX legal document scraper (GOCDMX PDFs)"
+    )
     parser.add_argument(
         "--out-dir",
         type=Path,

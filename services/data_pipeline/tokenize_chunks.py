@@ -54,7 +54,11 @@ def annotate_record(
     include_token_ids: bool = False,
     tokens: Optional[List[int]] = None,
 ) -> Dict[str, object]:
-    token_ids = tokens if tokens is not None else tokenize_text(record.get("content") or "", encoding)
+    token_ids = (
+        tokens
+        if tokens is not None
+        else tokenize_text(record.get("content") or "", encoding)
+    )
     annotated = dict(record)
     annotated["token_count"] = len(token_ids)
     annotated["tokenizer_model"] = tokenizer_model
@@ -63,7 +67,9 @@ def annotate_record(
     return annotated
 
 
-def validate_round_trip(text: str, token_ids: Sequence[int], encoding: tiktoken.Encoding) -> None:
+def validate_round_trip(
+    text: str, token_ids: Sequence[int], encoding: tiktoken.Encoding
+) -> None:
     """
     Ensure tokens decode back to the original string; raises ValueError on mismatch.
     Useful for catching boundary/UTF edge cases.

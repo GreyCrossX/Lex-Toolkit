@@ -10,8 +10,8 @@ Context: Chunking/embeddings/pgvector are done (GRE-22/23/24/25/26). Search + QA
 - Research agent: LangGraph graph in `apps/agent/research_graph.py` (intake → qualify → classify → facts → issues → plan → search loop → briefing) with structured outputs and tenant-aware tools (`pgvector_inspector`, `web_browser`).
 
 ## Immediate next steps (actionable)
-1) Extend ingestion (GRE-52/30): add doc_type-specific parsers and metadata for jurisprudence/contract/policy; keep timeouts small and reuse Celery worker routing.
-2) Auth frontend wiring: add Next.js route handlers to proxy `/auth/login|register|refresh|logout`, set HttpOnly cookies, middleware guard for dashboard routes, and a small fetch client that attaches access tokens. Add smoke coverage for `/auth/health` + refresh flow.
+1) Extend ingestion (GRE-52/30): doc_type selectors + chunking/timeouts landed; add richer parsers/metadata for jurisprudence/contract/policy and keep Celery worker routing tight.
+2) Auth frontend wiring: DONE — `/api/auth/*` proxy handlers with HttpOnly refresh cookie, CSRF double-submit token on refresh, access token in memory, dashboard middleware guard, and authFetch 401 retry. Follow-ups (new Linear items): key rotation (RS256+KID), stricter rate limits, and audit logging.
 3) Research agent hardening: swap Pydantic v2 validators/ConfigDict, add observability/tracing around nodes + tool calls, add few-shot prompts, and build synthetic evals for structured outputs/citations.
 4) Update docs + QA (GRE-48/49/50): refresh API docs to include auth/refresh, research agent/tooling summary, and formalize test plan (incl. auth flows and agent smoke).
 5) Close infra gaps (GRE-44/45/46/47): ensure `.env.example` is accurate, add Dockerfiles for api/web, and a runbook for compose + migrations/pgvector init.

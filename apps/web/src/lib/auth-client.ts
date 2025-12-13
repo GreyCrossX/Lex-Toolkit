@@ -1,4 +1,4 @@
-import { clearAccessToken, setAccessToken } from "./auth";
+import { clearAccessToken, getCsrfToken, setAccessToken } from "./auth";
 
 const AUTH_BASE = "/api/auth";
 
@@ -13,10 +13,11 @@ async function handleJsonResponse(res: Response) {
 }
 
 export async function apiLogin(email: string, password: string) {
+  const payload = { email: email.trim(), password: password.trim() };
   const res = await fetch(`${AUTH_BASE}/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password }),
+    body: JSON.stringify(payload),
     credentials: "include",
     cache: "no-store",
   });
@@ -41,7 +42,13 @@ export async function apiRegister({
   const res = await fetch(`${AUTH_BASE}/register`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ email, password, full_name: fullName, role, firm_id: firmId }),
+    body: JSON.stringify({
+      email: email.trim(),
+      password: password.trim(),
+      full_name: fullName,
+      role,
+      firm_id: firmId,
+    }),
     credentials: "include",
     cache: "no-store",
   });
@@ -53,6 +60,9 @@ export async function apiRegister({
 export async function apiRefresh() {
   const res = await fetch(`${AUTH_BASE}/refresh`, {
     method: "POST",
+    headers: {
+      ...(getCsrfToken() ? { "X-CSRF-Token": getCsrfToken() as string } : {}),
+    },
     credentials: "include",
     cache: "no-store",
   });

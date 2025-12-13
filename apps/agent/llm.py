@@ -4,6 +4,7 @@ Shared LLM client builder to keep configuration DRY across agents.
 Uses OPENAI_API_KEY from the environment. Swap models or providers here to
 propagate changes everywhere.
 """
+
 from __future__ import annotations
 
 import os
@@ -15,7 +16,11 @@ from langchain_openai import ChatOpenAI
 DEFAULT_MODEL = os.environ.get("OPENAI_MODEL", "gpt-4o-mini")
 
 
-def get_llm(model: Optional[str] = None, temperature: float = 0.0, max_tokens: Optional[int] = None) -> ChatOpenAI:
+def get_llm(
+    model: Optional[str] = None,
+    temperature: float = 0.0,
+    max_tokens: Optional[int] = None,
+) -> ChatOpenAI:
     """
     Create a ChatOpenAI client with sensible defaults.
 

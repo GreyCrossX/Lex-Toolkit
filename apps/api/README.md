@@ -37,6 +37,7 @@ docker compose --profile api up --build -d pgvector redis api worker
 Notes:
 - Access token is short-lived and returned in the JSON body; refresh token is returned in the body and should be stored as an HttpOnly/Secure cookie at the frontend proxy layer.
 - Auth is not yet enforced on search/qa/upload; add middleware/guards once the frontend stores tokens.
+- JWT signing: defaults to HS256 with `JWT_SECRET`. To enable RS256 + key rotation, set `JWT_PRIVATE_KEY` (PEM) and `JWT_PRIVATE_KEY_ID` (kid for the active key), and expose `JWT_PUBLIC_KEYS` as a JSON map `{ "kid-old": "-----BEGIN PUBLIC KEY-----..." }` so older tokens validate while new keys are active.
 
 ### Search request body
 ```json

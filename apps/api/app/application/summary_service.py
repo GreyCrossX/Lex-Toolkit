@@ -62,7 +62,9 @@ def summarize_document(
 ) -> SummaryResponse:
     # Ground on retrieved chunks using the provided text as the query (Option B).
     query_text = req.text or "Summarize document"
-    citations, context_chunks = _retrieve_grounded_context(pool, query_text, req.doc_ids or [], req.top_k)
+    citations, context_chunks = _retrieve_grounded_context(
+        pool, query_text, req.doc_ids or [], req.top_k
+    )
     summary = llm.summarize_text(query_text, context_chunks, max_tokens=req.max_tokens)
     return SummaryResponse(
         summary=summary,
@@ -77,14 +79,21 @@ def stream_summary_document(
     req: SummaryRequest,
 ) -> Generator[SummaryStreamEvent, None, None]:
     query_text = req.text or "Summarize document"
-    citations, context_chunks = _retrieve_grounded_context(pool, query_text, req.doc_ids or [], req.top_k)
+    citations, context_chunks = _retrieve_grounded_context(
+        pool, query_text, req.doc_ids or [], req.top_k
+    )
     for citation in citations:
         yield SummaryStreamEvent(type="citation", data=citation)
-    for chunk in llm.stream_summary_text(query_text, context_chunks, max_tokens=req.max_tokens):
+    for chunk in llm.stream_summary_text(
+        query_text, context_chunks, max_tokens=req.max_tokens
+    ):
         yield SummaryStreamEvent(type="summary_chunk", data=chunk)
     yield SummaryStreamEvent(
         type="done",
-        data={"model": getattr(llm, "OPENAI_MODEL", None), "chunks_used": len(context_chunks)},
+        data={
+            "model": getattr(llm, "OPENAI_MODEL", None),
+            "chunks_used": len(context_chunks),
+        },
     )
 
 
@@ -97,7 +106,9 @@ def summarize_multi(
     query_text = combined_text if combined_text else "Summarize multiple documents"
     # Increase retrieval budget slightly for multi-doc to cover more context.
     retrieval_limit = min(req.top_k * max(1, len(req.doc_ids or [])), 50)
-    citations, context_chunks = _retrieve_grounded_context(pool, query_text, req.doc_ids or [], retrieval_limit)
+    citations, context_chunks = _retrieve_grounded_context(
+        pool, query_text, req.doc_ids or [], retrieval_limit
+    )
     summary = llm.summarize_text(query_text, context_chunks, max_tokens=req.max_tokens)
     return SummaryResponse(
         summary=summary,
@@ -114,12 +125,19 @@ def stream_summary_multi(
     combined_text = "\n\n".join(req.texts or [])
     query_text = combined_text if combined_text else "Summarize multiple documents"
     retrieval_limit = min(req.top_k * max(1, len(req.doc_ids or [])), 50)
-    citations, context_chunks = _retrieve_grounded_context(pool, query_text, req.doc_ids or [], retrieval_limit)
+    citations, context_chunks = _retrieve_grounded_context(
+        pool, query_text, req.doc_ids or [], retrieval_limit
+    )
     for citation in citations:
         yield SummaryStreamEvent(type="citation", data=citation)
-    for chunk in llm.stream_summary_text(query_text, context_chunks, max_tokens=req.max_tokens):
+    for chunk in llm.stream_summary_text(
+        query_text, context_chunks, max_tokens=req.max_tokens
+    ):
         yield SummaryStreamEvent(type="summary_chunk", data=chunk)
     yield SummaryStreamEvent(
         type="done",
-        data={"model": getattr(llm, "OPENAI_MODEL", None), "chunks_used": len(context_chunks)},
+        data={
+            "model": getattr(llm, "OPENAI_MODEL", None),
+            "chunks_used": len(context_chunks),
+        },
     )

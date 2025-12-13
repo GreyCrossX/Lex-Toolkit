@@ -50,7 +50,9 @@ def upsert_run(
         "user_id": user_id,
         "status": status,
         "issues": json.dumps(issues) if issues is not None else None,
-        "research_plan": json.dumps(research_plan) if research_plan is not None else None,
+        "research_plan": json.dumps(research_plan)
+        if research_plan is not None
+        else None,
         "queries": json.dumps(queries) if queries is not None else None,
         "briefing": json.dumps(briefing) if briefing is not None else None,
         "errors": json.dumps(errors) if errors is not None else None,

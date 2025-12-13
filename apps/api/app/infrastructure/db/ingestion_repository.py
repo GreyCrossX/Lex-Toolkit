@@ -1,5 +1,4 @@
 import uuid
-from datetime import datetime
 from typing import Optional
 
 from app.core.domain.ingestion import IngestionJob
@@ -28,7 +27,9 @@ def ensure_table() -> None:
     pool = db.get_pool()
     with pool.connection() as conn, conn.cursor() as cur:
         cur.execute(TABLE_DDL)
-        cur.execute("ALTER TABLE ingestion_jobs ADD COLUMN IF NOT EXISTS doc_type TEXT NOT NULL DEFAULT 'statute';")
+        cur.execute(
+            "ALTER TABLE ingestion_jobs ADD COLUMN IF NOT EXISTS doc_type TEXT NOT NULL DEFAULT 'statute';"
+        )
         conn.commit()
 
 
@@ -49,7 +50,9 @@ def _row_to_job(row) -> IngestionJob:
     )
 
 
-def create_job(filename: str, content_type: str, doc_type: str = "statute") -> IngestionJob:
+def create_job(
+    filename: str, content_type: str, doc_type: str = "statute"
+) -> IngestionJob:
     ensure_table()
     pool = db.get_pool()
     job_id = str(uuid.uuid4())
@@ -77,7 +80,16 @@ def create_job(filename: str, content_type: str, doc_type: str = "statute") -> I
 
 def update_job(job_id: str, **kwargs) -> Optional[IngestionJob]:
     pool = db.get_pool()
-    allowed_keys = {"status", "progress", "message", "error", "doc_ids", "filename", "content_type", "doc_type"}
+    allowed_keys = {
+        "status",
+        "progress",
+        "message",
+        "error",
+        "doc_ids",
+        "filename",
+        "content_type",
+        "doc_type",
+    }
     set_clauses = []
     params = {"job_id": job_id}
     for key, value in kwargs.items():

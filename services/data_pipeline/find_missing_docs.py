@@ -13,6 +13,7 @@ from services.data_pipeline.paths import (
 LAW_SOURCES_PATH = DEFAULT_LAW_SOURCES
 OUT_DIR = Path("data")  # normalized data lives under repo_root/data
 
+
 def main() -> None:
     if not LAW_SOURCES_PATH.exists():
         raise SystemExit(f"law_sources.json not found at {LAW_SOURCES_PATH}")
@@ -42,6 +43,7 @@ def main() -> None:
             json.dumps(missing, ensure_ascii=False, indent=2), encoding="utf-8"
         )
         print(f"[OK] Wrote missing list to {DEFAULT_MISSING_LAWS}")
+
 
 if __name__ == "__main__":
     main()

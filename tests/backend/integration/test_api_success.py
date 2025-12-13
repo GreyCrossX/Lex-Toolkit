@@ -36,6 +36,7 @@ def test_search_with_query_uses_embed(monkeypatch, app_modules, client):
 
 def test_qa_with_query_returns_answer(monkeypatch, app_modules, client):
     qa_module = app_modules["qa"]
+
     def fake_embed(text: str) -> List[float]:
         return [0.1, 0.2]
 
@@ -128,7 +129,9 @@ def test_qa_without_results_returns_placeholder(monkeypatch, app_modules, client
     assert data["citations"] == []
 
 
-def test_search_accepts_max_distance_and_returns_sorted(monkeypatch, app_modules, client):
+def test_search_accepts_max_distance_and_returns_sorted(
+    monkeypatch, app_modules, client
+):
     search_module = app_modules["search"]
     captured = {"max_distance": None}
 
@@ -158,7 +161,9 @@ def test_search_accepts_max_distance_and_returns_sorted(monkeypatch, app_modules
 
     monkeypatch.setattr(search_module, "run_search", fake_run)
 
-    resp = client.post("/search", json={"embedding": [0.1], "limit": 5, "max_distance": 0.9})
+    resp = client.post(
+        "/search", json={"embedding": [0.1], "limit": 5, "max_distance": 0.9}
+    )
     assert resp.status_code == 200
     data = resp.json()
 
@@ -167,7 +172,9 @@ def test_search_accepts_max_distance_and_returns_sorted(monkeypatch, app_modules
     assert distances == sorted(distances)
 
 
-def test_qa_accepts_max_distance_and_returns_sorted_citations(monkeypatch, app_modules, client):
+def test_qa_accepts_max_distance_and_returns_sorted_citations(
+    monkeypatch, app_modules, client
+):
     qa_module = app_modules["qa"]
     captured = {"max_distance": None}
 

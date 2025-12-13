@@ -28,7 +28,9 @@ def embed_texts(texts: Iterable[str]) -> List[List[float]]:
     return [item.embedding for item in resp.data]  # type: ignore[return-value]
 
 
-def generate_answer(prompt: str, context_chunks: List[str], max_tokens: int = 400) -> str:
+def generate_answer(
+    prompt: str, context_chunks: List[str], max_tokens: int = 400
+) -> str:
     """
     Generate an answer using OpenAI if configured; otherwise return a simple concatenation.
     """
@@ -44,7 +46,8 @@ def generate_answer(prompt: str, context_chunks: List[str], max_tokens: int = 40
         },
         {
             "role": "user",
-            "content": f"Question: {prompt}\n\nContext:\n" + "\n\n".join(context_chunks),
+            "content": f"Question: {prompt}\n\nContext:\n"
+            + "\n\n".join(context_chunks),
         },
     ]
     kwargs = {
@@ -88,7 +91,8 @@ def summarize_text(
         },
         {
             "role": "user",
-            "content": f"Summarize the following text:\n\n{text}\n\nContext:\n" + "\n\n".join(context_chunks),
+            "content": f"Summarize the following text:\n\n{text}\n\nContext:\n"
+            + "\n\n".join(context_chunks),
         },
     ]
     kwargs = {
@@ -130,7 +134,8 @@ def stream_summary_text(
         },
         {
             "role": "user",
-            "content": f"Summarize the following text:\n\n{text}\n\nContext:\n" + "\n\n".join(context_chunks),
+            "content": f"Summarize the following text:\n\n{text}\n\nContext:\n"
+            + "\n\n".join(context_chunks),
         },
     ]
     kwargs = {
@@ -153,11 +158,18 @@ def stream_summary_text(
             yield delta.content
 
 
-def summarize(context_chunks: List[str], query_text: str, max_tokens: int = 400, model: Optional[str] = None) -> str:
+def summarize(
+    context_chunks: List[str],
+    query_text: str,
+    max_tokens: int = 400,
+    model: Optional[str] = None,
+) -> str:
     """
     Compatibility wrapper: summarize given context with a query_text prompt.
     """
-    return summarize_text(query_text, context_chunks, max_tokens=max_tokens, model=model)
+    return summarize_text(
+        query_text, context_chunks, max_tokens=max_tokens, model=model
+    )
 
 
 def stream_summary(
@@ -169,4 +181,6 @@ def stream_summary(
     """
     Compatibility wrapper: stream summary chunks for the given context + query_text.
     """
-    yield from stream_summary_text(query_text, context_chunks, max_tokens=max_tokens, model=model)
+    yield from stream_summary_text(
+        query_text, context_chunks, max_tokens=max_tokens, model=model
+    )

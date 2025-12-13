@@ -15,9 +15,12 @@ RUN pip install --no-cache-dir uv \
   && uv export --frozen --no-dev --no-hashes --format requirements.txt > /tmp/requirements.txt \
   && pip install --no-cache-dir -r /tmp/requirements.txt
 
-# Copy the API source
+# Copy the API source and agent graph (for research runs)
 WORKDIR /workspace/apps/api
 COPY apps/api /workspace/apps/api
+COPY apps/agent /workspace/apps/agent
+
+ENV PYTHONPATH="/workspace:${PYTHONPATH}"
 
 EXPOSE 8000
 

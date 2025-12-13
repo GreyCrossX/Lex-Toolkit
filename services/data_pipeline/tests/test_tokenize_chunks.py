@@ -60,7 +60,12 @@ class TokenizeChunksTests(unittest.TestCase):
         chunk_ids_array = np.array(chunk_ids, dtype=object)
         # Simulate save/load round-trip in-memory
         npz_path = Path("/tmp/token_test_sidecar.npz")
-        np.savez(npz_path, chunk_ids=chunk_ids_array, lengths=lengths_array, tokens=token_array)
+        np.savez(
+            npz_path,
+            chunk_ids=chunk_ids_array,
+            lengths=lengths_array,
+            tokens=token_array,
+        )
         loaded = np.load(npz_path, allow_pickle=True)
         self.assertTrue((loaded["tokens"] == token_array).all())
         self.assertTrue((loaded["lengths"] == lengths_array).all())
