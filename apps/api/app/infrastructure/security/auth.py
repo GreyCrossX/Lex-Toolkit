@@ -15,7 +15,9 @@ JWT_PRIVATE_KEY = os.environ.get("JWT_PRIVATE_KEY")
 JWT_PRIVATE_KEY_ID = os.environ.get("JWT_PRIVATE_KEY_ID", "current")
 JWT_PUBLIC_KEYS_RAW = os.environ.get("JWT_PUBLIC_KEYS")
 
-JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM") or ("RS256" if JWT_PRIVATE_KEY else "HS256")
+JWT_ALGORITHM = os.environ.get("JWT_ALGORITHM") or (
+    "RS256" if JWT_PRIVATE_KEY else "HS256"
+)
 JWT_ISSUER = os.environ.get("JWT_ISSUER", "legalscraper-api")
 JWT_AUDIENCE = os.environ.get("JWT_AUDIENCE", "lex-web")
 JWT_EXPIRE_MINUTES = int(os.environ.get("JWT_EXPIRE_MINUTES", "15"))
@@ -28,14 +30,18 @@ if JWT_PRIVATE_KEY:
         try:
             parsed = json.loads(JWT_PUBLIC_KEYS_RAW)
             if not isinstance(parsed, dict):
-                raise ValueError("JWT_PUBLIC_KEYS must be a JSON object mapping kid to public key PEM.")
+                raise ValueError(
+                    "JWT_PUBLIC_KEYS must be a JSON object mapping kid to public key PEM."
+                )
             _PUBLIC_KEYS = {str(k): v for k, v in parsed.items()}
         except Exception as exc:  # pragma: no cover - parse guard
             raise RuntimeError(f"Failed to parse JWT_PUBLIC_KEYS: {exc}") from exc
 else:
     _PUBLIC_KEYS = {}
     if not JWT_SECRET:
-        raise RuntimeError("JWT_SECRET env var is required for HS256 or provide JWT_PRIVATE_KEY for RS256.")
+        raise RuntimeError(
+            "JWT_SECRET env var is required for HS256 or provide JWT_PRIVATE_KEY for RS256."
+        )
     if len(JWT_SECRET) < 32:
         raise RuntimeError("JWT_SECRET must be at least 32 characters for HS256.")
 

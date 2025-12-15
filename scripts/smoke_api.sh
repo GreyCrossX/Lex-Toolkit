@@ -144,3 +144,17 @@ curl -fsS -X POST "${API_BASE}/draft/run" \
     "requirements": [{"label": "Monto a reclamar", "value": "$50,000"}],
     "constraints": ["No ceder indemnidad total", "Incluir plazo de respuesta 5 días"]
   }' | format_json
+
+echo "10) review stub (offline-safe)"
+curl -fsS -X POST "${API_BASE}/review/run" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "doc_type": "contrato",
+    "objective": "Detectar riesgos principales",
+    "audience": "cliente",
+    "guidelines": "Tono formal, español neutro",
+    "jurisdiction": "mx",
+    "constraints": ["No remover cláusulas, solo sugerir"],
+    "text": "Contrato de servicios con obligaciones y terminación dudosa.",
+    "research_summary": "Sin hallazgos previos."
+  }' | format_json

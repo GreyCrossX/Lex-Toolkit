@@ -22,14 +22,16 @@ Source of truth for how agents should reason through a matter. Each tool should 
 
 ## Current implementation notes
 - Research graph nodes: intake → qualification → jurisdiction/area → facts → conflict check → issue spotting → research plan → search loop → briefing. Briefing is formatted by phase/IRAC with strategy and next steps.
-- Auth/guardrails: CSRF on refresh, RS256 + JWKS, login/refresh rate limits, research run/stream logging with trace/user/firm.
-- Gaps to fill next: stream resilience/resume + frontend surfacing of conflict hits, CI target for synthetic evals, and per-tool UI polish.
+- Drafting agent (MVP): intake (doc_type/objective/audience/tone/language/context/facts/constraints/requirements/research trace/summary) → structured drafting stub that returns draft text, sections, risks, assumptions, open questions. Endpoints `/draft/run`, `/draft/run/stream`, `/draft/{trace_id}`, health `/draft/health`; UI streams + resume + health dot.
+- Review/Critique agent (MVP): intake (doc_type/objective/audience/guidelines/jurisdiction/constraints/text/sections/research trace/summary) → normalize → classify → fact extraction → conflict_check → structural_review → detailed_review → prioritize_issues → revision_suggestions → qa_pass → summarize_review. Endpoints `/review/run`, `/review/run/stream`, `/review/{trace_id}`, health `/review/health`; UI streams updates (findings/issues/suggestions/risks/conflict), resume by trace, health dot.
+- Auth/guardrails: CSRF on refresh, RS256 + JWKS, login/refresh rate limits, all run/stream endpoints log with trace/user/firm. Conflict hits surface to UI for both research and review.
+- Synthetic evals: research synthetic eval stub available offline; drafting/review smoke stubs live in `scripts/smoke_api.sh`.
 
 ## Tool workflows (intake → process → output)
 - **Research**: normalize_intake → classify_matter → jurisdiction_and_area_classifier → fact_extractor → conflict_check → issue_generator → research_plan_builder → run_next_search_step (loop) → synthesize_briefing (IRAC/strategy/next_steps).
 - **Summary**: normalize_intake → classify_matter → fact_extractor → synthesize_briefing (summary-focused).
-- **Drafting**: normalize_intake → classify_matter → fact_extractor → issue_generator → synthesize_briefing → (drafting agent not yet wired).
-- **Review**: normalize_intake → classify_matter → fact_extractor → issue_generator → synthesize_briefing → (critique loop TBD).
+- **Drafting**: intake validation → normalize_intake → classify_matter → fact_extractor → issue_generator → synthesize_briefing → drafting stub (draft + sections + risks + assumptions + open questions). Stream/persist/resume supported.
+- **Review**: intake validation → normalize_intake → classify_matter → fact_extractor → conflict_check → structural_review (severity + location/section) → detailed_review (categorized issues with severity/location) → prioritize_issues (80/20 weighting) → revision_suggestions (redline-style) → qa_pass → summarize_review. Stream/persist/resume supported.
 
 ## Synthetic evals
 - Scenarios live in `apps/agent/research_graph.py` (`SYNTHETIC_EVAL_SCENARIOS`) with helper `run_synthetic_eval(runner)`; pass a stubbed runner in tests to avoid network/tool calls.
@@ -40,5 +42,9 @@ Source of truth for how agents should reason through a matter. Each tool should 
 - Keepalive: streaming emits periodic `keepalive` events to keep proxies from timing out during long searches.
 
 ## Drafting agent intake (schema-first)
-- Endpoint `/draft` (stub) accepts: `doc_type`, `objective`, `audience`, `tone`, `language`, `context`, `facts[]`, `requirements[{label,value}]`, `research_trace_id?`, `research_summary?`, `constraints[]`.
-- Output (stub): `draft` (text) + `sections[]`, `assumptions`, `open_questions`, `risks`. This schema should drive the future drafting UI (doc type selector, requirements list, research trace picker).
+- Endpoint `/draft` accepts: `doc_type`, `objective`, `audience`, `tone`, `language`, `context`, `facts[]`, `requirements[{label,value}]`, `research_trace_id?`, `research_summary?`, `constraints[]`.
+- Output: `draft` (text) + `sections[]`, `assumptions`, `open_questions`, `risks`. This schema drives the drafting UI (doc type selector, requirements list, research trace picker).
+
+## Review agent intake (schema-first)
+- Endpoint `/review` accepts: `doc_type`, `objective`, `audience`, `guidelines`, `jurisdiction`, `constraints[]`, `text`, `sections[{title,content}]`, `research_trace_id?`, `research_summary?`.
+- Output: `structural_findings[]` (severity/location), `issues[]` (categorized, severity, location, priority), `suggestions[]` (redline-style), `qa_notes[]`, `residual_risks[]`, `summary`, `conflict_check`, `trace_id/status`. Streaming + persistence mirror the research/draft flows.

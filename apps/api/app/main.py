@@ -11,11 +11,13 @@ from app.infrastructure.db import (
     refresh_token_repository,
     research_repository,
     draft_repository,
+    review_repository,
 )
 from app.interfaces.api.routers import (
     auth,
     drafting,
     qa,
+    review,
     research,
     search,
     upload,
@@ -32,6 +34,7 @@ async def lifespan(_: FastAPI):
     refresh_token_repository.ensure_table()
     research_repository.ensure_table()
     draft_repository.ensure_table()
+    review_repository.ensure_table()
     try:
         yield
     finally:
@@ -59,6 +62,7 @@ app.include_router(search.router)
 app.include_router(qa.router)
 app.include_router(research.router)
 app.include_router(drafting.router)
+app.include_router(review.router)
 app.include_router(auth.router)
 app.include_router(upload.router)
 app.include_router(summary.router)

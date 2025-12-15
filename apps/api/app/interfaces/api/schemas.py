@@ -254,17 +254,47 @@ class DraftRequirement(BaseModel):
 
 
 class DraftRequest(BaseModel):
-    doc_type: str = Field(..., min_length=3, max_length=64, description="Tipo de documento: carta, contrato, demanda, memo.")
-    objective: Optional[str] = Field(default=None, max_length=4000, description="Propósito del documento.")
-    audience: Optional[str] = Field(default=None, max_length=200, description="Destinatario principal.")
-    tone: Optional[str] = Field(default=None, max_length=100, description="Tono deseado (formal, directo, etc).")
+    doc_type: str = Field(
+        ...,
+        min_length=3,
+        max_length=64,
+        description="Tipo de documento: carta, contrato, demanda, memo.",
+    )
+    objective: Optional[str] = Field(
+        default=None, max_length=4000, description="Propósito del documento."
+    )
+    audience: Optional[str] = Field(
+        default=None, max_length=200, description="Destinatario principal."
+    )
+    tone: Optional[str] = Field(
+        default=None, max_length=100, description="Tono deseado (formal, directo, etc)."
+    )
     language: Optional[str] = Field(default="es", max_length=5)
-    context: Optional[str] = Field(default=None, max_length=6000, description="Hechos clave o instrucciones.")
-    facts: List[str] = Field(default_factory=list, description="Lista de hechos relevantes.")
-    requirements: List[DraftRequirement] = Field(default_factory=list, description="Requisitos específicos o cláusulas obligatorias.")
-    research_trace_id: Optional[str] = Field(default=None, min_length=8, max_length=64, description="Trace previo de investigación.")
-    research_summary: Optional[str] = Field(default=None, max_length=4000, description="Resumen breve de investigación/estrategia.")
-    constraints: List[str] = Field(default_factory=list, description="Límites: jurisdicción, extensión máxima, exclusiones.")
+    context: Optional[str] = Field(
+        default=None, max_length=6000, description="Hechos clave o instrucciones."
+    )
+    facts: List[str] = Field(
+        default_factory=list, description="Lista de hechos relevantes."
+    )
+    requirements: List[DraftRequirement] = Field(
+        default_factory=list,
+        description="Requisitos específicos o cláusulas obligatorias.",
+    )
+    research_trace_id: Optional[str] = Field(
+        default=None,
+        min_length=8,
+        max_length=64,
+        description="Trace previo de investigación.",
+    )
+    research_summary: Optional[str] = Field(
+        default=None,
+        max_length=4000,
+        description="Resumen breve de investigación/estrategia.",
+    )
+    constraints: List[str] = Field(
+        default_factory=list,
+        description="Límites: jurisdicción, extensión máxima, exclusiones.",
+    )
 
 
 class DraftSection(BaseModel):
@@ -281,6 +311,65 @@ class DraftResponse(BaseModel):
     assumptions: List[str] = Field(default_factory=list)
     open_questions: List[str] = Field(default_factory=list)
     risks: List[str] = Field(default_factory=list)
+    errors: Optional[List[str]] = None
+
+
+# -------- Review --------
+
+
+class ReviewSection(BaseModel):
+    title: Optional[str] = None
+    content: Optional[str] = None
+
+
+class ReviewFinding(BaseModel):
+    section: Optional[str] = None
+    location: Optional[str] = None
+    issue: str
+    severity: str
+
+
+class ReviewIssue(BaseModel):
+    category: str
+    description: str
+    severity: str
+    section: Optional[str] = None
+    location: Optional[str] = None
+    priority: Optional[str] = None
+
+
+class ReviewSuggestion(BaseModel):
+    section: Optional[str] = None
+    location: Optional[str] = None
+    suggestion: str
+    rationale: Optional[str] = None
+
+
+class ReviewRequest(BaseModel):
+    doc_type: str = Field(..., min_length=3, max_length=64)
+    objective: Optional[str] = Field(default=None, max_length=4000)
+    audience: Optional[str] = Field(default=None, max_length=400)
+    guidelines: Optional[str] = Field(default=None, max_length=4000)
+    jurisdiction: Optional[str] = Field(default=None, max_length=200)
+    constraints: List[str] = Field(default_factory=list)
+    text: Optional[str] = Field(default=None, max_length=12000)
+    sections: List[ReviewSection] = Field(default_factory=list)
+    research_trace_id: Optional[str] = Field(default=None, min_length=8, max_length=64)
+    research_summary: Optional[str] = Field(default=None, max_length=4000)
+
+
+class ReviewResponse(BaseModel):
+    trace_id: str
+    status: str
+    doc_type: str
+    structural_findings: List[ReviewFinding] = Field(default_factory=list)
+    issues: List[ReviewIssue] = Field(default_factory=list)
+    suggestions: List[ReviewSuggestion] = Field(default_factory=list)
+    qa_notes: List[str] = Field(default_factory=list)
+    residual_risks: List[str] = Field(default_factory=list)
+    summary: Optional[Dict[str, Any]] = None
+    conflict_check: Optional[Dict[str, Any]] = None
+    errors: Optional[List[str]] = None
 
 
 # DB-facing schemas for type safety when returning raw records.

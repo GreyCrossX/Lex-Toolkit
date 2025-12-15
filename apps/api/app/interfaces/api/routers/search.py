@@ -10,6 +10,11 @@ from app.interfaces.api.schemas import SearchRequest, SearchResponse, UserPublic
 router = APIRouter()
 
 
+@router.get("/search/health")
+def search_health() -> dict:
+    return {"status": "ok", "service": "search"}
+
+
 @router.post("/search", response_model=SearchResponse)
 def search(
     req: SearchRequest,

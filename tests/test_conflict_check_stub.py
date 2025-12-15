@@ -26,7 +26,11 @@ class StubWebTool:
 
     def invoke(self, payload):
         self.calls.append(payload)
-        return {"links": ["http://example.com/opposing-party"]} if payload.get("query") else {}
+        return (
+            {"links": ["http://example.com/opposing-party"]}
+            if payload.get("query")
+            else {}
+        )
 
 
 def test_conflict_check_blocks_on_vector_hit(monkeypatch):

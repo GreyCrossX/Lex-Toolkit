@@ -25,7 +25,7 @@ import {
   X,
 } from "lucide-react";
 import { useBackendHealth } from "@/hooks/use-backend-health";
-import { useServiceHealth } from "@/hooks/use-service-health";
+import { useServiceHealth, type HealthStatus } from "@/hooks/use-service-health";
 import { useCustomerContext } from "@/hooks/use-customer-context";
 import { API_BASE_URL } from "@/lib/config";
 import { clearAccessToken, getAccessToken } from "@/lib/auth";
@@ -33,7 +33,8 @@ import { authFetch } from "@/lib/auth-fetch";
 import { apiLogout } from "@/lib/auth-client";
 import { TOOLS, type Tool } from "@/lib/tools";
 import { getResearchRun, runResearch, streamResearch, type ResearchEvent, type ResearchRunResponse } from "@/lib/research-client";
-import { getDraft, runDraft, type DraftRequest, type DraftResponse } from "@/lib/drafting-client";
+import { getDraft, runDraft, streamDraft, type DraftEvent, type DraftRequest, type DraftResponse } from "@/lib/drafting-client";
+import { getReview, runReview, streamReview, type ReviewEvent, type ReviewRequest, type ReviewResponse } from "@/lib/review-client";
 
 type ChatMessage = {
   id: string;
@@ -107,6 +108,11 @@ const docTypeLabel = (value: string) =>
 export default function DashboardPage() {
   const health = useBackendHealth();
   const summaryHealth = useServiceHealth("/summary/health", 30000);
+  const researchHealth = useServiceHealth("/research/health", 30000);
+  const draftingHealth = useServiceHealth("/draft/health", 30000);
+  const reviewHealth = useServiceHealth("/review/health", 30000);
+  const searchHealth = useServiceHealth("/search/health", 30000);
+  const uploadHealth = useServiceHealth("/upload/health", 30000);
   const { user, firmId, loading: userLoading, error: userError } = useCustomerContext();
   const [selectedTool, setSelectedTool] = useState<Tool>(TOOLS.find((t) => t.id === "qa") || TOOLS[0]);
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -154,6 +160,33 @@ export default function DashboardPage() {
   const [draftingTraceInput, setDraftingTraceInput] = useState("");
   const [draftingLoading, setDraftingLoading] = useState(false);
   const [draftingError, setDraftingError] = useState<string | null>(null);
+  const [draftingEvents, setDraftingEvents] = useState<DraftEvent[]>([]);
+  const draftingStreamCancelRef = useRef<null | (() => void)>(null);
+  const [reviewInput, setReviewInput] = useState<ReviewRequest>({
+    doc_type: "contrato",
+    constraints: [],
+    text: "",
+    sections: [],
+  });
+  const [reviewText, setReviewText] = useState("");
+  const [reviewConstraintsText, setReviewConstraintsText] = useState("");
+  const parseSectionsText = (value: string) =>
+    value
+      .split(/\n/)
+      .map((line) => line.trim())
+      .filter(Boolean)
+      .map((line) => {
+        const [title, ...rest] = line.split(":");
+        return { title: title?.trim(), content: rest.join(":").trim() };
+      })
+      .filter((s) => s.title || s.content);
+  const [reviewSectionsText, setReviewSectionsText] = useState("");
+  const [reviewResult, setReviewResult] = useState<ReviewResponse | null>(null);
+  const [reviewTraceInput, setReviewTraceInput] = useState("");
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewError, setReviewError] = useState<string | null>(null);
+  const [reviewEvents, setReviewEvents] = useState<ReviewEvent[]>([]);
+  const reviewStreamCancelRef = useRef<null | (() => void)>(null);
   const lastResearchMessageTraceRef = useRef<string | null>(null);
   const uploadInputRef = useRef<HTMLInputElement | null>(null);
   const activeUploadJobId = useRef<string | null>(null);
@@ -166,6 +199,15 @@ export default function DashboardPage() {
 
   const readyTools = useMemo(() => TOOLS.filter((t) => t.status === "ready"), []);
   const syncSessionToken = () => setSessionToken(getAccessToken());
+  const toolHealth = (toolId: string): HealthStatus => {
+    if (toolId === "summary") return summaryHealth.status;
+    if (toolId === "research") return researchHealth.status;
+    if (toolId === "drafting") return draftingHealth.status;
+    if (toolId === "review") return reviewHealth.status;
+    if (toolId === "qa" || toolId === "search") return searchHealth.status;
+    if (toolId === "upload") return uploadHealth.status;
+    return "offline"; // default to offline when no healthcheck is wired
+  };
 
   useEffect(() => {
     const el = chatBottomRef.current;
@@ -357,6 +399,11 @@ export default function DashboardPage() {
   const runDraftFlow = async () => {
     setDraftingLoading(true);
     setDraftingError(null);
+    setDraftingEvents([]);
+    if (draftingStreamCancelRef.current) {
+      draftingStreamCancelRef.current();
+      draftingStreamCancelRef.current = null;
+    }
     try {
       const facts = formatList(draftingFactsText);
       const constraints = formatList(draftingConstraintsText);
@@ -368,14 +415,53 @@ export default function DashboardPage() {
         requirements,
       };
       setDraftingInput(payload);
-      const res = await runDraft(payload);
-      setDraftingResult(res);
-      setDraftingTraceInput(res.trace_id);
-      toast.success("Redacción lista", { description: res.trace_id });
+      const streamer = streamDraft(payload, {
+        onEvent: (evt) => {
+          setDraftingEvents((prev) => [...prev, evt]);
+          if (evt.type === "start") {
+            setDraftingTraceInput(evt.trace_id);
+          } else if (evt.type === "update" && evt.data) {
+            setDraftingResult((prev) => ({
+              ...(prev || {
+                trace_id: evt.trace_id,
+                status: evt.status || "running",
+                doc_type: payload.doc_type,
+                draft: "",
+                sections: [],
+                assumptions: [],
+                open_questions: [],
+                risks: [],
+              }),
+              ...evt.data,
+              status: evt.status || evt.data.status || prev?.status || "running",
+            }));
+          } else if (evt.type === "done") {
+            setDraftingResult(evt);
+            toast.success("Redacción lista", { description: evt.trace_id });
+          } else if (evt.type === "error") {
+            setDraftingError(evt.error);
+            toast.error("No se pudo completar la redacción", { description: evt.error });
+          }
+        },
+        onError: (err) => {
+          setDraftingError(err.message);
+        },
+      });
+      draftingStreamCancelRef.current = () => streamer.cancel();
+      await streamer.start();
+      syncSessionToken();
     } catch (error) {
       const msg = error instanceof Error ? error.message : "Error desconocido";
-      setDraftingError(msg);
-      toast.error("No se pudo generar la redacción", { description: msg });
+      // Fallback to non-stream run.
+      try {
+        const res = await runDraft({ ...draftingInput, facts: formatList(draftingFactsText), constraints: formatList(draftingConstraintsText), requirements: parseRequirementsText(draftingRequirementsText) });
+        setDraftingResult(res);
+        setDraftingTraceInput(res.trace_id);
+        toast.info("Streaming no disponible, se usó ejecución directa", { description: res.trace_id });
+      } catch (fallbackErr) {
+        setDraftingError(msg);
+        toast.error("No se pudo generar la redacción", { description: msg });
+      }
     } finally {
       setDraftingLoading(false);
     }
@@ -398,6 +484,93 @@ export default function DashboardPage() {
       toast.error("No se pudo recuperar el borrador", { description: msg });
     } finally {
       setDraftingLoading(false);
+    }
+  };
+
+  const runReviewFlow = async () => {
+    setReviewLoading(true);
+    setReviewError(null);
+    setReviewEvents([]);
+    if (reviewStreamCancelRef.current) {
+      reviewStreamCancelRef.current();
+      reviewStreamCancelRef.current = null;
+    }
+    try {
+      const constraints = formatList(reviewConstraintsText);
+      const sections = parseSectionsText(reviewSectionsText);
+      const payload: ReviewRequest = {
+        ...reviewInput,
+        text: reviewText,
+        constraints,
+        sections,
+      };
+      setReviewInput(payload);
+      const streamer = streamReview(payload, {
+        onEvent: (evt) => {
+          setReviewEvents((prev) => [...prev, evt]);
+          if (evt.type === "start") {
+            setReviewTraceInput(evt.trace_id);
+          } else if (evt.type === "update" && evt.data) {
+            setReviewResult((prev) => ({
+              ...(prev || {
+                trace_id: evt.trace_id,
+                status: evt.status || "running",
+                doc_type: payload.doc_type,
+                structural_findings: [],
+                issues: [],
+                suggestions: [],
+                qa_notes: [],
+                residual_risks: [],
+              }),
+              ...evt.data,
+              status: evt.status || evt.data.status || prev?.status || "running",
+            }));
+          } else if (evt.type === "done") {
+            setReviewResult(evt);
+            toast.success("Revisión lista", { description: evt.trace_id });
+          } else if (evt.type === "error") {
+            setReviewError(evt.error);
+            toast.error("No se pudo completar la revisión", { description: evt.error });
+          }
+        },
+        onError: (err) => setReviewError(err.message),
+      });
+      reviewStreamCancelRef.current = () => streamer.cancel();
+      await streamer.start();
+      syncSessionToken();
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Error desconocido";
+      try {
+        const res = await runReview({ ...reviewInput, text: reviewText, constraints: formatList(reviewConstraintsText) });
+        setReviewResult(res);
+        setReviewTraceInput(res.trace_id);
+        toast.info("Streaming no disponible, se usó ejecución directa", { description: res.trace_id });
+      } catch (fallbackErr) {
+        setReviewError(msg);
+        toast.error("No se pudo generar la revisión", { description: msg });
+      }
+    } finally {
+      setReviewLoading(false);
+    }
+  };
+
+  const resumeReviewByTrace = async () => {
+    const traceId = reviewTraceInput.trim();
+    if (!traceId) {
+      toast.info("Ingresa un trace_id para recuperar una revisión.");
+      return;
+    }
+    setReviewLoading(true);
+    try {
+      const res = await getReview(traceId);
+      setReviewResult(res);
+      toast.success("Revisión recuperada", { description: traceId });
+    } catch (error) {
+      const msg = error instanceof Error ? error.message : "Error desconocido";
+      setReviewError(msg);
+      toast.error("No se pudo recuperar la revisión", { description: msg });
+    } finally {
+      setReviewLoading(false);
     }
   };
 
@@ -1188,17 +1361,22 @@ export default function DashboardPage() {
                 }`}
               >
                 <span>{tool.name}</span>
-                {tool.id === "summary" && (
-                  <span
-                    className={`h-2 w-2 rounded-full ${
-                      summaryHealth.status === "online"
-                        ? "bg-emerald-400"
-                        : summaryHealth.status === "checking"
-                          ? "bg-amber-300"
-                          : "bg-red-400"
-                    }`}
-                  />
-                )}
+                <span
+                  className={`h-2 w-2 rounded-full ${
+                    toolHealth(tool.id) === "online"
+                      ? "bg-emerald-400"
+                      : toolHealth(tool.id) === "checking"
+                        ? "bg-amber-300"
+                        : "bg-red-400"
+                  }`}
+                  title={
+                    toolHealth(tool.id) === "online"
+                      ? "Salud OK"
+                      : toolHealth(tool.id) === "checking"
+                        ? "Verificando"
+                        : "Sin healthcheck"
+                  }
+                />
               </button>
             ))}
           </div>
@@ -1583,6 +1761,9 @@ export default function DashboardPage() {
               {draftingError && (
                 <p className="mt-2 text-xs text-danger">Error: {draftingError}</p>
               )}
+              {draftingEvents.length > 0 && (
+                <p className="mt-1 text-[11px] text-muted">Eventos recibidos: {draftingEvents.length}</p>
+              )}
 
               <div className="mt-3 flex flex-wrap items-center gap-2">
                 <button
@@ -1660,6 +1841,269 @@ export default function DashboardPage() {
                           <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-foreground">
                             {draftingResult.open_questions.map((q, idx) => (
                               <li key={`oq-${idx}`}>{q}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          ) : selectedTool.id === "review" ? (
+            <div className="sticky bottom-2 mt-3 rounded-2xl border border-border/60 bg-card/90 p-4 shadow-lg text-sm text-foreground">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-[11px] uppercase tracking-wide text-muted">Revisión / Crítica</p>
+                  <p className="text-muted text-xs">Ingresa el texto y contexto para auditar el documento.</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setReviewResult(null);
+                    setReviewTraceInput("");
+                    setReviewError(null);
+                  }}
+                  className="text-xs text-muted underline"
+                >
+                  Limpiar
+                </button>
+              </div>
+
+              <div className="mt-3 grid gap-3 md:grid-cols-2">
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Tipo de documento</span>
+                  <input
+                    value={reviewInput.doc_type}
+                    onChange={(e) => setReviewInput((p) => ({ ...p, doc_type: e.target.value }))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="contrato, memo, escrito"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Objetivo</span>
+                  <input
+                    value={reviewInput.objective ?? ""}
+                    onChange={(e) => setReviewInput((p) => ({ ...p, objective: e.target.value }))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Detectar riesgos, mejorar claridad"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Audiencia</span>
+                  <input
+                    value={reviewInput.audience ?? ""}
+                    onChange={(e) => setReviewInput((p) => ({ ...p, audience: e.target.value }))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Cliente, juez"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Jurisdicción</span>
+                  <input
+                    value={reviewInput.jurisdiction ?? ""}
+                    onChange={(e) => setReviewInput((p) => ({ ...p, jurisdiction: e.target.value }))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="mx, us, cdmx"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 md:col-span-2">
+                  <span className="text-xs text-muted">Guías / estilo</span>
+                  <textarea
+                    value={reviewInput.guidelines ?? ""}
+                    onChange={(e) => setReviewInput((p) => ({ ...p, guidelines: e.target.value }))}
+                    rows={2}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Instrucciones del cliente, estilo, políticas."
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Restricciones (coma o nueva línea)</span>
+                  <textarea
+                    value={reviewConstraintsText}
+                    onChange={(e) => setReviewConstraintsText(e.target.value)}
+                    rows={3}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="No remover cláusulas; Sólo sugerir"
+                  />
+                </label>
+                <label className="flex flex-col gap-1 md:col-span-2">
+                  <span className="text-xs text-muted">Texto a revisar</span>
+                  <textarea
+                    value={reviewText}
+                    onChange={(e) => setReviewText(e.target.value)}
+                    rows={6}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Pega el texto del documento."
+                  />
+                </label>
+                <label className="flex flex-col gap-1 md:col-span-2">
+                  <span className="text-xs text-muted">Secciones (opcional, formato Título: Contenido por línea)</span>
+                  <textarea
+                    value={reviewSectionsText}
+                    onChange={(e) => setReviewSectionsText(e.target.value)}
+                    rows={3}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Definiciones: ...&#10;Obligaciones: ...&#10;Terminación: ..."
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Trace de investigación (opcional)</span>
+                  <input
+                    value={reviewInput.research_trace_id ?? ""}
+                    onChange={(e) => setReviewInput((p) => ({ ...p, research_trace_id: e.target.value }))}
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="trace_id"
+                  />
+                </label>
+                <label className="flex flex-col gap-1">
+                  <span className="text-xs text-muted">Resumen de investigación (opcional)</span>
+                  <textarea
+                    value={reviewInput.research_summary ?? ""}
+                    onChange={(e) => setReviewInput((p) => ({ ...p, research_summary: e.target.value }))}
+                    rows={3}
+                    className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                    placeholder="Pega hallazgos para guiar la revisión."
+                  />
+                </label>
+              </div>
+
+              {reviewError && <p className="mt-2 text-xs text-danger">Error: {reviewError}</p>}
+              {reviewEvents.length > 0 && (
+                <p className="mt-1 text-[11px] text-muted">Eventos recibidos: {reviewEvents.length}</p>
+              )}
+
+              <div className="mt-3 flex flex-wrap items-center gap-2">
+                <button
+                  type="button"
+                  onClick={runReviewFlow}
+                  disabled={reviewLoading}
+                  className="inline-flex items-center gap-2 rounded-xl bg-accent px-4 py-2 text-sm font-semibold text-contrast transition hover:bg-accent-strong disabled:opacity-70"
+                >
+                  {reviewLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : <Wand2 className="h-4 w-4" />}
+                  Revisar
+                </button>
+                <div className="flex items-center gap-2">
+                  <input
+                    value={reviewTraceInput}
+                    onChange={(e) => setReviewTraceInput(e.target.value)}
+                    placeholder="trace_id para reanudar"
+                    className="rounded-lg border border-border bg-background px-3 py-2 text-sm text-foreground outline-none transition focus:border-accent"
+                  />
+                  <button
+                    type="button"
+                    onClick={resumeReviewByTrace}
+                    disabled={reviewLoading}
+                    className="rounded-lg border border-border px-3 py-2 text-xs text-muted transition hover:border-accent hover:text-accent"
+                  >
+                    Recuperar
+                  </button>
+                </div>
+              </div>
+
+              {reviewResult && (
+                <div className="mt-4 space-y-3 rounded-2xl border border-border/60 bg-background/70 p-3 text-sm">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] uppercase tracking-wide text-muted">Trace</p>
+                      <p className="font-mono text-xs text-foreground">{reviewResult.trace_id}</p>
+                    </div>
+                    <span className="rounded-full border border-border/60 bg-background/60 px-3 py-1 text-[11px] text-muted">
+                      {reviewResult.status}
+                    </span>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-muted">Resumen</p>
+                    <p className="text-sm text-foreground">
+                      {(reviewResult.summary as { summary?: string })?.summary ?? "—"}
+                    </p>
+                  </div>
+                  {reviewResult.conflict_check && (
+                    <div className="rounded-lg border border-border/60 bg-background/70 p-2 text-xs">
+                      <p className="text-[11px] uppercase tracking-wide text-muted">Conflicto</p>
+                      <p className={reviewResult.conflict_check.conflict_found ? "text-danger" : "text-foreground"}>
+                        {reviewResult.conflict_check.conflict_found
+                          ? reviewResult.conflict_check.reason || "Conflicto detectado."
+                          : reviewResult.conflict_check.reason || "Sin conflicto."}
+                      </p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-muted">
+                      Hallazgos estructurales ({reviewResult.structural_findings.length})
+                    </p>
+                    <div className="mt-1 space-y-1">
+                      {reviewResult.structural_findings.map((f, idx) => (
+                        <div key={`sf-${idx}`} className="rounded-lg border border-border/60 bg-card/80 p-2">
+                          <p className="text-sm text-foreground">
+                            {f.section ? `${f.section}: ` : ""}{f.issue}
+                          </p>
+                          <p className="text-[11px] text-muted">
+                            Severidad: {f.severity}
+                            {f.location ? ` · Ubicación: ${f.location}` : ""}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-muted">Issues ({reviewResult.issues.length})</p>
+                    <div className="mt-1 space-y-1">
+                      {reviewResult.issues.map((iss, idx) => (
+                        <div key={`iss-${idx}`} className="rounded-lg border border-border/60 bg-card/80 p-2">
+                          <p className="text-sm font-semibold text-foreground">
+                            {iss.category} · {iss.severity} {iss.priority ? `· ${iss.priority}` : ""}
+                          </p>
+                          <p className="text-sm text-muted">{iss.description}</p>
+                          <p className="text-[11px] text-muted">
+                            {iss.section ? `Sección: ${iss.section}` : ""}
+                            {iss.location ? ` · Ubicación: ${iss.location}` : ""}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[11px] uppercase tracking-wide text-muted">
+                      Sugerencias ({reviewResult.suggestions.length})
+                    </p>
+                    <div className="mt-1 space-y-1">
+                      {reviewResult.suggestions.map((sugg, idx) => (
+                        <div key={`sugg-${idx}`} className="rounded-lg border border-border/60 bg-card/80 p-2">
+                          <p className="text-sm font-semibold text-foreground">
+                            {sugg.section || "General"}
+                          </p>
+                          <p className="text-sm text-foreground">{sugg.suggestion}</p>
+                          <p className="text-[11px] text-muted">
+                            {sugg.rationale ? `Por qué: ${sugg.rationale}` : ""}
+                            {sugg.location ? ` · Ubicación: ${sugg.location}` : ""}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  {(reviewResult.qa_notes.length > 0 || reviewResult.residual_risks.length > 0) && (
+                    <div className="grid gap-2 md:grid-cols-2">
+                      <div className="rounded-lg border border-border/60 bg-background/80 p-2">
+                        <p className="text-[11px] uppercase tracking-wide text-muted">QA</p>
+                        {reviewResult.qa_notes.length === 0 ? (
+                          <p className="text-sm text-muted">Sin notas.</p>
+                        ) : (
+                          <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-foreground">
+                            {reviewResult.qa_notes.map((n, idx) => (
+                              <li key={`qa-${idx}`}>{n}</li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      <div className="rounded-lg border border-border/60 bg-background/80 p-2">
+                        <p className="text-[11px] uppercase tracking-wide text-muted">Riesgos residuales</p>
+                        {reviewResult.residual_risks.length === 0 ? (
+                          <p className="text-sm text-muted">Sin riesgos declarados.</p>
+                        ) : (
+                          <ul className="mt-1 list-disc space-y-1 pl-4 text-sm text-foreground">
+                            {reviewResult.residual_risks.map((r, idx) => (
+                              <li key={`risk-res-${idx}`}>{r}</li>
                             ))}
                           </ul>
                         )}

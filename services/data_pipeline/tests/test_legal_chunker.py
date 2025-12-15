@@ -2,7 +2,10 @@ import unittest
 
 import tiktoken
 
-from services.data_pipeline.legal_chunker import chunk_text_by_tokens, split_article_into_units
+from services.data_pipeline.legal_chunker import (
+    chunk_text_by_tokens,
+    split_article_into_units,
+)
 
 
 class DummyArt:

@@ -36,15 +36,47 @@ class ResearchStatus:
 
 # Node metadata to align tools to phases of the canonical workflow.
 NODE_METADATA: Dict[str, Dict[str, Any]] = {
-    "normalize_intake": {"phase": "intake", "role": "gatekeeper", "outputs": ["intake"]},
-    "classify_matter": {"phase": "diagnostics", "role": "gatekeeper", "outputs": ["qualification"]},
-    "jurisdiction_and_area_classifier": {"phase": "diagnostics", "role": "gatekeeper", "outputs": ["jurisdiction_hypotheses", "chosen_jurisdictions", "area_of_law"]},
-    "fact_extractor": {"phase": "facts", "role": "discovery", "outputs": ["facts", "parties"]},
-    "conflict_check": {"phase": "conflict_check", "role": "ethics", "outputs": ["conflict_check"]},
+    "normalize_intake": {
+        "phase": "intake",
+        "role": "gatekeeper",
+        "outputs": ["intake"],
+    },
+    "classify_matter": {
+        "phase": "diagnostics",
+        "role": "gatekeeper",
+        "outputs": ["qualification"],
+    },
+    "jurisdiction_and_area_classifier": {
+        "phase": "diagnostics",
+        "role": "gatekeeper",
+        "outputs": ["jurisdiction_hypotheses", "chosen_jurisdictions", "area_of_law"],
+    },
+    "fact_extractor": {
+        "phase": "facts",
+        "role": "discovery",
+        "outputs": ["facts", "parties"],
+    },
+    "conflict_check": {
+        "phase": "conflict_check",
+        "role": "ethics",
+        "outputs": ["conflict_check"],
+    },
     "issue_generator": {"phase": "issues", "role": "brain", "outputs": ["issues"]},
-    "research_plan_builder": {"phase": "plan", "role": "strategy", "outputs": ["research_plan"]},
-    "run_next_search_step": {"phase": "research", "role": "research", "outputs": ["queries", "research_plan"]},
-    "synthesize_briefing": {"phase": "briefing", "role": "analysis", "outputs": ["briefing"]},
+    "research_plan_builder": {
+        "phase": "plan",
+        "role": "strategy",
+        "outputs": ["research_plan"],
+    },
+    "run_next_search_step": {
+        "phase": "research",
+        "role": "research",
+        "outputs": ["queries", "research_plan"],
+    },
+    "synthesize_briefing": {
+        "phase": "briefing",
+        "role": "analysis",
+        "outputs": ["briefing"],
+    },
 }
 
 # Tool-to-workflow map (intake -> process -> output) to keep tools aligned.
@@ -392,7 +424,7 @@ ISSUE_FEWSHOTS = [
 PLAN_FEWSHOTS = [
     (
         "human",
-        "Issues: [{\"id\":\"I1\",\"question\":\"¿Despido discriminatorio por embarazo?\",\"priority\":\"high\",\"area\":\"laboral\",\"status\":\"pending\"}]",
+        'Issues: [{"id":"I1","question":"¿Despido discriminatorio por embarazo?","priority":"high","area":"laboral","status":"pending"}]',
     ),
     (
         "ai",
@@ -400,7 +432,7 @@ PLAN_FEWSHOTS = [
     ),
     (
         "human",
-        "Issues: [{\"id\":\"I2\",\"question\":\"¿Procede registro de marca en MX y EUA?\",\"priority\":\"medium\",\"area\":\"propiedad intelectual\",\"status\":\"pending\"}]",
+        'Issues: [{"id":"I2","question":"¿Procede registro de marca en MX y EUA?","priority":"medium","area":"propiedad intelectual","status":"pending"}]',
     ),
     (
         "ai",
@@ -515,6 +547,7 @@ def classify_matter(state: ResearchState) -> ResearchState:
             ("user", "{text}"),
         ]
     )
+
     def fallback(exc: Exception) -> Dict[str, Any]:
         return QualificationModel(
             is_legal_matter=True,
@@ -522,6 +555,7 @@ def classify_matter(state: ResearchState) -> ResearchState:
             recommended_path="legal_action",
             rationale=f"fallback: {exc}",
         ).dict()
+
     data = _structured_call(
         prompt,
         QualificationModel,
@@ -557,18 +591,26 @@ def jurisdiction_and_area_classifier(state: ResearchState) -> ResearchState:
             ("user", "{text}"),
         ]
     )
+
     def fallback(exc: Exception) -> Dict[str, Any]:
         return JurisdictionAreaModel(
             jurisdiction_hypotheses=[
                 JurisdictionHypothesisModel(
-                    level="federal", label="federal - MX", confidence=0.5, basis=str(exc)
+                    level="federal",
+                    label="federal - MX",
+                    confidence=0.5,
+                    basis=str(exc),
                 )
             ],
             chosen_jurisdictions=["federal"],
             area_of_law=AreaOfLawModel(
-                primary="desconocido", secondary=[], confidence=0.5, rationale="fallback"
+                primary="desconocido",
+                secondary=[],
+                confidence=0.5,
+                rationale="fallback",
             ),
         ).dict()
+
     data = _structured_call(
         prompt,
         JurisdictionAreaModel,
@@ -627,14 +669,23 @@ def fact_extractor(state: ResearchState) -> ResearchState:
 
 def conflict_check(state: ResearchState) -> ResearchState:
     parties = state.get("parties", []) or []
-    opposing = [p for p in parties if (p.get("role") or "").lower() not in {"client", "self", "unknown"}]
+    opposing = [
+        p
+        for p in parties
+        if (p.get("role") or "").lower() not in {"client", "self", "unknown"}
+    ]
     opposing_names = [p.get("name") for p in opposing if p.get("name")]
     has_conflict = False
     conflict_hits: List[Dict[str, Any]] = []
 
     def _search_vector(name: str) -> bool:
         payload = pgvector_inspector_tool.invoke(
-            {"query": name, "top_k": CONFLICT_RESULTS_LIMIT, "jurisdictions": None, "firm_id": state.get("firm_id")}
+            {
+                "query": name,
+                "top_k": CONFLICT_RESULTS_LIMIT,
+                "jurisdictions": None,
+                "firm_id": state.get("firm_id"),
+            }
         )
         results = payload.get("results", []) if isinstance(payload, dict) else []
         for hit in results:
@@ -654,7 +705,9 @@ def conflict_check(state: ResearchState) -> ResearchState:
     def _search_web(name: str) -> None:
         payload = web_browser_tool.invoke({"query": name, "max_results": 1})
         if isinstance(payload, dict) and payload.get("links"):
-            conflict_hits.append({"name": name, "source": "web", "links": payload.get("links")})
+            conflict_hits.append(
+                {"name": name, "source": "web", "links": payload.get("links")}
+            )
 
     for name in opposing_names:
         try:
@@ -663,7 +716,9 @@ def conflict_check(state: ResearchState) -> ResearchState:
                 has_conflict = True
             _search_web(name)
         except Exception as exc:  # pragma: no cover - best-effort lookup
-            logger.warning("conflict_check_lookup_failed", extra={"name": name, "error": str(exc)})
+            logger.warning(
+                "conflict_check_lookup_failed", extra={"name": name, "error": str(exc)}
+            )
 
     logger.info(
         "conflict_check.results",
@@ -682,7 +737,9 @@ def conflict_check(state: ResearchState) -> ResearchState:
         "conflict_check": {
             "opposing_parties": opposing_names,
             "conflict_found": has_conflict,
-            "reason": "Conflict hit on opposing party" if has_conflict else "No conflict detected",
+            "reason": "Conflict hit on opposing party"
+            if has_conflict
+            else "No conflict detected",
             "hits": conflict_hits,
         },
         "status": ResearchStatus.CONFLICT_CHECKED,
@@ -883,7 +940,10 @@ def synthesize_briefing(state: ResearchState) -> ResearchState:
                 "analysis (cómo se aplican las reglas a los hechos), strategy (recomendaciones claras con riesgos/lagunas), next_steps (acciones concretas). "
                 "Devuelve JSON briefing: {overview, legal_characterization, recommended_strategy, issue_answers:[{issue_id, answer, citations:[{doc_id,citation,snippet,norm_layer}]}], open_questions, intake_summary, conflict_check, strategy, next_steps}.",
             ),
-            ("user", "Partes: {parties}\nHechos: {facts}\nConflictCheck: {conflict}\nIssues: {issues}\nQueries: {queries}"),
+            (
+                "user",
+                "Partes: {parties}\nHechos: {facts}\nConflictCheck: {conflict}\nIssues: {issues}\nQueries: {queries}",
+            ),
         ]
     )
 
@@ -906,7 +966,13 @@ def synthesize_briefing(state: ResearchState) -> ResearchState:
     data = _structured_call(
         prompt,
         BriefingModel,
-        {"issues": str(issues), "queries": str(queries), "facts": str(facts), "conflict": str(conflict), "parties": str(parties)},
+        {
+            "issues": str(issues),
+            "queries": str(queries),
+            "facts": str(facts),
+            "conflict": str(conflict),
+            "parties": str(parties),
+        },
         _fallback,
         temperature=0.1,
         max_tokens=800,
@@ -975,17 +1041,30 @@ def run_synthetic_eval(
         try:
             state = runner(prompt) or {}
             area = (state.get("area_of_law") or {}).get("primary")
-            jurisdictions = state.get("chosen_jurisdictions") or state.get("jurisdiction_hypotheses") or []
+            jurisdictions = (
+                state.get("chosen_jurisdictions")
+                or state.get("jurisdiction_hypotheses")
+                or []
+            )
             passed = True
             if scenario.get("expect_area_primary") and area:
                 passed = passed and scenario["expect_area_primary"] in area.lower()
             if scenario.get("expect_jurisdiction"):
                 expected = scenario["expect_jurisdiction"]
                 if isinstance(jurisdictions, list):
-                    passed = passed and any(expected in str(j).lower() for j in jurisdictions)
+                    passed = passed and any(
+                        expected in str(j).lower() for j in jurisdictions
+                    )
                 else:
                     passed = passed and expected in str(jurisdictions).lower()
-            results.append({"prompt": prompt, "passed": bool(passed), "area": area, "jurisdictions": jurisdictions})
+            results.append(
+                {
+                    "prompt": prompt,
+                    "passed": bool(passed),
+                    "area": area,
+                    "jurisdictions": jurisdictions,
+                }
+            )
         except Exception as exc:  # pragma: no cover - harness safety
             results.append({"prompt": prompt, "passed": False, "error": str(exc)})
     return results

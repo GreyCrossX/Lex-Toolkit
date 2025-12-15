@@ -38,7 +38,9 @@ def test_jwks_route_serves_public_keys(monkeypatch):
     monkeypatch.setenv("JWT_ALGORITHM", "RS256")
     monkeypatch.delenv("JWT_SECRET", raising=False)
 
-    auth_module = importlib.reload(importlib.import_module("app.interfaces.api.routers.auth"))
+    auth_module = importlib.reload(
+        importlib.import_module("app.interfaces.api.routers.auth")
+    )
     app = fastapi.FastAPI()
     app.include_router(auth_module.router)
 

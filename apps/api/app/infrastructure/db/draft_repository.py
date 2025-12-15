@@ -60,7 +60,9 @@ def upsert_run(
         "sections": json.dumps(sections) if sections is not None else None,
         "draft": draft,
         "assumptions": json.dumps(assumptions) if assumptions is not None else None,
-        "open_questions": json.dumps(open_questions) if open_questions is not None else None,
+        "open_questions": json.dumps(open_questions)
+        if open_questions is not None
+        else None,
         "risks": json.dumps(risks) if risks is not None else None,
         "errors": json.dumps(errors) if errors is not None else None,
     }

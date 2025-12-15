@@ -15,7 +15,9 @@ from .research_graph import (
 def demo(prompt: str) -> None:
     result = demo_research_run(prompt)
     print("[research-demo] status:", result.get("status"))
-    print("[research-demo] briefing overview:", result.get("briefing", {}).get("overview"))
+    print(
+        "[research-demo] briefing overview:", result.get("briefing", {}).get("overview")
+    )
 
 
 def synthetic_eval() -> None:
@@ -32,7 +34,9 @@ def main(argv: List[str] | None = None) -> None:
     parser = argparse.ArgumentParser(description="Agent utilities")
     parser.add_argument("--demo", action="store_true", help="Run demo research flow.")
     parser.add_argument(
-        "--synthetic-eval", action="store_true", help="Run synthetic eval scenarios (offline)."
+        "--synthetic-eval",
+        action="store_true",
+        help="Run synthetic eval scenarios (offline).",
     )
     parser.add_argument("--prompt", type=str, help="Prompt for demo run.")
     args = parser.parse_args(argv)
@@ -40,7 +44,10 @@ def main(argv: List[str] | None = None) -> None:
     if args.synthetic_eval:
         synthetic_eval()
     else:
-        prompt = args.prompt or "Cliente indica despido injustificado en CDMX sin carta de terminación."
+        prompt = (
+            args.prompt
+            or "Cliente indica despido injustificado en CDMX sin carta de terminación."
+        )
         demo(prompt)
 
 

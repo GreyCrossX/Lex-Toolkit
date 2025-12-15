@@ -17,6 +17,11 @@ ALLOWED_CONTENT_TYPES = {"application/pdf", "application/octet-stream"}
 ALLOWED_DOC_TYPES = {"statute", "jurisprudence", "contract", "policy"}
 
 
+@router.get("/upload/health")
+def upload_health() -> dict:
+    return {"status": "ok", "service": "upload"}
+
+
 async def _handle_upload(doc_type: str, file: UploadFile) -> UploadResponse:
     if doc_type not in ALLOWED_DOC_TYPES:
         raise HTTPException(

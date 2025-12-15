@@ -61,11 +61,15 @@ def _reload_auth(monkeypatch, priv: str, kid: str, pub_map: dict):
 
 
 def test_rs256_rotation_keeps_old_tokens_valid(monkeypatch):
-    auth = _reload_auth(monkeypatch, OLD_PRIV, "kid-old", {"kid-old": OLD_PUB, "kid-new": NEW_PUB})
+    auth = _reload_auth(
+        monkeypatch, OLD_PRIV, "kid-old", {"kid-old": OLD_PUB, "kid-new": NEW_PUB}
+    )
     token_old = auth.create_access_token("u1", "u@example.com", "user")
     assert auth.decode_token(token_old)["sub"] == "u1"
 
-    auth = _reload_auth(monkeypatch, NEW_PRIV, "kid-new", {"kid-old": OLD_PUB, "kid-new": NEW_PUB})
+    auth = _reload_auth(
+        monkeypatch, NEW_PRIV, "kid-new", {"kid-old": OLD_PUB, "kid-new": NEW_PUB}
+    )
     token_new = auth.create_access_token("u1", "u@example.com", "user")
     assert auth.decode_token(token_new)["sub"] == "u1"
 
@@ -74,7 +78,9 @@ def test_rs256_rotation_keeps_old_tokens_valid(monkeypatch):
 
 
 def test_jwks_exposes_public_keys(monkeypatch):
-    auth = _reload_auth(monkeypatch, NEW_PRIV, "kid-new", {"kid-old": OLD_PUB, "kid-new": NEW_PUB})
+    auth = _reload_auth(
+        monkeypatch, NEW_PRIV, "kid-new", {"kid-old": OLD_PUB, "kid-new": NEW_PUB}
+    )
     jwks = auth.get_public_jwks()
     assert len(jwks) >= 2
     kids = {entry["kid"] for entry in jwks}

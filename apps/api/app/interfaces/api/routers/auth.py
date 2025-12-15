@@ -78,7 +78,8 @@ def _require_csrf(request: Request, response: Response) -> None:
         _clear_refresh_cookie(response)
         _clear_csrf_cookie(response)
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="CSRF token missing or invalid."
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="CSRF token missing or invalid.",
         )
 
 
@@ -146,7 +147,14 @@ def login(payload: UserLogin, response: Response, request: Request) -> TokenResp
     refresh_token, _ = security.create_refresh_token(user.user_id)
     _set_refresh_cookie(response, refresh_token)
     _set_csrf_cookie(response, secrets.token_urlsafe(24))
-    logger.info("Login success", extra={"user_id": user.user_id, "email": user.email, "ip": request.client.host if request.client else "unknown"})
+    logger.info(
+        "Login success",
+        extra={
+            "user_id": user.user_id,
+            "email": user.email,
+            "ip": request.client.host if request.client else "unknown",
+        },
+    )
     return TokenResponse(
         access_token=access_token, refresh_token=None, token_type="bearer"
     )
@@ -250,7 +258,11 @@ def refresh_token(
     _set_csrf_cookie(response, secrets.token_urlsafe(24))
     logger.info(
         "Refresh success",
-        extra={"user_id": user.user_id, "email": user.email, "ip": request.client.host if request.client else "unknown"},
+        extra={
+            "user_id": user.user_id,
+            "email": user.email,
+            "ip": request.client.host if request.client else "unknown",
+        },
     )
     return TokenResponse(
         access_token=access_token, refresh_token=None, token_type="bearer"

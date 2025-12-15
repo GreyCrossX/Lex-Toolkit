@@ -28,20 +28,27 @@ Next immediate actions (keep Local + Linear aligned):
 1) Summarization: define templates + implement `/summary` (single/multi) so the dashboard UI can render real summaries/citations (GRE-31/32/33/53/34).
 2) Ingestion hardening: doc_type selectors + chunking/metadata/timeouts added; extend specialized parsers per `doc_type` (jurisprudence/contract/policy) and richer metadata; keep timeouts small. Extend dashboard upload UX as needed (GRE-30/52).
 3) Docs/QA/infra: finalize API docs + test plan + smoke test, and finish env/Docker coverage to match compose (GRE-48/49/50/44/45/46/47). Keep auth key-rotation/audit follow-ups tracked in Linear.
-4) Drafting agent: ship MVP (intake → plan → draft → self-check) with schema-driven frontend/API.
+4) Review/Critique agent: ship MVP (intake → structural → detailed → prioritize → redline suggestions → QA → summary).
 
-Drafting Agent MVP checklist (intake → process → output):
-- [x] Intake schema enforced end-to-end: doc_type, objective, audience, tone, language, context, facts[], requirements[{label,value}], constraints[], research_trace_id?, research_summary? (validated in API, wired in UI form).
-- [x] Conflict check runs before drafting; blocks on hits and surfaces conflict_check in response.
-- [x] Planning: template/section planner maps doc_type + requirements/constraints to sections/clauses; flags missing info/open questions.
-- [x] Drafting: section-by-section generation honoring tone/constraints; inserts TODOs instead of fabricating when facts missing; can ground on research_trace briefing when provided.
-- [x] Self-review: checklist for completeness (all planned sections), requirement coverage, risk flags, assumptions/open_questions surfaced; status/deliverables streamed to UI.
-- [x] Streaming & traceability: `/draft/run` and `/draft/run/stream` emit start/update/done/error; traces include trace_id/user_id/firm_id; errors surface trace_id.
-- [x] Frontend: drafting tool UI captures intake fields, shows plan/sections/risks/open questions, supports resume via trace_id.
-- [x] Docs/DX: workflow documented (intake → plan → draft → review), endpoint(s) documented, and smoke/eval stub for drafting added to scripts.
+Review Agent MVP checklist (intake → process → output):
+- [ ] Intake schema enforced: doc_type, objective, audience, guidelines/style, jurisdiction, constraints, text/sections, research_trace_id?, research_summary? (API + UI).
+- [ ] Conflict check before review; surface conflict_check in response.
+- [ ] Structural review: detect missing/duplicated sections and flow issues; return structural_findings with severity.
+- [ ] Detailed review: categorize issues (accuracy/legal, clarity/style, consistency/refs/defs, formatting), with severity and location/section.
+- [ ] Prioritization: apply 80/20; ranked issue list with suggested fix approach.
+- [ ] Revision suggestions: redline-style suggestions per issue/section; use TODO when info missing; no silent edits.
+- [ ] QA pass: final checks on revised text; residual risks/assumptions noted.
+- [ ] Outputs: critique summary per category, issues with severity and fixes, redline suggestions, QA notes, residual risks, trace_id/status.
+- [ ] Streaming & traceability: `/review/run` + `/review/run/stream` emit start/update/done/error; include trace_id/user_id/firm_id; persist for resume.
+- [ ] Frontend: review form (doc_type, objective, audience, guidelines, constraints, text/sections, research trace), stream display (findings/issues/suggestions/risks), resume by trace_id, health dot.
+- [ ] Docs/DX: workflow and endpoints documented; smoke stub for review added to scripts; basic API test.
 
 Implementation route:
-- Extend API schemas (done) and add drafting graph with nodes: normalize_intake → classify_matter → fact_extractor → conflict_check → issue_generator (light) → template_selector → section_planner → draft_builder → draft_reviewer. ✅ graph stubbed.
-- Add `/draft/stream` (parallel to research stream) and persistence of drafts/runs; log with trace_id/user_id/firm_id. ✅ implemented.
-- Frontend: add Drafting form (doc_type selector, objective, audience, tone, constraints, facts list, requirements list, research_trace picker) and render plan/sections/risks in the dashboard. ✅ done.
-- Add docs entry in `docs/agent_workflow.md` and a smoke stub in `scripts/smoke_api.sh` for CI (offline-safe). ✅ done.
+- Backend: add review graph nodes (ingest → conflict_check → structural_review → detailed_review → prioritize → revision_suggestions → qa_pass → summary); schemas for ReviewRequest/ReviewResponse; endpoints `/review/run`, `/review/{trace_id}`, `/review/run/stream`; persistence table; health endpoint.
+- Frontend: add review client, form, stream/resume UI, and health wiring in sidebar.
+- DX/tests: smoke script stub hitting `/review/run`; lightweight API test with stubbed runner; update docs/agent_workflow.md.
+
+Next tasks for “Intake schema enforced”:
+1) Backend schema & endpoints: add ReviewRequest/Response models covering doc_type/objective/audience/guidelines/jurisdiction/constraints/text/sections/research_trace_id/research_summary; add `/review/run`, `/review/{trace_id}`, `/review/run/stream`, and persistence table with health probe.
+2) Review graph ingest: add review graph ingest node to normalize intake, classify, run conflict_check, and pass structured text/sections onward (structural/detailed nodes can initially be stubs).
+3) Frontend intake UI: add review client + dashboard form for all intake fields (doc_type, objective, audience, guidelines, constraints, text/sections, research trace/summary) with resume by trace_id and health indicator.

@@ -30,6 +30,11 @@ except Exception as exc:  # pragma: no cover - import safety
 router = APIRouter()
 
 
+@router.get("/research/health")
+def research_health() -> dict:
+    return {"status": "ok", "service": "research"}
+
+
 def _research_rate_limit(identifier: str, bucket: str = "research_run") -> None:
     try:
         rate_limit.enforce(
@@ -260,7 +265,9 @@ def research_run_stream(
                             "trace_id": trace_id,
                             "user_id": user.user_id,
                             "firm_id": user.firm_id,
-                            "opposing": update["conflict_check"].get("opposing_parties"),
+                            "opposing": update["conflict_check"].get(
+                                "opposing_parties"
+                            ),
                         },
                     )
 
